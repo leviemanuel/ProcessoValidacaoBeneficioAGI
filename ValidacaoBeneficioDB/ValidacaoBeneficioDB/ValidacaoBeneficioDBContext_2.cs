@@ -5,93 +5,17 @@ using System.Linq;
 
 namespace ValidacaoBeneficioDB
 {
-    public partial class ValidacaoBeneficioDBContext : DbContext
+    public partial class ValidacaoBeneficioDBContext_2 : DbContext
     {
-        public ValidacaoBeneficioDBContext() : base("name=ValidacaoBeneficioDBContext") { }
+        public ValidacaoBeneficioDBContext_2()
+            : base("name=Model1ValidacaoBeneficioDBContext_2")
+        {
+        }
 
-        public virtual DbSet<tb_cons_massiva> tb_cons_massiva { get; set; }
         public virtual DbSet<tb_cons_massiva_produtos> tb_cons_massiva_produtos { get; set; }
+        public virtual DbSet<tb_cons_massiva> tb_cons_massiva { get; set; }
         public virtual DbSet<tb_cons_massiva_simulacoes> tb_cons_massiva_simulacoes { get; set; }
         public virtual DbSet<tb_erro_param> tb_erro_param { get; set; }
-
-        public tb_cons_massiva ReservarConsulta(bool flNovos, bool flErro)
-        {
-            //Database.BeginTransaction();
-
-            //tb_cons_massiva consulta = new tb_cons_massiva();
-            //consulta.id = Guid.NewGuid();
-            //consulta.cpf = "00396804608";
-            //consulta.nome = "JOSE PAULO SUPRIANO";
-
-            //var consulta = tb_cons_massiva.Where(c=> c.cpf == "15062958865").FirstOrDefault();
-            //var consulta = tb_cons_massiva.Where(c => !c.id.HasValue).FirstOrDefault();
-            //var consulta = tb_cons_massiva.Where(c => c.erro == "Cliente novo - Não cadastrar").FirstOrDefault();
-
-            tb_cons_massiva consulta;
-
-            if (flNovos && flErro)
-                consulta = tb_cons_massiva.Where(c => !c.id.HasValue || (c.id.HasValue && !string.IsNullOrEmpty(c.erro))).FirstOrDefault();
-            else if (flNovos)
-                consulta = tb_cons_massiva.Where(c => !c.id.HasValue).FirstOrDefault();
-            else
-                consulta = tb_cons_massiva.Where(c => c.id.HasValue && !string.IsNullOrEmpty(c.erro)).FirstOrDefault();
-
-            consulta = tb_cons_massiva.Where(c => c.status == 9).FirstOrDefault();
-
-            //consulta = tb_cons_massiva.Where(c => c.cpf == "13259674837").FirstOrDefault();
-
-            if (consulta != null)
-            {
-                consulta.status = 1;
-                consulta.id = Guid.NewGuid();
-                consulta.dtconsulta = DateTime.Now;
-                SaveChanges();
-            }
-
-            //Database.CurrentTransaction.Commit();
-
-            return consulta;
-        }
-
-        public tb_cons_massiva BuscarDadosCliente(string cpf)
-        {
-            tb_cons_massiva consulta;
-
-            consulta = tb_cons_massiva.Where(c => c.cpf == cpf).FirstOrDefault();
-
-            return consulta;
-        }
-
-        public void SalvaErro(Guid id, string erro, string erroSite)
-        {
-            var consulta = tb_cons_massiva.Where(c => c.id == id).FirstOrDefault();
-
-            var erroParam = tb_erro_param.Where(e => e.erro_param_texto.Contains(erroSite)).FirstOrDefault();
-
-            if (consulta != null)
-            {
-                if (erroParam != null)
-                    consulta.status = erroParam.status_cons_massiva;
-                else
-                    consulta.status = 9;
-
-                consulta.erro = erro;
-                SaveChanges();
-            }
-        }
-
-        public void SalvaProcessado(Guid id)
-        {
-            var consulta = tb_cons_massiva.Where(c => c.id == id).FirstOrDefault();
-
-            if (consulta != null)
-            {
-                consulta.status = 2;
-                consulta.erro = null;
-
-                SaveChanges();
-            }
-        }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

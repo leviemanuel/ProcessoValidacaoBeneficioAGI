@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="tb_erro_param.cs" />
     <Compile Include="ValidacaoBeneficioDBContext_1.cs" />
     <Compile Include="Models\ConsMassivaSimulacaoModel.cs" />
     <Compile Include="tb_cons_massiva.cs" />

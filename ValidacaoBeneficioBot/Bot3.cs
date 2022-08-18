@@ -910,7 +910,7 @@ namespace ValidacaoBeneficioBot
             }
         }
 
-        public bool BuscaCliente(string cpf, string nome, string sobrenome, ref bool clienteNovo, ref string erro)
+        public bool BuscaCliente(string cpf, string nome, string sobrenome, ref bool clienteNovo, ref string erro, ref string erroSite)
         {
             try
             {
@@ -2517,6 +2517,7 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = ex.Message;
                 if (ex.InnerException != null)
                     erro += " - " + ex.InnerException.Message;
@@ -2525,7 +2526,7 @@ namespace ValidacaoBeneficioBot
 
         }
 
-        public bool ClicaSimulacao(string cpf, string nome, string sobrenome, ref string erro)
+        public bool ClicaSimulacao(string cpf, string nome, string sobrenome, ref string erro, ref string erroSite)
         {
             try
             {
@@ -2780,6 +2781,7 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = ex.Message;
                 if (ex.InnerException != null)
                     erro += " - " + ex.InnerException.Message;
@@ -2788,7 +2790,7 @@ namespace ValidacaoBeneficioBot
 
         }
 
-        public bool ClicaINSS(string cpf, string nome, string sobrenome, ref string erro)
+        public bool ClicaINSS(string cpf, string nome, string sobrenome, ref string erro, ref string erroSite)
         {
             var LinhaErro = "";
 
@@ -3780,6 +3782,7 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = LinhaErro + "   -   " + ex.Message;
                 if (ex.InnerException != null)
                     erro += " - " + ex.InnerException.Message;
@@ -3788,7 +3791,7 @@ namespace ValidacaoBeneficioBot
 
         }
 
-        public bool AceitaOfertaGEV(DataClientPutRequest dadosCliente, ref string erro)
+        public bool AceitaOfertaGEV(DataClientPutRequest dadosCliente, ref string erro, ref string erroSite)
         {
             try
             {
@@ -4141,6 +4144,7 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = ex.Message;
                 if (ex.InnerException != null)
                     erro += " - " + ex.InnerException.Message;
@@ -4149,7 +4153,7 @@ namespace ValidacaoBeneficioBot
 
         }
 
-        public bool AtendimentoTelefonico(string cpf, string nome, string sobrenome, ref string erro)
+        public bool AtendimentoTelefonico(string cpf, string nome, string sobrenome, ref string erro, ref string erroSite)
         {
             try
             {
@@ -4299,6 +4303,7 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = ex.Message;
                 if (ex.InnerException != null)
                     erro += " - " + ex.InnerException.Message;
@@ -4307,7 +4312,7 @@ namespace ValidacaoBeneficioBot
 
         }
 
-        public bool ContinuarProcesso(string cpf, string nome, string sobrenome, ref string erro)
+        public bool ContinuarProcesso(string cpf, string nome, string sobrenome, ref string erro, ref string erroSite)
         {
             try
             {
@@ -4385,6 +4390,7 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = ex.Message;
                 if (ex.InnerException != null)
                     erro += " - " + ex.InnerException.Message;
@@ -4393,7 +4399,7 @@ namespace ValidacaoBeneficioBot
 
         }
 
-        public bool ContinuarSemCadastro(string cpf, string nome, string sobrenome, ref string erro)
+        public bool ContinuarSemCadastro(string cpf, string nome, string sobrenome, ref string erro, ref string erroSite)
         {
             try
             {
@@ -4622,6 +4628,7 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = ex.Message;
                 if (ex.InnerException != null)
                     erro += " - " + ex.InnerException.Message;
@@ -4630,7 +4637,7 @@ namespace ValidacaoBeneficioBot
 
         }
 
-        public bool EtapaDadosPessoais(DataClientPutRequest dadosCliente, ref string erro)
+        public bool EtapaDadosPessoais(DataClientPutRequest dadosCliente, ref string erro, ref string erroSite)
         {
             try
             {
@@ -4758,6 +4765,7 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = ex.Message;
                 if (ex.InnerException != null)
                     erro += " - " + ex.InnerException.Message;
@@ -4766,7 +4774,7 @@ namespace ValidacaoBeneficioBot
 
         }
 
-        public bool EtapaDadosBeneficios(DataClientPutRequest dadosCliente, ref string erro)
+        public bool EtapaDadosBeneficios(DataClientPutRequest dadosCliente, ref string erro, ref string erroSite)
         {
             try
             {
@@ -4916,6 +4924,7 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = ex.Message;
                 if (ex.InnerException != null)
                     erro += " - " + ex.InnerException.Message;
@@ -4924,7 +4933,7 @@ namespace ValidacaoBeneficioBot
 
         }
 
-        public bool EtapaDadosRenda(DataClientPutRequest dadosCliente, ref string erro)
+        public bool EtapaDadosRenda(DataClientPutRequest dadosCliente, ref string erro, ref string erroSite)
         {
             try
             {
@@ -5103,6 +5112,7 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = ex.Message;
                 if (ex.InnerException != null)
                     erro += " - " + ex.InnerException.Message;
@@ -5117,7 +5127,7 @@ namespace ValidacaoBeneficioBot
         /// <param name="dadosCliente"></param>
         /// <param name="erro"></param>
         /// <returns></returns>
-        public bool EtapaConferencia(DataClientPutRequest dadosCliente, ref string erro)
+        public bool EtapaConferencia(DataClientPutRequest dadosCliente, ref string erro, ref string erroSite)
         {
             try
             {
@@ -5229,6 +5239,7 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = ex.Message;
                 if (ex.InnerException != null)
                     erro += " - " + ex.InnerException.Message;
@@ -5237,7 +5248,7 @@ namespace ValidacaoBeneficioBot
 
         }
 
-        public DadosClienteProduto Simular(DataClientPutRequest dadosCliente, ref string erro)
+        public DadosClienteProduto Simular(DataClientPutRequest dadosCliente, ref string erro, ref string erroSite)
         {
             DadosClienteProduto retornoDadosCliente = new DadosClienteProduto();
             var LinhaErro = 0;
@@ -6093,6 +6104,7 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = "Simular " + LinhaErro.ToString() + " - " + ex.Message;
                 if (ex.InnerException != null)
                     erro += " - " + ex.InnerException.Message;

@@ -1166,7 +1166,7 @@ namespace ValidacaoBeneficioBot
             }
         }
 
-        public bool BuscaCPF(string cpf, string nome, string sobrenome, ref bool flClienteNovo, ref string erro)
+        public bool BuscaCPF(string cpf, string nome, string sobrenome, ref bool flClienteNovo, ref string erro, ref string erroSite)
         {
             try
             {
@@ -1449,6 +1449,7 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = ex.Message;
                 if (ex.InnerException != null)
                     erro = ex.InnerException.Message;
@@ -1456,7 +1457,7 @@ namespace ValidacaoBeneficioBot
             }
         }
 
-        public bool ClicaSimulacao(ref string erro)
+        public bool ClicaSimulacao(ref string erro, ref string erroSite)
         {
             try
             {
@@ -1602,6 +1603,7 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = ex.Message;
                 if (ex.InnerException != null)
                     erro = ex.InnerException.Message;
@@ -1609,7 +1611,7 @@ namespace ValidacaoBeneficioBot
             }
         }
 
-        public bool ClicaFonteINSS(ref string erro)
+        public bool ClicaFonteINSS(ref string erro, ref string erroSite)
         {
             try
             {
@@ -2579,6 +2581,7 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = ex.Message;
                 if (ex.InnerException != null)
                     erro = ex.InnerException.Message;
@@ -2586,7 +2589,7 @@ namespace ValidacaoBeneficioBot
             }
         }
 
-        public bool ContinuarSemConsulta(ref string erro)
+        public bool ContinuarSemConsulta(ref string erro, ref string erroSite)
         {
             try
             {
@@ -2755,6 +2758,7 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = ex.Message;
                 if (ex.InnerException != null)
                     erro = ex.InnerException.Message;
@@ -2762,7 +2766,7 @@ namespace ValidacaoBeneficioBot
             }
         }
 
-        public bool SelecionaOfertaGEV(DataClientPutRequest dataClientePut, DateTime DtPadrao, ref string erro)
+        public bool SelecionaOfertaGEV(DataClientPutRequest dataClientePut, DateTime DtPadrao, ref string erro, ref string erroSite)
         {
             try
             {
@@ -3499,6 +3503,7 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = ex.Message;
                 if (ex.InnerException != null)
                     erro = ex.InnerException.Message;
@@ -3506,7 +3511,7 @@ namespace ValidacaoBeneficioBot
             }
         }
 
-        public DadosClienteProduto Simular(DataClientPutRequest dataClientePut, ref string erro)
+        public DadosClienteProduto Simular(DataClientPutRequest dataClientePut, ref string erro, ref string erroSite)
         {
             DadosClienteProduto dadosCliente = new DadosClienteProduto();
 
@@ -4378,6 +4383,7 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = ex.Message;
                 if (ex.InnerException != null)
                     erro = ex.InnerException.Message;
