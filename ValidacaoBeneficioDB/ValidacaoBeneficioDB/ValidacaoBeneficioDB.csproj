@@ -53,11 +53,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="tb_cons_massiva_02.cs" />
+    <Compile Include="tb_cons_massiva_produtos.cs" />
+    <Compile Include="tb_cons_massiva_produtos_02.cs" />
+    <Compile Include="tb_cons_massiva_simulacoes_02.cs" />
     <Compile Include="tb_erro_param.cs" />
     <Compile Include="ValidacaoBeneficioDBContext_1.cs" />
     <Compile Include="Models\ConsMassivaSimulacaoModel.cs" />
     <Compile Include="tb_cons_massiva.cs" />
-    <Compile Include="tb_cons_massiva_produtos.cs" />
     <Compile Include="tb_cons_massiva_simulacoes.cs" />
     <Compile Include="ValidacaoBeneficioDBContext.cs" />
     <Compile Include="Models\ConsMassivaModel.cs" />

@@ -1,4 +1,4 @@
-namespace ValidacaoBeneficioDB
+﻿namespace ValidacaoBeneficioDB
 {
     using System;
     using System.Collections.Generic;
@@ -7,7 +7,7 @@ namespace ValidacaoBeneficioDB
     using System.Data.Entity.Spatial;
     using System.Linq;
 
-    public partial class tb_cons_massiva
+    public partial class tb_cons_massiva_02
     {
         [Key]
         [StringLength(20)]

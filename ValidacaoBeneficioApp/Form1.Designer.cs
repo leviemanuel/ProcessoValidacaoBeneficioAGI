@@ -55,9 +55,20 @@
             this.lblWorking = new System.Windows.Forms.Label();
             this.txtLog = new System.Windows.Forms.TextBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.lblStatusConsulta = new System.Windows.Forms.Label();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.grdProdutos = new System.Windows.Forms.DataGridView();
+            this.produto = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.grdSimulacoes = new System.Windows.Forms.DataGridView();
+            this.prazo = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.vl_parcela = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.tx_mensal = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cet_mensal = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.cet_anual = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.vl_credito = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.vl_max_min_parcelas = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.vl_min_max_parcelas = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.plano = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.lblConsultaWorking = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
@@ -73,17 +84,6 @@
             this.label6 = new System.Windows.Forms.Label();
             this.lblAProcessar = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
-            this.produto = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.prazo = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.vl_parcela = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.tx_mensal = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cet_mensal = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.cet_anual = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.vl_credito = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.vl_max_min_parcelas = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.vl_min_max_parcelas = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.plano = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.lblStatusConsulta = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
@@ -416,6 +416,14 @@
             this.tabPage2.Text = "Consulta";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // lblStatusConsulta
+            // 
+            this.lblStatusConsulta.Location = new System.Drawing.Point(3, 570);
+            this.lblStatusConsulta.Name = "lblStatusConsulta";
+            this.lblStatusConsulta.Size = new System.Drawing.Size(460, 23);
+            this.lblStatusConsulta.TabIndex = 3;
+            this.lblStatusConsulta.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // tableLayoutPanel2
             // 
             this.tableLayoutPanel2.ColumnCount = 1;
@@ -445,6 +453,13 @@
             this.grdProdutos.TabIndex = 0;
             this.grdProdutos.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.grdProdutos_CellContentClick);
             // 
+            // produto
+            // 
+            this.produto.HeaderText = "produto";
+            this.produto.Name = "produto";
+            this.produto.ReadOnly = true;
+            this.produto.Width = 420;
+            // 
             // grdSimulacoes
             // 
             this.grdSimulacoes.AllowUserToAddRows = false;
@@ -466,6 +481,60 @@
             this.grdSimulacoes.ReadOnly = true;
             this.grdSimulacoes.Size = new System.Drawing.Size(454, 219);
             this.grdSimulacoes.TabIndex = 1;
+            // 
+            // prazo
+            // 
+            this.prazo.HeaderText = "Prazo";
+            this.prazo.Name = "prazo";
+            this.prazo.ReadOnly = true;
+            // 
+            // vl_parcela
+            // 
+            this.vl_parcela.HeaderText = "Parcela";
+            this.vl_parcela.Name = "vl_parcela";
+            this.vl_parcela.ReadOnly = true;
+            // 
+            // tx_mensal
+            // 
+            this.tx_mensal.HeaderText = "Tx. Mensal";
+            this.tx_mensal.Name = "tx_mensal";
+            this.tx_mensal.ReadOnly = true;
+            // 
+            // cet_mensal
+            // 
+            this.cet_mensal.HeaderText = "CET Mensal";
+            this.cet_mensal.Name = "cet_mensal";
+            this.cet_mensal.ReadOnly = true;
+            // 
+            // cet_anual
+            // 
+            this.cet_anual.HeaderText = "CET Anual";
+            this.cet_anual.Name = "cet_anual";
+            this.cet_anual.ReadOnly = true;
+            // 
+            // vl_credito
+            // 
+            this.vl_credito.HeaderText = "Vl. Crédito";
+            this.vl_credito.Name = "vl_credito";
+            this.vl_credito.ReadOnly = true;
+            // 
+            // vl_max_min_parcelas
+            // 
+            this.vl_max_min_parcelas.HeaderText = "Vl. Max Min Parcelas";
+            this.vl_max_min_parcelas.Name = "vl_max_min_parcelas";
+            this.vl_max_min_parcelas.ReadOnly = true;
+            // 
+            // vl_min_max_parcelas
+            // 
+            this.vl_min_max_parcelas.HeaderText = "Vl. Min Max Parcelas";
+            this.vl_min_max_parcelas.Name = "vl_min_max_parcelas";
+            this.vl_min_max_parcelas.ReadOnly = true;
+            // 
+            // plano
+            // 
+            this.plano.HeaderText = "Plano";
+            this.plano.Name = "plano";
+            this.plano.ReadOnly = true;
             // 
             // groupBox2
             // 
@@ -614,75 +683,6 @@
             this.label8.Size = new System.Drawing.Size(87, 21);
             this.label8.TabIndex = 6;
             this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // produto
-            // 
-            this.produto.HeaderText = "produto";
-            this.produto.Name = "produto";
-            this.produto.ReadOnly = true;
-            this.produto.Width = 420;
-            // 
-            // prazo
-            // 
-            this.prazo.HeaderText = "Prazo";
-            this.prazo.Name = "prazo";
-            this.prazo.ReadOnly = true;
-            // 
-            // vl_parcela
-            // 
-            this.vl_parcela.HeaderText = "Parcela";
-            this.vl_parcela.Name = "vl_parcela";
-            this.vl_parcela.ReadOnly = true;
-            // 
-            // tx_mensal
-            // 
-            this.tx_mensal.HeaderText = "Tx. Mensal";
-            this.tx_mensal.Name = "tx_mensal";
-            this.tx_mensal.ReadOnly = true;
-            // 
-            // cet_mensal
-            // 
-            this.cet_mensal.HeaderText = "CET Mensal";
-            this.cet_mensal.Name = "cet_mensal";
-            this.cet_mensal.ReadOnly = true;
-            // 
-            // cet_anual
-            // 
-            this.cet_anual.HeaderText = "CET Anual";
-            this.cet_anual.Name = "cet_anual";
-            this.cet_anual.ReadOnly = true;
-            // 
-            // vl_credito
-            // 
-            this.vl_credito.HeaderText = "Vl. Crédito";
-            this.vl_credito.Name = "vl_credito";
-            this.vl_credito.ReadOnly = true;
-            // 
-            // vl_max_min_parcelas
-            // 
-            this.vl_max_min_parcelas.HeaderText = "Vl. Max Min Parcelas";
-            this.vl_max_min_parcelas.Name = "vl_max_min_parcelas";
-            this.vl_max_min_parcelas.ReadOnly = true;
-            // 
-            // vl_min_max_parcelas
-            // 
-            this.vl_min_max_parcelas.HeaderText = "Vl. Min Max Parcelas";
-            this.vl_min_max_parcelas.Name = "vl_min_max_parcelas";
-            this.vl_min_max_parcelas.ReadOnly = true;
-            // 
-            // plano
-            // 
-            this.plano.HeaderText = "Plano";
-            this.plano.Name = "plano";
-            this.plano.ReadOnly = true;
-            // 
-            // lblStatusConsulta
-            // 
-            this.lblStatusConsulta.Location = new System.Drawing.Point(3, 570);
-            this.lblStatusConsulta.Name = "lblStatusConsulta";
-            this.lblStatusConsulta.Size = new System.Drawing.Size(460, 23);
-            this.lblStatusConsulta.TabIndex = 3;
-            this.lblStatusConsulta.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // Form1
             // 

@@ -2790,9 +2790,10 @@ namespace ValidacaoBeneficioBot
 
         }
 
-        public bool ClicaINSS(string cpf, string nome, string sobrenome, ref string erro, ref string erroSite)
+        public Product ClicaINSS(string cpf, string nome, string sobrenome, ref string erro, ref string erroSite)
         {
             var LinhaErro = "";
+            Product retorno;
 
             try
             {
@@ -3774,11 +3775,18 @@ namespace ValidacaoBeneficioBot
                                  _accept: "*/*",
                                  _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
 
+                var offers = JsonConvert.DeserializeObject<CustomerOffersRequest>(response.Content);
 
-                //attendancesData = JsonConvert.DeserializeObject<AttendancesData>(response.Content);
+                retorno = JsonConvert.DeserializeObject<Product>(JsonConvert.SerializeObject(offers.Products.Where(p => p.Id == "PERSONAL_LOAN").FirstOrDefault()));
+
+                if (retorno != null)
+                {
+                    var x = 1;
+                }
+
                 #endregion
 
-                return true;
+                return retorno;
             }
             catch (Exception ex)
             {
@@ -3786,7 +3794,7 @@ namespace ValidacaoBeneficioBot
                 erro = LinhaErro + "   -   " + ex.Message;
                 if (ex.InnerException != null)
                     erro += " - " + ex.InnerException.Message;
-                return false;
+                return null;
             }
 
         }
@@ -6111,6 +6119,409 @@ namespace ValidacaoBeneficioBot
             }
 
             return retornoDadosCliente;
+        }
+
+        public bool SalvarRascunho(ref string erro, ref string erroSite)
+        {
+            DadosClienteProduto retornoDadosCliente = new DadosClienteProduto();
+            var LinhaErro = 0;
+
+            try
+            {
+                var hdrs = new Dictionary<string, string>();
+                var auxURL = "";
+
+                #region POST /Venda.UI.Web//Atendimento/SalvarRascunho HTTP/1.1
+                LinhaErro = 5571;
+                hdrs = new Dictionary<string, string>();
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "portal.agiplan.com.br");
+                hdrs.Add("Origin", "https://portal.agiplan.com.br");
+                hdrs.Add("Content-Type", "application/json;charset=UTF-8");
+
+                response = DoPost("https://portal.agiplan.com.br/Venda.UI.Web/Atendimento/AtendimentoVerificaPontoAptoTelefonica",
+                                  "{\"atendimentoCodigo\":" + keys["externalId"] + "}",
+                                  headers: hdrs,
+                                  _referer: keys["GevAtendimentoDetailSrcUrl"].Substring(0, keys["GevAtendimentoDetailSrcUrl"].IndexOf('#')),
+                                  _accept: "application/json, text/plain, */*",
+                                  _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.81 Safari/537.36 Edg/104.0.1293.54");
+                #endregion
+
+                #region POST /OriginationPage?id=0018Z00002hGxfeQAC HTTP/1.1
+                LinhaErro = 2946;
+                hdrs = new Dictionary<string, string>();
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "agibank.force.com");
+                hdrs.Add("Origin", "https://agibank.force.com");
+                hdrs.Add("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+
+
+                var strPost = "AJAXREQUEST=_viewRoot" +
+                          "&thepage:form=thepage:form" +
+                          "&com.salesforce.visualforce.ViewState=" + WebUtility.UrlEncode(keys["ViewState"]) +
+                          "&com.salesforce.visualforce.ViewStateVersion=" + WebUtility.UrlEncode(keys["ViewStateVersion"]) +
+                          "&com.salesforce.visualforce.ViewStateMAC=" + WebUtility.UrlEncode(keys["ViewStateMAC"]) +
+                          "&com.salesforce.visualforce.ViewStateCSRF=" + WebUtility.UrlEncode(keys["ViewStateCSRF"]) +
+                          "&&thepage:form:j_id34=thepage:form:j_id34" +
+                          "&taskId=" + keys["taskId"] +
+                          "&status=Deferred&";
+
+                var auxReferer = response.ResponseUri.ToString();
+
+                response = DoPost("https://agibank.force.com/OriginationPage?id=" + recordResponse.Account.Record.Id,
+                           strPost,
+                           headers: hdrs,
+                           _referer: auxReferer,
+                           _accept: "*/*");
+
+                UpdateKeys("ViewState", RetornaAuxSubstring(response.Content, "ViewState\" value=\"", "\""));
+                UpdateKeys("ViewStateVersion", RetornaAuxSubstring(response.Content, "=\"com.salesforce.visualforce.ViewStateVersion\" value=\"", "\""));
+                UpdateKeys("ViewStateCSRF", RetornaAuxSubstring(response.Content, "ViewStateCSRF\" value=\"", "\""));
+                UpdateKeys("ViewStateMAC", RetornaAuxSubstring(response.Content, "ViewStateMAC\" value=\"", "\""));
+                #endregion
+
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                erroSite = ex.Message;
+                erro = "Simular " + LinhaErro.ToString() + " - " + ex.Message;
+                if (ex.InnerException != null)
+                    erro += " - " + ex.InnerException.Message;
+            }
+
+            return false;
+        }
+
+        public bool ClicarSemConsultaDataprevSelecionarEmprestimoPessoal(DataClientPutRequest dadosCliente, ref string erro, ref string erroSite)
+        {
+            var LinhaErro = "";
+
+            try
+            {
+                var hdrs = new Dictionary<string, string>();
+                var auxURL = "";
+
+                #region PATCH /v1/attendances/14498943 HTTP/1.1
+                LinhaErro = "6201 - ATCH /v1/attendances/14498943 HTTP/1.1";
+                hdrs = new Dictionary<string, string>();
+
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "origination-crm-service-comercial.agibank-prd.in");
+                hdrs.Add("Origin", "https://origination-product-sale-originacao.agibank-prd.in");
+                hdrs.Add("Content-Type", "application/json");
+
+                hdrs.Add("store-id", attendancesData.StoreId);
+                hdrs.Add("user-id", attendancesData.UserId);
+
+                auxURL = "{\"benefitChosenAuthorization\":\"NO_AUTHORIZATION\",\"payerSource\":{\"name\":\"INSS\",\"identifier\":\"INSS\"}}";
+
+                var responsePatch = DoPatch("https://origination-crm-service-comercial.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"],
+                                            auxURL,
+                                            headers: hdrs,
+                                            _accept: "*/*",
+                                            _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
+                #endregion
+
+                #region GET /v1/attendances/14498943 HTTP/1.1
+                LinhaErro = "6223 - GET /v1/attendances/14498943 HTTP/1.1";
+                hdrs = new Dictionary<string, string>();
+
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "origination-crm-service-comercial.agibank-prd.in");
+                hdrs.Add("Origin", "https://origination-product-sale-originacao.agibank-prd.in");
+
+                hdrs.Add("store-id", attendancesData.StoreId);
+                hdrs.Add("user-id", attendancesData.UserId);
+
+                response = DoGet("https://origination-product-sale-originacao.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"],
+                                 headers: hdrs,
+                                 _accept: "*/*",
+                                 _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37",
+                                 _referer: "https://origination-product-sale-originacao.agibank-prd.in");
+                #endregion
+
+                #region GET /v1/attendances/14498943?state-safe=true HTTP/1.1 
+                LinhaErro = "6242 - GET /v1/attendances/14498943?state-safe=true HTTP/1.1";
+                hdrs = new Dictionary<string, string>();
+
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "origination-crm-service-comercial.agibank-prd.in");
+                hdrs.Add("Origin", "https://origination-product-sale-originacao.agibank-prd.in");
+
+                hdrs.Add("store-id", attendancesData.StoreId);
+                hdrs.Add("user-id", "0");
+
+                response = DoGet("https://origination-product-sale-originacao.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"] + "?state-safe=true",
+                                 headers: hdrs,
+                                 _accept: "*/*",
+                                 _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
+
+                try
+                {
+                    attendancesData = JsonConvert.DeserializeObject<AttendancesData>(response.Content);
+                }
+                catch (Exception ex)
+                {
+                    attendancesData = new AttendancesData() { StoreId = "2722", UserId = "41642530883" };
+                }
+                #endregion
+
+                #region GET /v1/attendances/14498943/available-offers HTTP/1.1 
+                LinhaErro = "6269 - GET /v1/attendances/14498943/available-offers HTTP/1.1";
+                hdrs = new Dictionary<string, string>();
+
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "origination-crm-service-comercial.agibank-prd.in");
+                hdrs.Add("Origin", "https://origination-product-sale-originacao.agibank-prd.in");
+
+                hdrs.Add("store-id", attendancesData.StoreId);
+                hdrs.Add("user-id", attendancesData.UserId);
+
+                response = DoGet("https://origination-product-sale-originacao.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"] + "/available-offers",
+                                 headers: hdrs,
+                                 _accept: "*/*",
+                                 _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
+
+                //attendancesData = JsonConvert.DeserializeObject<AttendancesData>(response.Content);
+
+                dynamic auxBody = JsonConvert.DeserializeObject(response.Content);
+
+                var strPost = "";
+
+                try
+                {
+                    var teste = JsonConvert.DeserializeObject<CustomerOffersRequest>(response.Content);
+                    List<Product> produtosSelecionados = new List<Product>();
+
+                    var empPessoal = teste.Products.Where(p => p.Id == "PERSONAL_LOAN").FirstOrDefault();
+                    var empPessoalUn = teste.UnavailableProducts.Where(p => p.Id == "PERSONAL_LOAN").FirstOrDefault();
+
+                    if (empPessoal != null)
+                    {
+                        produtosSelecionados.Add(empPessoal);
+
+                        foreach (var prod in empPessoal.Dependencies)
+                            produtosSelecionados.Add(teste.Products.Where(p => p.ProductOfferId == prod).FirstOrDefault());
+
+                        foreach (var prod in produtosSelecionados)
+                            prod.Checked = true;
+
+                        var USER_REGISTRATIONProd = teste.Products.Where(p => p.Id == "USER_REGISTRATION").FirstOrDefault();
+
+                        if (USER_REGISTRATIONProd == null)
+                        {
+                            var USER_REGISTRATIONUn = teste.UnavailableProducts.Where(p => p.Id == "USER_REGISTRATION").FirstOrDefault();
+
+                            if (USER_REGISTRATIONUn != null)
+                            {
+                                produtosSelecionados.Add(JsonConvert.DeserializeObject<Product>(JsonConvert.SerializeObject(USER_REGISTRATIONUn)));
+                            }
+                        }
+                        else
+                        {
+                            produtosSelecionados.Add(USER_REGISTRATIONProd);
+                        }
+
+                        strPost = "{\"person\": {}, \"products\":" + JsonConvert.SerializeObject(produtosSelecionados) + "}";
+                    }
+                    else
+                    {
+                        erro = "CLIENTE SEM EMPRÉSTIMO PESSOAL DISPONÍVEL";
+                        return false;
+                    }
+                }
+                catch (Exception exx)
+                {
+
+                }
+                #endregion
+
+                #region PUT /v1/attendances/14498943/customers/39119556691/offers?document-type=CPF HTTP/1.1
+                LinhaErro = "PUT /v1/attendances/14498943/customers/39119556691/offers?document-type=CPF HTTP/1.1";
+                hdrs = new Dictionary<string, string>();
+
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "origination-crm-service-comercial.agibank-prd.in");
+                hdrs.Add("Origin", "https://origination-product-sale-originacao.agibank-prd.in");
+                hdrs.Add("Content-Type", "application/json");
+
+                hdrs.Add("store-id", attendancesData.StoreId);
+                hdrs.Add("user-id", attendancesData.UserId);
+
+                var responsePut = DoPut("https://origination-crm-service-comercial.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"] + "/customers/" + dadosCliente.Document + "/offers?document-type=CPF",
+                                        body: strPost,
+                                        headers: hdrs,
+                                        _accept: "*/*",
+                                        _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
+                #endregion
+
+                #region GET /v1/attendances/14498943 HTTP/1.1
+                LinhaErro = "GET /v1/attendances/14498943 HTTP/1.1";
+                hdrs = new Dictionary<string, string>();
+
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "origination-crm-service-comercial.agibank-prd.in");
+                hdrs.Add("Origin", "https://origination-product-sale-originacao.agibank-prd.in");
+
+                hdrs.Add("store-id", attendancesData.StoreId);
+                hdrs.Add("user-id", attendancesData.UserId);
+
+                response = DoGet("https://origination-crm-service-comercial.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"],
+                                 headers: hdrs,
+                                 _accept: "*/*",
+                                 _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
+                #endregion
+
+                #region GET /v1/attendances/14498943 HTTP/1.1
+                LinhaErro = "GET /v1/attendances/14498943 HTTP/1.1";
+                hdrs = new Dictionary<string, string>();
+
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "origination-crm-service-comercial.agibank-prd.in");
+                hdrs.Add("Origin", "https://origination-product-sale-originacao.agibank-prd.in");
+
+                hdrs.Add("store-id", attendancesData.StoreId);
+                hdrs.Add("user-id", attendancesData.UserId);
+
+                response = DoGet("https://origination-crm-service-comercial.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"],
+                                 headers: hdrs,
+                                 _accept: "*/*",
+                                 _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
+                #endregion
+
+                #region CAPTURA DADOS EMPRÉSTIMO PESSOAL
+
+
+
+                #endregion
+
+
+
+                #region GET /v1/attendances/14498943/products/current-account/tax-packages HTTP/1.1
+                LinhaErro = "GET /v1/attendances/14498943/products/current-account/tax-packages HTTP/1.1";
+                hdrs = new Dictionary<string, string>();
+
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "origination-crm-service-comercial.agibank-prd.in");
+                hdrs.Add("Origin", "https://origination-product-sale-originacao.agibank-prd.in");
+
+                hdrs.Add("store-id", attendancesData.StoreId);
+                hdrs.Add("user-id", attendancesData.UserId);
+
+                response = DoGet("https://origination-crm-service-comercial.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"] + "/products/current-account/tax-packages",
+                                 headers: hdrs,
+                                 _accept: "*/*",
+                                 _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
+
+                keys.Add("selectedPackage", RetornaAuxSubstring(response.Content, "[{\"id\":\"", "\""));
+                #endregion
+
+                #region GET /v1/attendances/14498943/products/current-account/extra-services-taxes HTTP/1.1
+                LinhaErro = "GET /v1/attendances/14498943/products/current-account/extra-services-taxes HTTP/1.1";
+                hdrs = new Dictionary<string, string>();
+
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "origination-crm-service-comercial.agibank-prd.in");
+                hdrs.Add("Origin", "https://origination-product-sale-originacao.agibank-prd.in");
+
+                hdrs.Add("store-id", attendancesData.StoreId);
+                hdrs.Add("user-id", attendancesData.UserId);
+
+                response = DoGet("https://origination-crm-service-comercial.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"] + "/products/current-account/extra-services-taxes",
+                                 headers: hdrs,
+                                 _accept: "*/*",
+                                 _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
+                #endregion
+
+                #region GET /v1/attendances/14498943/products/current-account/due-dates HTTP/1.1
+                LinhaErro = "6409 - GET /v1/attendances/14498943/products/current-account/due-dates HTTP/1.1";
+                hdrs = new Dictionary<string, string>();
+
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "origination-crm-service-comercial.agibank-prd.in");
+                hdrs.Add("Origin", "https://origination-product-sale-originacao.agibank-prd.in");
+
+                hdrs.Add("store-id", attendancesData.StoreId);
+                hdrs.Add("user-id", attendancesData.UserId);
+
+                response = DoGet("https://origination-crm-service-comercial.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"] + "/products/current-account/due-dates",
+                                 headers: hdrs,
+                                 _accept: "*/*",
+                                 _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
+
+                auxBody = JsonConvert.DeserializeObject(response.Content);
+
+                keys.Add("CURRENT_ACCOUNT", auxBody);
+                #endregion
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                erroSite = ex.Message;
+                erro = LinhaErro + "   -   " + ex.Message;
+                if (ex.InnerException != null)
+                    erro += " - " + ex.InnerException.Message;
+                return false;
+            }
+
+        }
+
+        public bool CancelaCreditoPessoal(ref string erro, ref string erroSite)
+        {
+            var LinhaErro = "";
+
+            try
+            {
+                var hdrs = new Dictionary<string, string>();
+                var auxURL = "";
+
+                #region PATCH /v1/attendances/14498943/cancellation HTTP/1.1
+                LinhaErro = "PATCH /v1/attendances/14498943/cancellation HTTP/1.1";
+                hdrs = new Dictionary<string, string>();
+
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "origination-crm-service-comercial.agibank-prd.in");
+                hdrs.Add("Origin", "https://origination-product-sale-originacao.agibank-prd.in");
+                hdrs.Add("Content-Type", "application/json");
+
+                hdrs.Add("store-id", attendancesData.StoreId);
+                hdrs.Add("user-id", attendancesData.UserId);
+
+                auxURL = "{\"reason\":\"Desistência da proposta\",\"attendanceNumber\":\"14498943\"}";
+
+                var responsePatch = DoPatch("https://origination-crm-service-comercial.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"] + "/cancellation",
+                                            auxURL,
+                                            headers: hdrs,
+                                            _accept: "*/*",
+                                            _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
+                #endregion
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                erroSite = ex.Message;
+                erro = LinhaErro + "   -   " + ex.Message;
+                if (ex.InnerException != null)
+                    erro += " - " + ex.InnerException.Message;
+                return false;
+            }
         }
 
         #region WEBREQUEST

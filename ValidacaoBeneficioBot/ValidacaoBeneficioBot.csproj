@@ -97,6 +97,7 @@
     <Compile Include="JSONObjects\MessageRequest.cs" />
     <Compile Include="JSONObjects\ObterUltimaOperacaoResponse.cs" />
     <Compile Include="JSONObjects\ProdutoResponse.cs" />
+    <Compile Include="JSONObjects\FonteINSSResponse.cs" />
     <Compile Include="JSONObjects\RecordResponse.cs" />
     <Compile Include="JSONObjects\SalvaDadosIdentificacaoRequest.cs" />
     <Compile Include="JSONObjects\SimulacaoResponse.cs" />
