@@ -127,9 +127,9 @@ namespace ValidacaoBeneficioApp
 
 #if DEBUG
             txtUsuario.Text = "fortal.caio";
-            txtSenha.Text = "Fort@001";
+            txtSenha.Text = "Fort@002";
             txtConsultaUsuario.Text = "fortal.caio";
-            txtConsultaSenha.Text = "Fort@001";
+            txtConsultaSenha.Text = "Fort@002";
 
             //TESTE();
 #endif
@@ -883,6 +883,7 @@ namespace ValidacaoBeneficioApp
 
                 } while (cons != null);
             }
+
             catch (Exception ex)
             {
                 AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro no robô");
@@ -1192,252 +1193,648 @@ namespace ValidacaoBeneficioApp
 
         private void RoboV4(int threadNum)
         {
-            //var erro = "";
-            //var dados = new DadosClienteProduto();
+            try
+            {
+                var erro = "";
+                var erroSite = "";
+                var dados = new DadosClienteProduto();
+                Product emprestimoPessoal;
 
-            //var robo = new ValidacaoBeneficioBot.Bot4();
+                var robo = new ValidacaoBeneficioBot.Bot4();
 
-            //#region INICIALIZA ROBÔ
-            //InsereLog("Inicializando Robô...", false);
-            //AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Inicializando Robô...");
+                #region INICIALIZA ROBÔ
+                InsereLog("Inicializando Robô... (v3)", false);
+                AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Inicializando Robô...");
 
-            //robo.BotInicialize(ref erro);
+                robo.BotInicialize(ref erro);
 
-            //if (erro != "")
-            //{
-            //    AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro ao inicializar o robô - Encerrando processo");
-            //    InsereLog("Erro método BotInicialize: : " + erro, true);
-            //    return;
-            //}
-            //#endregion
+                if (erro != "")
+                {
+                    AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro ao inicializar o robô - Encerrando processo");
+                    InsereLog("Erro método BotInicialize: : " + erro, true);
+                    return;
+                }
+                #endregion
 
-            //#region LOGIN
-            //InsereLog("Logando...", false);
-            //AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Logando...");
+                #region LOGIN
+                InsereLog("THREAD " + threadNum.ToString() + ": Logando...", false);
+                AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Logando...");
 
-            //robo.Login(txtUsuario.Text, txtSenha.Text, ref erro);
+                robo.Login(txtUsuario.Text, txtSenha.Text, ref erro);
 
-            //if (erro != "")
-            //{
-            //    AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro ao tentar logar - Encerrando processo");
-            //    InsereLog("Erro método Login: " + erro, true);
-            //    return;
-            //}
-            //#endregion
+                if (erro != "")
+                {
+                    AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro ao tentar logar - Encerrando processo");
+                    InsereLog("Erro método Login: " + erro, true);
+                    return;
+                }
+                #endregion
 
-            //tb_cons_massiva cons;
+                tb_cons_massiva cons;
 
-            //ValidacaoBeneficioBot.JSONObjects.DataClientPutRequest dataClientRequest;
-            //bool flClienteNovo = false;
+                ValidacaoBeneficioBot.JSONObjects.DataClientPutRequest dataClientRequest;
+                bool flClienteNovo = false;
 
-            //do
-            //{
-            //    //Verifica se é para parar a Thread
-            //    VerificarRegistros(threadNum);
+                do
+                {
+                    //Verifica se é para parar a Thread
+                    VerificarRegistros(threadNum);
 
-            //    erro = "";
-            //    contador++;
+                    erro = "";
+                    contador++;
 
-            //    //Reserva o registro pra consultar
-            //    cons = context.ReservarConsulta(chkApenasNovos.Checked, chkApenasErro.Checked);
+                    //Reserva o registro pra consultar
+                    AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Reservando registro...");
+                    cons = context.ReservarConsulta(chkApenasNovos.Checked, chkApenasErro.Checked);
 
-            //    if (cons != null)
-            //    {
-            //        #region Recupera dados cliente
-            //        dataClientRequest = new ValidacaoBeneficioBot.JSONObjects.DataClientPutRequest()
-            //        {
-            //            Phone = null,
-            //            AdditionalDocuments = new List<ValidacaoBeneficioBot.JSONObjects.AdditionalDocumentsType>(),
-            //            Benefit = new ValidacaoBeneficioBot.JSONObjects.BenefitType()
-            //            {
-            //                BenefitKind = new ValidacaoBeneficioBot.JSONObjects.BenefitKindType()
-            //                {
-            //                    Code = int.Parse(cons.esp)
-            //                },
-            //                CBCIfPayer = "237",//TODO: INSERIR CODIGO DO BANCO
-            //                DispatchYear = 2014, //TODO: INSERIR ANO CORRETO
-            //                BenefitNumber = cons.nb,
-            //                OwnsLawfulAgent = true, //TODO: VERIFICAR VALOR CORRETO
-            //                AvailableCardMargin = null,
-            //                AvailableMargin = null
-            //            },
-            //            DateBirthday = cons.dtnasc.Value,
-            //            Document = cons.cpf,
-            //            ExternalId = "", // PREENCHIDO NA CLASSE DO ROBO
-            //            FullName = cons.nome,
-            //            Income = new ValidacaoBeneficioBot.JSONObjects.IncomeType()
-            //            {
-            //                GrossIncome = int.Parse(cons.renda.Substring(0, cons.renda.IndexOf('.'))),
-            //                NetIncome = int.Parse(cons.renda.Substring(0, cons.renda.IndexOf('.'))),
-            //                DatePayday = new DateTime(2022, 01, 05), //TODO: VERIFICAR VALOR CORRETO
-            //                CalculatedPayday = false,
-            //                Discount = "0"
-            //            },
-            //            PostCode = cons.cep,
-            //            HasValidToken = false,
-            //            AttendanceType = "BY_PHONE",
-            //            Consultant = new ValidacaoBeneficioBot.JSONObjects.ConsultantType() { TaxId = "" }, // PREENCHIDO NA CLASSE DO ROBO
-            //            OriginalAttendanceType = "BY_PHONE",
-            //            DataprevAllowanceType = null,
-            //            AllowDataprev = false,
-            //            AllowDataprevRemotely = false,
-            //            Attachments = new List<object>(),
-            //            //CreationDate = DateTime.Now,
-            //            AsyncTokenReceived = false,
-            //            //LastUpdateDate = DateTime.Now,
-            //            DurationSeconds = 0,
-            //            ActualStoreId = "",
-            //            DataprevAllowanceTypes = new List<object>()
-            //        };
+                    if (cons != null)
+                    {
+                        #region Recupera dados cliente
+                        dataClientRequest = new ValidacaoBeneficioBot.JSONObjects.DataClientPutRequest()
+                        {
+                            Phone = null,
+                            AdditionalDocuments = new List<ValidacaoBeneficioBot.JSONObjects.AdditionalDocumentsType>(),
+                            Benefit = new ValidacaoBeneficioBot.JSONObjects.BenefitType()
+                            {
+                                BenefitKind = new ValidacaoBeneficioBot.JSONObjects.BenefitKindType()
+                                {
+                                    Code = int.Parse(cons.esp)
+                                },
+                                CBCIfPayer = "237",//TODO: INSERIR CODIGO DO BANCO
+                                DispatchYear = 2014, //TODO: INSERIR ANO CORRETO
+                                BenefitNumber = cons.nb,
+                                OwnsLawfulAgent = true, //TODO: VERIFICAR VALOR CORRETO
+                                AvailableCardMargin = null,
+                                AvailableMargin = null
+                            },
+                            DateBirthday = cons.dtnasc.Value,
+                            Document = cons.cpf,
+                            ExternalId = "", // PREENCHIDO NA CLASSE DO ROBO
+                            FullName = cons.nome,
+                            Income = new ValidacaoBeneficioBot.JSONObjects.IncomeType()
+                            {
+                                GrossIncome = int.Parse(cons.vlrenda.Substring(0, cons.vlrenda.Replace(',', '.').IndexOf('.'))),
+                                NetIncome = int.Parse(cons.vlrenda.Substring(0, cons.vlrenda.Replace(',', '.').IndexOf('.'))),
+                                DatePayday = new DateTime(2022, 01, 05), //TODO: VERIFICAR VALOR CORRETO
+                                CalculatedPayday = false,
+                                Discount = "0"
+                            },
+                            PostCode = cons.cep,
+                            HasValidToken = false,
+                            AttendanceType = "BY_PHONE",
+                            Consultant = new ValidacaoBeneficioBot.JSONObjects.ConsultantType() { TaxId = "" }, // PREENCHIDO NA CLASSE DO ROBO
+                            OriginalAttendanceType = "BY_PHONE",
+                            DataprevAllowanceType = null,
+                            AllowDataprev = false,
+                            AllowDataprevRemotely = false,
+                            Attachments = new List<object>(),
+                            //CreationDate = DateTime.Now,
+                            AsyncTokenReceived = false,
+                            //LastUpdateDate = DateTime.Now,
+                            DurationSeconds = 0,
+                            ActualStoreId = "",
+                            DataprevAllowanceTypes = new List<object>()
+                        };
 
-            //        //TODO: MUDAR PRA RG
-            //        dataClientRequest.AdditionalDocuments.Add(new ValidacaoBeneficioBot.JSONObjects.AdditionalDocumentsType() { Type = "RG", Number = cons.nb });
-            //        #endregion
+                        //TODO: MUDAR PRA RG
+                        dataClientRequest.AdditionalDocuments.Add(new ValidacaoBeneficioBot.JSONObjects.AdditionalDocumentsType() { Type = "RG", Number = cons.nb });
+                        #endregion
 
-            //        if (!robo.BuscaCliente(cons.cpf, cons.PrimeiroNome, cons.Sobrenome, ref flClienteNovo, ref erro))
-            //        {
-            //            context.SalvaErro(cons.id.Value, erro);
-            //            if (erro == "CLIENTE NOVO - PULAR")
-            //            {
-            //                contador--;
-            //                continue;
-            //            }
-            //            else
-            //            {
-            //                context.SalvaErro(cons.id.Value, "Erro método BuscaCliente: " + erro);
-            //                AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
-            //                IncrementaErro();
-            //            }
-            //            continue;
-            //        }
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Buscando cliente...");
+                        if (!robo.BuscaCliente(cons.cpf, cons.PrimeiroNome, cons.Sobrenome, ref flClienteNovo, ref erro, ref erroSite))
+                        {
+                            context.SalvaErro(cons.id.Value, erro, erroSite);
+                            if (erro == "CLIENTE NOVO - PULAR")
+                            {
+                                contador--;
+                                continue;
+                            }
+                            else
+                            {
+                                context.SalvaErro(cons.id.Value, "Erro método BuscaCliente: " + erro, erroSite);
+                                AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                                IncrementaErro();
+                            }
+                            continue;
+                        }
 
-            //        if (flClienteNovo)
-            //        {
-            //            if (!robo.BuscaCliente(cons.cpf, cons.PrimeiroNome, cons.Sobrenome, ref flClienteNovo, ref erro))
-            //            {
-            //                context.SalvaErro(cons.id.Value, erro);
-            //                if (erro == "CLIENTE NOVO - PULAR")
-            //                {
-            //                    contador--;
-            //                    continue;
-            //                }
-            //                else
-            //                {
-            //                    context.SalvaErro(cons.id.Value, "Erro método BuscaCliente (Segunda chamada): " + erro);
-            //                    AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
-            //                    IncrementaErro();
-            //                }
-            //                continue;
-            //            }
-            //        }
+                        if (flClienteNovo)
+                        {
+                            if (!robo.BuscaCliente(cons.cpf, cons.PrimeiroNome, cons.Sobrenome, ref flClienteNovo, ref erro, ref erroSite))
+                            {
+                                context.SalvaErro(cons.id.Value, erro, erroSite);
+                                if (erro == "CLIENTE NOVO - PULAR")
+                                {
+                                    contador--;
+                                    continue;
+                                }
+                                else
+                                {
+                                    context.SalvaErro(cons.id.Value, "Erro método BuscaCliente (Segunda chamada): " + erro, erroSite);
+                                    AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                                    IncrementaErro();
+                                }
+                                continue;
+                            }
+                        }
 
-            //        if (!robo.ClicaSimulacao(cons.cpf, cons.PrimeiroNome, cons.Sobrenome, ref erro))
-            //        {
-            //            context.SalvaErro(cons.id.Value, "Erro método ClicaSimulacao: " + erro);
-            //            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
-            //            IncrementaErro();
-            //            continue;
-            //        }
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Clicando em Simulacao...");
+                        if (!robo.ClicaSimulacao(cons.cpf, cons.PrimeiroNome, cons.Sobrenome, ref erro, ref erroSite))
+                        {
+                            context.SalvaErro(cons.id.Value, "Erro método ClicaSimulacao: " + erro, erroSite);
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                            IncrementaErro();
+                            continue;
+                        }
 
-            //        if (!robo.ClicaINSS(cons.cpf, cons.PrimeiroNome, cons.Sobrenome, ref erro))
-            //        {
-            //            context.SalvaErro(cons.id.Value, "Erro método ClicaINSS: " + erro);
-            //            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
-            //            IncrementaErro();
-            //            continue;
-            //        }
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Clicando INSS...");
+                        emprestimoPessoal = robo.ClicaINSS(cons.cpf, cons.PrimeiroNome, cons.Sobrenome, ref erro, ref erroSite);
 
-            //        if (!robo.AceitaOfertaGEV(dataClientRequest, ref erro))
-            //        {
-            //            context.SalvaErro(cons.id.Value, "Erro método AceitaOfertaGEV: " + erro);
-            //            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
-            //            IncrementaErro();
-            //            continue;
-            //        }
+                        if (erro != "")
+                        {
+                            context.SalvaErro(cons.id.Value, "Erro método ClicaINSS: " + erro, erroSite);
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                            IncrementaErro();
+                            continue;
+                        }
+                        else
+                        {
+                            if (emprestimoPessoal != null)
+                                InsereEmprestimoPessoal(cons.id.Value, emprestimoPessoal);
+                        }
 
-            //        if (!robo.AtendimentoTelefonico(cons.cpf, cons.PrimeiroNome, cons.Sobrenome, ref erro))
-            //        {
-            //            context.SalvaErro(cons.id.Value, "Erro método AtendimentoTelefonico: " + erro);
-            //            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
-            //            IncrementaErro();
-            //            continue;
-            //        }
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Aceitando Oferta GEV...");
+                        if (!robo.AceitaOfertaGEV(dataClientRequest, ref erro, ref erroSite))
+                        {
+                            context.SalvaErro(cons.id.Value, "Erro método AceitaOfertaGEV: " + erro, erroSite);
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                            IncrementaErro();
+                            continue;
+                        }
 
-            //        if (!robo.ContinuarProcesso(cons.cpf, cons.PrimeiroNome, cons.Sobrenome, ref erro))
-            //        {
-            //            context.SalvaErro(cons.id.Value, "Erro método ContinuarProcesso: " + erro);
-            //            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
-            //            IncrementaErro();
-            //            continue;
-            //        }
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Atendimento Telefônico...");
+                        if (!robo.AtendimentoTelefonico(cons.cpf, cons.PrimeiroNome, cons.Sobrenome, ref erro, ref erroSite))
+                        {
+                            context.SalvaErro(cons.id.Value, "Erro método AtendimentoTelefonico: " + erro, erroSite);
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                            IncrementaErro();
+                            continue;
+                        }
 
-            //        if (!robo.ContinuarSemCadastro(cons.cpf, cons.PrimeiroNome, cons.Sobrenome, ref erro))
-            //        {
-            //            context.SalvaErro(cons.id.Value, "Erro método ContinuarSemCadastro: " + erro);
-            //            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
-            //            IncrementaErro();
-            //            continue;
-            //        }
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Continuando processo...");
+                        if (!robo.ContinuarProcesso(cons.cpf, cons.PrimeiroNome, cons.Sobrenome, ref erro, ref erroSite))
+                        {
+                            context.SalvaErro(cons.id.Value, "Erro método ContinuarProcesso: " + erro, erroSite);
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                            IncrementaErro();
+                            continue;
+                        }
 
-            //        if (!robo.EtapaDadosPessoais(dataClientRequest, ref erro))
-            //        {
-            //            context.SalvaErro(cons.id.Value, "Erro método EtapaDadosPessoais: " + erro);
-            //            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
-            //            IncrementaErro();
-            //            continue;
-            //        }
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Continuar sem Cadastro...");
+                        if (!robo.ContinuarSemCadastro(cons.cpf, cons.PrimeiroNome, cons.Sobrenome, ref erro, ref erroSite))
+                        {
+                            context.SalvaErro(cons.id.Value, "Erro método ContinuarSemCadastro: " + erro, erroSite);
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                            IncrementaErro();
+                            continue;
+                        }
 
-            //        if (!robo.EtapaDadosBeneficios(dataClientRequest, ref erro))
-            //        {
-            //            context.SalvaErro(cons.id.Value, "Erro método EtapaDadosBeneficios: " + erro);
-            //            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
-            //            IncrementaErro();
-            //            continue;
-            //        }
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Informando dados pessoais...");
+                        if (!robo.EtapaDadosPessoais(dataClientRequest, ref erro, ref erroSite))
+                        {
+                            context.SalvaErro(cons.id.Value, "Erro método EtapaDadosPessoais: " + erro, erroSite);
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                            IncrementaErro();
+                            continue;
+                        }
 
-            //        if (!robo.EtapaDadosRenda(dataClientRequest, ref erro))
-            //        {
-            //            context.SalvaErro(cons.id.Value, "Erro método EtapaDadosRenda: " + erro);
-            //            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
-            //            IncrementaErro();
-            //            continue;
-            //        }
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Informando dados do benefício...");
+                        if (!robo.EtapaDadosBeneficios(dataClientRequest, ref erro, ref erroSite))
+                        {
+                            context.SalvaErro(cons.id.Value, "Erro método EtapaDadosBeneficios: " + erro, erroSite);
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                            IncrementaErro();
+                            continue;
+                        }
 
-            //        if (!robo.EtapaConferencia(dataClientRequest, ref erro))
-            //        {
-            //            context.SalvaErro(cons.id.Value, "Erro método EtapaConferencia: " + erro);
-            //            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
-            //            IncrementaErro();
-            //            continue;
-            //        }
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Informando dados de renda...");
+                        if (!robo.EtapaDadosRenda(dataClientRequest, ref erro, ref erroSite))
+                        {
+                            context.SalvaErro(cons.id.Value, "Erro método EtapaDadosRenda: " + erro, erroSite);
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                            IncrementaErro();
+                            continue;
+                        }
 
-            //        dados = robo.Simular(dataClientRequest, ref erro);
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Conferindo dados...");
+                        if (!robo.EtapaConferencia(dataClientRequest, ref erro, ref erroSite))
+                        {
+                            context.SalvaErro(cons.id.Value, "Erro método EtapaConferencia: " + erro, erroSite);
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                            IncrementaErro();
+                            continue;
+                        }
 
-            //        if (erro == "")
-            //        {
-            //            InsereDados(dados, cons.id.Value);
-            //            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Cliente processado e produtos capturados");
-            //            context.SalvaProcessado(cons.id.Value);
-            //        }
-            //        else
-            //        {
-            //            context.SalvaErro(cons.id.Value, "Erro método BuscaOfertasDisponiveis: " + erro);
-            //            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
-            //            IncrementaErro();
-            //            continue;
-            //        }
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Simulando...");
+                        dados = robo.Simular(dataClientRequest, ref erro, ref erroSite);
 
-            //        //TODO: robo.SalvarRascunho();
+                        if (erro == "")
+                        {
 
-            //        IncrementaProcessado();
-            //    }
-            //    else
-            //    {
-            //        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Sem mais registros para consultar");
-            //        return;
-            //    }
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Cadastrando produtos e simulações...");
+                            InsereDados(dados, cons.id.Value);
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Cliente processado e produtos capturados");
+                        }
+                        else
+                        {
+                            context.SalvaErro(cons.id.Value, "Erro método BuscaOfertasDisponiveis: " + erro, erroSite);
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                            IncrementaErro();
+                            continue;
+                        }
 
-            //} while (cons != null);
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Salvando rascunho...");
+                        if (!robo.SalvarRascunho(ref erro, ref erroSite))
+                        {
+                            context.SalvaErro(cons.id.Value, "Erro método SalvarRascunho: " + erro, erroSite);
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                            IncrementaErro();
+                            continue;
+                        }
+
+
+                        #region Busca de Crédito Pessoal
+
+                        //AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Iniciando etapa de busca de crédito pessoal...");
+                        //AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Buscando cliente...");
+                        //if (!robo.BuscaCliente(cons.cpf, cons.PrimeiroNome, cons.Sobrenome, ref flClienteNovo, ref erro, ref erroSite))
+                        //{
+                        //    context.SalvaErro(cons.id.Value, "Erro método BuscaCliente: " + erro, erroSite);
+                        //    AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                        //    IncrementaErro();
+                        //    continue;
+                        //}
+
+                        //AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Clicando em Simulacao...");
+                        //if (!robo.ClicaSimulacao(cons.cpf, cons.PrimeiroNome, cons.Sobrenome, ref erro, ref erroSite))
+                        //{
+                        //    context.SalvaErro(cons.id.Value, "Erro método ClicaSimulacao: " + erro, erroSite);
+                        //    AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                        //    IncrementaErro();
+                        //    continue;
+                        //}
+
+                        //AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Clicando INSS...");
+                        //if (!robo.ClicaINSS(cons.cpf, cons.PrimeiroNome, cons.Sobrenome, ref erro, ref erroSite))
+                        //{
+                        //    context.SalvaErro(cons.id.Value, "Erro método ClicaINSS: " + erro, erroSite);
+                        //    AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                        //    IncrementaErro();
+                        //    continue;
+                        //}
+
+                        //AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Consultando sem Dataprev...");
+                        //if (!robo.ClicarSemConsultaDataprevSelecionarEmprestimoPessoal(dataClientRequest, ref erro, ref erroSite))
+                        //{
+                        //    if (erro == "CLIENTE SEM EMPRÉSTIMO PESSOAL DISPONÍVEL")
+                        //    {
+
+                        //    }
+                        //    else
+                        //    {
+                        //        context.SalvaErro(cons.id.Value, "Erro método ClicarSemConsultaDataprev: " + erro, erroSite);
+                        //        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                        //        IncrementaErro();
+                        //        continue;
+                        //    }
+                        //}
+
+                        //AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Cancelando crédito pessoal..");
+                        //if (!robo.CancelaCreditoPessoal(ref erro, ref erroSite))
+                        //{
+                        //    context.SalvaErro(cons.id.Value, "Erro método CancelaCreditoPessoal: " + erro, erroSite);
+                        //    AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                        //    IncrementaErro();
+                        //    continue;
+                        //}
+                        #endregion
+
+                        IncrementaProcessado();
+                    }
+                    else
+                    {
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Sem mais registros para consultar");
+                        return;
+                    }
+
+                } while (cons != null);
+            }
+
+            catch (Exception ex)
+            {
+                AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro no robô");
+                AlteraTexto("\r\n" + ex.Message);
+
+                if (ex.InnerException != null)
+                    AlteraTexto("\r\n" + ex.InnerException.Message);
+
+                ListaThreads[threadNum - 1].Abort();
+                return;
+            }
+        }
+
+        private void RoboV4_02(int threadNum)
+        {
+            try
+            {
+                var erro = "";
+                var erroSite = "";
+                var dados = new DadosClienteProduto();
+                Product emprestimoPessoal;
+
+                var robo = new ValidacaoBeneficioBot.Bot4();
+
+                #region INICIALIZA ROBÔ
+                InsereLog("Inicializando Robô... (v3)", false);
+                AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Inicializando Robô...");
+
+                robo.BotInicialize(ref erro);
+
+                if (erro != "")
+                {
+                    AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro ao inicializar o robô - Encerrando processo");
+                    InsereLog("Erro método BotInicialize: : " + erro, true);
+                    return;
+                }
+                #endregion
+
+                #region LOGIN
+                InsereLog("THREAD " + threadNum.ToString() + ": Logando...", false);
+                AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Logando...");
+
+                robo.Login(txtUsuario.Text, txtSenha.Text, ref erro);
+
+                if (erro != "")
+                {
+                    AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro ao tentar logar - Encerrando processo");
+                    InsereLog("Erro método Login: " + erro, true);
+                    return;
+                }
+                #endregion
+
+                tb_cons_massiva_02 cons;
+
+                ValidacaoBeneficioBot.JSONObjects.DataClientPutRequest dataClientRequest;
+                bool flClienteNovo = false;
+
+                do
+                {
+                    //Verifica se é para parar a Thread
+                    VerificarRegistros(threadNum);
+
+                    erro = "";
+                    contador++;
+
+                    //Reserva o registro pra consultar
+                    AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Reservando registro...");
+                    cons = context.ReservarConsulta_02(chkApenasNovos.Checked, chkApenasErro.Checked);
+
+                    if (cons != null)
+                    {
+                        #region Recupera dados cliente
+                        dataClientRequest = new ValidacaoBeneficioBot.JSONObjects.DataClientPutRequest()
+                        {
+                            Phone = null,
+                            AdditionalDocuments = new List<ValidacaoBeneficioBot.JSONObjects.AdditionalDocumentsType>(),
+                            Benefit = new ValidacaoBeneficioBot.JSONObjects.BenefitType()
+                            {
+                                BenefitKind = new ValidacaoBeneficioBot.JSONObjects.BenefitKindType()
+                                {
+                                    Code = int.Parse(cons.esp)
+                                },
+                                CBCIfPayer = "237",//TODO: INSERIR CODIGO DO BANCO
+                                DispatchYear = 2014, //TODO: INSERIR ANO CORRETO
+                                BenefitNumber = cons.nb,
+                                OwnsLawfulAgent = true, //TODO: VERIFICAR VALOR CORRETO
+                                AvailableCardMargin = null,
+                                AvailableMargin = null
+                            },
+                            DateBirthday = cons.dtnasc.Value,
+                            Document = cons.cpf,
+                            ExternalId = "", // PREENCHIDO NA CLASSE DO ROBO
+                            FullName = cons.nome,
+                            Income = new ValidacaoBeneficioBot.JSONObjects.IncomeType()
+                            {
+                                GrossIncome = int.Parse(cons.vlrenda.Substring(0, cons.vlrenda.Replace(',', '.').IndexOf('.'))),
+                                NetIncome = int.Parse(cons.vlrenda.Substring(0, cons.vlrenda.Replace(',', '.').IndexOf('.'))),
+                                DatePayday = new DateTime(2022, 01, 05), //TODO: VERIFICAR VALOR CORRETO
+                                CalculatedPayday = false,
+                                Discount = "0"
+                            },
+                            PostCode = cons.cep,
+                            HasValidToken = false,
+                            AttendanceType = "BY_PHONE",
+                            Consultant = new ValidacaoBeneficioBot.JSONObjects.ConsultantType() { TaxId = "" }, // PREENCHIDO NA CLASSE DO ROBO
+                            OriginalAttendanceType = "BY_PHONE",
+                            DataprevAllowanceType = null,
+                            AllowDataprev = false,
+                            AllowDataprevRemotely = false,
+                            Attachments = new List<object>(),
+                            //CreationDate = DateTime.Now,
+                            AsyncTokenReceived = false,
+                            //LastUpdateDate = DateTime.Now,
+                            DurationSeconds = 0,
+                            ActualStoreId = "",
+                            DataprevAllowanceTypes = new List<object>()
+                        };
+
+                        //TODO: MUDAR PRA RG
+                        dataClientRequest.AdditionalDocuments.Add(new ValidacaoBeneficioBot.JSONObjects.AdditionalDocumentsType() { Type = "RG", Number = cons.nb });
+                        #endregion
+
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Buscando cliente...");
+                        if (!robo.BuscaCliente(cons.cpf, cons.PrimeiroNome, cons.Sobrenome, ref flClienteNovo, ref erro, ref erroSite))
+                        {
+                            context.SalvaErro_02(cons.id.Value, erro, erroSite);
+                            if (erro == "CLIENTE NOVO - PULAR")
+                            {
+                                contador--;
+                                continue;
+                            }
+                            else
+                            {
+                                context.SalvaErro_02(cons.id.Value, "Erro método BuscaCliente: " + erro, erroSite);
+                                AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                                IncrementaErro();
+                            }
+                            continue;
+                        }
+
+                        if (flClienteNovo)
+                        {
+                            if (!robo.BuscaCliente(cons.cpf, cons.PrimeiroNome, cons.Sobrenome, ref flClienteNovo, ref erro, ref erroSite))
+                            {
+                                context.SalvaErro_02(cons.id.Value, erro, erroSite);
+                                if (erro == "CLIENTE NOVO - PULAR")
+                                {
+                                    contador--;
+                                    continue;
+                                }
+                                else
+                                {
+                                    context.SalvaErro_02(cons.id.Value, "Erro método BuscaCliente (Segunda chamada): " + erro, erroSite);
+                                    AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                                    IncrementaErro();
+                                }
+                                continue;
+                            }
+                        }
+
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Clicando em Simulacao...");
+                        if (!robo.ClicaSimulacao(cons.cpf, cons.PrimeiroNome, cons.Sobrenome, ref erro, ref erroSite))
+                        {
+                            context.SalvaErro_02(cons.id.Value, "Erro método ClicaSimulacao: " + erro, erroSite);
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                            IncrementaErro();
+                            continue;
+                        }
+
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Clicando INSS...");
+                        emprestimoPessoal = robo.ClicaINSS(cons.cpf, cons.PrimeiroNome, cons.Sobrenome, ref erro, ref erroSite);
+
+                        if (erro != "")
+                        {
+                            context.SalvaErro_02(cons.id.Value, "Erro método ClicaINSS: " + erro, erroSite);
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                            IncrementaErro();
+                            continue;
+                        }
+                        else
+                        {
+                            if (emprestimoPessoal != null)
+                                InsereEmprestimoPessoal(cons.id.Value, emprestimoPessoal);
+                        }
+
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Aceitando Oferta GEV...");
+                        if (!robo.AceitaOfertaGEV(dataClientRequest, ref erro, ref erroSite))
+                        {
+                            context.SalvaErro_02(cons.id.Value, "Erro método AceitaOfertaGEV: " + erro, erroSite);
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                            IncrementaErro();
+                            continue;
+                        }
+
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Atendimento Telefônico...");
+                        if (!robo.AtendimentoTelefonico(cons.cpf, cons.PrimeiroNome, cons.Sobrenome, ref erro, ref erroSite))
+                        {
+                            context.SalvaErro_02(cons.id.Value, "Erro método AtendimentoTelefonico: " + erro, erroSite);
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                            IncrementaErro();
+                            continue;
+                        }
+
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Continuando processo...");
+                        if (!robo.ContinuarProcesso(cons.cpf, cons.PrimeiroNome, cons.Sobrenome, ref erro, ref erroSite))
+                        {
+                            context.SalvaErro_02(cons.id.Value, "Erro método ContinuarProcesso: " + erro, erroSite);
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                            IncrementaErro();
+                            continue;
+                        }
+
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Continuar sem Cadastro...");
+                        if (!robo.ContinuarSemCadastro(cons.cpf, cons.PrimeiroNome, cons.Sobrenome, ref erro, ref erroSite))
+                        {
+                            context.SalvaErro_02(cons.id.Value, "Erro método ContinuarSemCadastro: " + erro, erroSite);
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                            IncrementaErro();
+                            continue;
+                        }
+
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Informando dados pessoais...");
+                        if (!robo.EtapaDadosPessoais(dataClientRequest, ref erro, ref erroSite))
+                        {
+                            context.SalvaErro_02(cons.id.Value, "Erro método EtapaDadosPessoais: " + erro, erroSite);
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                            IncrementaErro();
+                            continue;
+                        }
+
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Informando dados do benefício...");
+                        if (!robo.EtapaDadosBeneficios(dataClientRequest, ref erro, ref erroSite))
+                        {
+                            context.SalvaErro_02(cons.id.Value, "Erro método EtapaDadosBeneficios: " + erro, erroSite);
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                            IncrementaErro();
+                            continue;
+                        }
+
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Informando dados de renda...");
+                        if (!robo.EtapaDadosRenda(dataClientRequest, ref erro, ref erroSite))
+                        {
+                            context.SalvaErro_02(cons.id.Value, "Erro método EtapaDadosRenda: " + erro, erroSite);
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                            IncrementaErro();
+                            continue;
+                        }
+
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Conferindo dados...");
+                        if (!robo.EtapaConferencia(dataClientRequest, ref erro, ref erroSite))
+                        {
+                            context.SalvaErro_02(cons.id.Value, "Erro método EtapaConferencia: " + erro, erroSite);
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                            IncrementaErro();
+                            continue;
+                        }
+
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Simulando...");
+                        dados = robo.Simular(dataClientRequest, ref erro, ref erroSite);
+
+                        if (erro == "")
+                        {
+
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Cadastrando produtos e simulações...");
+                            InsereDados_02(dados, cons.id.Value);
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Cliente processado e produtos capturados");
+                        }
+                        else
+                        {
+                            context.SalvaErro_02(cons.id.Value, "Erro método BuscaOfertasDisponiveis: " + erro, erroSite);
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                            IncrementaErro();
+                            continue;
+                        }
+
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Salvando rascunho...");
+                        if (!robo.SalvarRascunho(ref erro, ref erroSite))
+                        {
+                            context.SalvaErro_02(cons.id.Value, "Erro método SalvarRascunho: " + erro, erroSite);
+                            AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro");
+                            IncrementaErro();
+                            continue;
+                        }
+
+                        IncrementaProcessado();
+                    }
+                    else
+                    {
+                        AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Sem mais registros para consultar");
+                        return;
+                    }
+
+                } while (cons != null);
+            }
+            catch (Exception ex)
+            {
+                AlteraTexto("\r\n" + DateTime.Now.ToString("HH:mm:ss") + " Thread " + threadNum.ToString() + " - Erro no robô");
+                AlteraTexto("\r\n" + ex.Message);
+
+                if (ex.InnerException != null)
+                    AlteraTexto("\r\n" + ex.InnerException.Message);
+
+                ListaThreads[threadNum - 1].Abort();
+                return;
+            }
         }
 
         private void InsereEmprestimoPessoal(Guid idConsulta, Product emprestimoPessoal)

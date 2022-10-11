@@ -28,7 +28,7 @@ namespace ValidacaoBeneficioDB
 
             //var consulta = tb_cons_massiva.Where(c=> c.cpf == "15062958865").FirstOrDefault();
             //var consulta = tb_cons_massiva.Where(c => !c.id.HasValue).FirstOrDefault();
-            //var consulta = tb_cons_massiva.Where(c => c.erro == "Cliente novo - Não cadastrar").FirstOrDefault();
+
 
             tb_cons_massiva consulta;
 
@@ -39,9 +39,9 @@ namespace ValidacaoBeneficioDB
             else
                 consulta = tb_cons_massiva.Where(c => c.id.HasValue && !string.IsNullOrEmpty(c.erro)).FirstOrDefault();
 
-            //consulta = tb_cons_massiva.Where(c => c.status == 9).FirstOrDefault();
+            //consulta = tb_cons_massiva.Where(c => c.erro == "Erro método AceitaOfertaGEV: Request failed with status code Conflict").FirstOrDefault();
 
-            //consulta = tb_cons_massiva.Where(c => c.cpf == "66723019920").FirstOrDefault();
+            consulta = tb_cons_massiva.Where(c => c.cpf == "27139166315").FirstOrDefault();
 
             if (consulta != null)
             {

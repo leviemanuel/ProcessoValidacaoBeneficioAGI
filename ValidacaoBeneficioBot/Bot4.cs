@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using ValidacaoBeneficioBot.JSONObjects;
 using ValidacaoBeneficioBot.Objs;
@@ -19,14 +18,14 @@ namespace ValidacaoBeneficioBot
         private string urlAPI = "https://api.agibank.com.br";
         private int timeout = 10000;
 
-        //private RestClient client;
+        private RestClient client;
         private Dictionary<string, string> keys = new Dictionary<string, string>();
 
         private string accept;
         private string userAgent;
         private string referer;
         private int cntURL = -1;
-        private HttpResponseMessage response;
+        private RestResponse response;
         AccountClientResponse objCliente;
         VfrmRemotingProviderImplResponse vfrmRemotingProviderImplResponse;
         JSONObjects.SimularRequest SimularRequestContext;
@@ -40,19 +39,11 @@ namespace ValidacaoBeneficioBot
         RecordResponse recordResponse;
         dynamic VFRMRemotingProviderImpl;
 
-        HttpClient httpClient;
-
         public bool BotInicialize(ref string erro)
         {
             try
             {
-
-                HttpClientHandler handler = new HttpClientHandler()
-                {
-                    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
-                };
-
-                httpClient = new HttpClient(handler);
+                client = new RestClient(urlSite);
 
                 var hdrs = new Dictionary<string, string>();
 
@@ -80,9 +71,34 @@ namespace ValidacaoBeneficioBot
                     _accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
                     _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36 Edg/102.0.1245.33",
                     _referer: "https://agibank.force.com/s/");
+                #endregion
 
+                #region oauth2/authorize?response_type=code&client_id=WklRjqY1Ei_ftgpfpDCHruwQEOka&redirect_uri=https%3A%2F%2Fagibank.force.com%2Fservices%2Fauthcallback%2FAgibank&scope=openid+refresh_token&state=CAAAAYIemX89MDAwMDAwMDAwMDAwMDAwAAAA7k0OZktYik0OM4HM6xVpOxf-wKcxkCmOUZIJnfT3GVh_E3M3zRTjcQIQRFKEOnI0JyNANCvwo7WU2qox_6MLArE81gA3aD1RQ6sdokvNnpepc2F_34AkpnTs9Jmn4EccQBfCvBYftAwpgr8TefIn1gM6tNdzTKvyYfIBsv5hQMzCb7wHoGuMFF-i-4vo3f7fDlZhhZWOsd8vWXWrL6quKkq60S7dk8xTj1av2lglWj2PC7aNgP6HPwq7SUpkZk5A1Q%3D%3D
+                hdrs = new Dictionary<string, string>();
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "agibank.force.com");
 
-                var urlItens = response.RequestMessage.RequestUri.ToString().Split('&');
+                //response = DoGet(response.Headers.Where(h => h.Name == "Location").FirstOrDefault().Value.ToString(),
+                //    headers: hdrs,
+                //    _accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+                //    _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36 Edg/102.0.1245.33",
+                //    _referer: "https://agibank.force.com/");
+                #endregion
+
+                #region /authenticationendpoint/login.do?client_id=WklRjqY1Ei_ftgpfpDCHruwQEOka&commonAuthCallerPath=%2Foauth2%2Fauthorize&forceAuth=false&passiveAuth=false&redirect_uri=https%3A%2F%2Fagibank.force.com%2Fservices%2Fauthcallback%2FAgibank&response_type=code&scope=openid+refresh_token&state=CAAAAYIemX89MDAwMDAwMDAwMDAwMDAwAAAA7k0OZktYik0OM4HM6xVpOxf-wKcxkCmOUZIJnfT3GVh_E3M3zRTjcQIQRFKEOnI0JyNANCvwo7WU2qox_6MLArE81gA3aD1RQ6sdokvNnpepc2F_34AkpnTs9Jmn4EccQBfCvBYftAwpgr8TefIn1gM6tNdzTKvyYfIBsv5hQMzCb7wHoGuMFF-i-4vo3f7fDlZhhZWOsd8vWXWrL6quKkq60S7dk8xTj1av2lglWj2PC7aNgP6HPwq7SUpkZk5A1Q%3D%3D&tenantDomain=carbon.super&sessionDataKey=00cf04f0-9ef4-402e-ad05-519b64cc9564&relyingParty=WklRjqY1Ei_ftgpfpDCHruwQEOka&type=oidc&sp=admin_Salesforce_PRODUCTION&isSaaSApp=false&authenticators=BasicAuthenticator:LOCAL 
+                hdrs = new Dictionary<string, string>();
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "agibank.force.com");
+
+                //response = DoGet(response.Headers.Where(h => h.Name == "Location").FirstOrDefault().Value.ToString(),
+                //    headers: hdrs,
+                //    _accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+                //    _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36 Edg/102.0.1245.33",
+                //    _referer: "https://agibank.force.com/");
+
+                var urlItens = response.ResponseUri.Query.Split('&');
 
                 UpdateKeys("sessionDataKey", urlItens.FirstOrDefault(i => i.Contains("sessionDataKey=")).Split('=')[1]);
                 UpdateKeys("scope", urlItens.FirstOrDefault(i => i.Contains("scope=")).Split('=')[1]);
@@ -95,19 +111,17 @@ namespace ValidacaoBeneficioBot
                 UpdateKeys("authenticators", urlItens.FirstOrDefault(i => i.Contains("authenticators=")).Split('=')[1]);
                 #endregion
 
-
                 #region /logincontext?sessionDataKey=00cf04f0-9ef4-402e-ad05-519b64cc9564&relyingParty=WklRjqY1Ei_ftgpfpDCHruwQEOka&tenantDomain=carbon.super&_=1658369853473
                 hdrs = new Dictionary<string, string>();
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
                 hdrs.Add("Host", "api.agibank.com.br");
 
-                var auxURL = response.Content.ReadAsStringAsync().Result;
-                auxURL = auxURL.Substring(auxURL.IndexOf("input type=\"hidden\" name=\"sessionDataKey\" value='") + 49);
+                var auxURL = response.Content.Substring(response.Content.IndexOf("input type=\"hidden\" name=\"sessionDataKey\" value='") + 49);
                 auxURL = auxURL.Substring(0, auxURL.IndexOf("'/>"));
                 UpdateKeys("sessionDataKey", auxURL);
 
-                auxURL = response.Content.ReadAsStringAsync().Result.Substring(response.Content.ReadAsStringAsync().Result.IndexOf("if(clientIdsHashArray.includes(\"") + 49);
+                auxURL = response.Content.Substring(response.Content.IndexOf("if(clientIdsHashArray.includes(\"") + 49);
                 auxURL = auxURL.Substring(0, auxURL.IndexOf("\""));
                 UpdateKeys("relyingParty", auxURL);
 
@@ -115,7 +129,7 @@ namespace ValidacaoBeneficioBot
                     headers: hdrs,
                     _accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
                     _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36 Edg/102.0.1245.33",
-                    _referer: response.RequestMessage.RequestUri.ToString());
+                    _referer: response.ResponseUri.ToString());
                 #endregion
 
                 return true;
@@ -124,7 +138,7 @@ namespace ValidacaoBeneficioBot
             {
                 erro = ex.Message;
                 if (ex.InnerException != null)
-                    erro = ex.InnerException.Message;
+                    erro += " - " + ex.InnerException.Message;
                 return false;
             }
         }
@@ -138,9 +152,9 @@ namespace ValidacaoBeneficioBot
                 #region POST /commonauth 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
-                //hdrs.Add("Host", "api.agibank.com.br");
-                //hdrs.Add("Origin", "https://api.agibank.com.br");
-                //hdrs.Add("Content-Type", "application/x-www-form-urlencoded");
+                hdrs.Add("Host", "api.agibank.com.br");
+                hdrs.Add("Origin", "https://api.agibank.com.br");
+                hdrs.Add("Content-Type", "application/x-www-form-urlencoded");
 
                 var auxReferer = urlAPI + @"authenticationendpoint/login.do?client_id=" + keys["client_id"] + "&" +
                                         "commonAuthCallerPath=%2Foauth2%2Fauthorize&" +
@@ -167,7 +181,7 @@ namespace ValidacaoBeneficioBot
 
                 var url = "";
                 var auxURL = "<meta http-equiv=\"Refresh\" content=\"0; URL=https://agibank.force.com/secur/frontdoor.jsp?sid=";
-                auxURL = response.Content.ReadAsStringAsync().Result.Substring(response.Content.ReadAsStringAsync().Result.IndexOf(auxURL) + auxURL.Length);
+                auxURL = response.Content.Substring(response.Content.IndexOf(auxURL) + auxURL.Length);
                 auxURL = auxURL.Substring(0, auxURL.IndexOf("\""));
 
                 url = "/secur/frontdoor.jsp?sid=" + WebUtility.HtmlDecode(auxURL);
@@ -194,7 +208,7 @@ namespace ValidacaoBeneficioBot
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
                 hdrs.Add("Host", "agibank.force.com");
 
-                //response = DoGet(response.RequestMessage.RequestUri.ToString(),
+                //response = DoGet(response.ResponseUri.ToString(),
                 //             headers: hdrs,
                 //             _accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
                 //             _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37",
@@ -209,17 +223,17 @@ namespace ValidacaoBeneficioBot
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
                 hdrs.Add("Host", "agibank.force.com");
 
-                auxURL = RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "SfdcApp.projectOneNavigator.handleRedirect('", "')");
+                auxURL = RetornaAuxSubstring(response.Content, "SfdcApp.projectOneNavigator.handleRedirect('", "')");
 
                 response = DoGet(auxURL,
                              headers: hdrs,
                              _accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
                              _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37",
-                             _referer: response.RequestMessage.RequestUri.ToString());
+                             _referer: response.ResponseUri.ToString());
 
                 #endregion
 
-                NavegaHome(response.RequestMessage.RequestUri.ToString());
+                NavegaHome(response.ResponseUri.ToString());
 
                 return true;
             }
@@ -227,7 +241,7 @@ namespace ValidacaoBeneficioBot
             {
                 erro = ex.Message;
                 if (ex.InnerException != null)
-                    erro = ex.InnerException.Message;
+                    erro += " - " + ex.InnerException.Message;
                 return false;
             }
         }
@@ -253,9 +267,9 @@ namespace ValidacaoBeneficioBot
                     _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36 Edg/102.0.1245.33",
                     _referer: auxReferer);
 
-                context = JsonConvert.DeserializeObject<JSONObjects.AuraContextRequest>(RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "&aura.app=markup://siteforce:communityApp&aura.mode=PROD\",\"context\":", ",\"attributes\":{\""));
+                context = JsonConvert.DeserializeObject<JSONObjects.AuraContextRequest>(RetornaAuxSubstring(response.Content, "&aura.app=markup://siteforce:communityApp&aura.mode=PROD\",\"context\":", ",\"attributes\":{\""));
 
-                var auraToken = RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "\",\"pathPrefix\":\"\",\"token\":\"", "\",\"staticResourceDomain");
+                var auraToken = RetornaAuxSubstring(response.Content, "\",\"pathPrefix\":\"\",\"token\":\"", "\",\"staticResourceDomain");
                 UpdateKeys("aura.token", auraToken);
                 #endregion
 
@@ -263,7 +277,7 @@ namespace ValidacaoBeneficioBot
                 hdrs = new Dictionary<string, string>();
                 auxReferer = auxURL;
 
-                auxURL = response.Content.ReadAsStringAsync().Result;
+                auxURL = response.Content;
                 auxURL = auxURL.Substring(auxURL.LastIndexOf("><script src=\"/s/sfsites/l/%7B%22mode%22%3A%22PROD") + 14);
                 auxURL = auxURL.Substring(0, auxURL.IndexOf("\"></"));
 
@@ -277,7 +291,7 @@ namespace ValidacaoBeneficioBot
                     _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36 Edg/102.0.1245.33",
                     _referer: "https://agibank.force.com/s/");
 
-                auxURL = RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "values\":{\"CurrentUser\":", "}},{\"type");
+                auxURL = RetornaAuxSubstring(response.Content, "values\":{\"CurrentUser\":", "}},{\"type");
 
                 currentUser = JsonConvert.DeserializeObject<CurrentUserResponse>(auxURL);
                 #endregion
@@ -336,13 +350,13 @@ namespace ValidacaoBeneficioBot
                     "&aura.pageURI=%2Fs%2F" +
                     "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&ui-comm-runtime-components-aura-components-siteforce-controller.PubliclyCacheableComponentLoader.getAudienceTargetedPageComponent=1",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&ui-comm-runtime-components-aura-components-siteforce-controller.PubliclyCacheableComponentLoader.getAudienceTargetedPageComponent=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/",
                            _accept: "*/*");
                 //}\n};\n});\n"}],"loaded":{
-                auxURL = response.Content.ReadAsStringAsync().Result.Substring(response.Content.ReadAsStringAsync().Result.IndexOf("{\"APPLICATION@markup://siteforce:communityApp"));
+                auxURL = response.Content.Substring(response.Content.IndexOf("{\"APPLICATION@markup://siteforce:communityApp"));
                 auxURL = auxURL.Substring(0, auxURL.IndexOf(",\"globalValueProviders"));
 
                 context.Loaded = JsonConvert.DeserializeObject<Loaded>(auxURL);
@@ -361,14 +375,14 @@ namespace ValidacaoBeneficioBot
                 strPost = "message=%7B%22actions%22%3A%5B%7B%22id%22%3A%22142%3Ba%22%2C%22descriptor%22%3A%22serviceComponent%3A%2F%2Fui.chatter.components.messages.MessagesController%2FACTION%24getMessagingPermAndPref%22%2C%22callingDescriptor%22%3A%22UNKNOWN%22%2C%22params%22%3A%7B%7D%2C%22storable%22%3Atrue%7D%2C%7B%22id%22%3A%2241%3Ba%22%2C%22descriptor%22%3A%22serviceComponent%3A%2F%2Fui.self.service.components.profileMenu.ProfileMenuController%2FACTION%24getProfileMenuResponse%22%2C%22callingDescriptor%22%3A%22markup%3A%2F%2FselfService%3AprofileMenuAPI%22%2C%22params%22%3A%7B%7D%2C%22version%22%3A%2255.0%22%7D%2C%7B%22id%22%3A%22147%3Ba%22%2C%22descriptor%22%3A%22serviceComponent%3A%2F%2Fui.force.components.controllers.hostConfig.HostConfigController%2FACTION%24getConfigData%22%2C%22callingDescriptor%22%3A%22UNKNOWN%22%2C%22params%22%3A%7B%7D%2C%22storable%22%3Atrue%7D%2C%7B%22id%22%3A%22106%3Ba%22%2C%22descriptor%22%3A%22serviceComponent%3A%2F%2Fui.analytics.dashboard.components.lightning.DashboardComponentController%2FACTION%24isFeedEnabled%22%2C%22callingDescriptor%22%3A%22UNKNOWN%22%2C%22params%22%3A%7B%22dashboardId%22%3A%2201Z6e000001DeZoEAK%22%7D%7D%2C%7B%22id%22%3A%22107%3Ba%22%2C%22descriptor%22%3A%22serviceComponent%3A%2F%2Fui.analytics.dashboard.components.lightning.DashboardComponentController%2FACTION%24getAdditionalParameters%22%2C%22callingDescriptor%22%3A%22UNKNOWN%22%2C%22params%22%3A%7B%7D%7D%2C%7B%22id%22%3A%22149%3Ba%22%2C%22descriptor%22%3A%22serviceComponent%3A%2F%2Fui.communities.components.aura.components.forceCommunity.richText.RichTextController%2FACTION%24getParsedRichTextValue%22%2C%22callingDescriptor%22%3A%22UNKNOWN%22%2C%22params%22%3A%7B%22html%22%3A%22%3Cp%20style%3D%5C%22text-align%3A%20center%3B%5C%22%3E%3Cimg%20class%3D%5C%22sfdcCbImage%5C%22%20src%3D%5C%22%7B!contentAsset.footer_agi_expanded.1%7D%5C%22%20%2F%3E%3C%2Fp%3E%22%7D%2C%22version%22%3A%2255.0%22%2C%22storable%22%3Atrue%7D%2C%7B%22id%22%3A%22116%3Ba%22%2C%22descriptor%22%3A%22serviceComponent%3A%2F%2Fui.communities.components.aura.components.forceCommunity.flowCommunity.FlowCommunityController%2FACTION%24canViewFlow%22%2C%22callingDescriptor%22%3A%22markup%3A%2F%2FforceCommunity%3AflowCommunity%22%2C%22params%22%3A%7B%22flowName%22%3A%22OrderProductSearchFlow%22%7D%2C%22version%22%3A%2255.0%22%7D%2C%7B%22id%22%3A%22150%3Ba%22%2C%22descriptor%22%3A%22serviceComponent%3A%2F%2Fui.chatter.components.aura.components.forceChatter.groups.GroupAnnouncementController%2FACTION%24getAnnouncement%22%2C%22callingDescriptor%22%3A%22UNKNOWN%22%2C%22params%22%3A%7B%22groupId%22%3A%220F96e000000fysaCAA%22%7D%2C%22storable%22%3Atrue%7D%2C%7B%22id%22%3A%22151%3Ba%22%2C%22descriptor%22%3A%22serviceComponent%3A%2F%2Fui.communities.components.aura.components.forceCommunity.richText.RichTextController%2FACTION%24getParsedRichTextValue%22%2C%22callingDescriptor%22%3A%22UNKNOWN%22%2C%22params%22%3A%7B%22html%22%3A%22%3Cp%3E%3Cb%20style%3D%5C%22color%3A%20rgb(68%2C%2068%2C%2068)%3B%20font-size%3A%2036px%3B%5C%22%3EQue%20bom%20te%20ver%20por%20aqui%2C%3C%2Fb%3E%3Cb%20style%3D%5C%22color%3A%20rgb(0%2C%200%2C%200)%3B%20font-size%3A%2036px%3B%5C%22%3E%20%3C%2Fb%3E%3Cb%20style%3D%5C%22color%3A%20rgb(0%2C%20102%2C%20204)%3B%20font-size%3A%2036px%3B%5C%22%3ECaio%3C%2Fb%3E%3Cb%20style%3D%5C%22font-size%3A%2036px%3B%5C%22%3E%20%3A)%3C%2Fb%3E%3C%2Fp%3E%3Cp%3E%26nbsp%3B%3C%2Fp%3E%22%7D%2C%22version%22%3A%2255.0%22%2C%22storable%22%3Atrue%7D%2C%7B%22id%22%3A%22152%3Ba%22%2C%22descriptor%22%3A%22serviceComponent%3A%2F%2Fui.communities.components.aura.components.forceCommunity.richText.RichTextController%2FACTION%24getParsedRichTextValue%22%2C%22callingDescriptor%22%3A%22UNKNOWN%22%2C%22params%22%3A%7B%22html%22%3A%22%3Cp%3E%3Cimg%20class%3D%5C%22sfdcCbImage%5C%22%20src%3D%5C%22%7B!contentAsset.digitacao.1%7D%5C%22%20style%3D%5C%22width%3A%20568.641px%3B%20height%3A%2078.4219px%3B%5C%22%20%2F%3E%3C%2Fp%3E%22%7D%2C%22version%22%3A%2255.0%22%2C%22storable%22%3Atrue%7D%2C%7B%22id%22%3A%22130%3Ba%22%2C%22descriptor%22%3A%22serviceComponent%3A%2F%2Fui.communities.components.aura.components.forceCommunity.flowCommunity.FlowCommunityController%2FACTION%24canViewFlow%22%2C%22callingDescriptor%22%3A%22markup%3A%2F%2FforceCommunity%3AflowCommunity%22%2C%22params%22%3A%7B%22flowName%22%3A%22NewAccountSimulationFlow%22%7D%2C%22version%22%3A%2255.0%22%7D%2C%7B%22id%22%3A%22153%3Ba%22%2C%22descriptor%22%3A%22serviceComponent%3A%2F%2Fui.communities.components.aura.components.forceCommunity.richText.RichTextController%2FACTION%24getParsedRichTextValue%22%2C%22callingDescriptor%22%3A%22UNKNOWN%22%2C%22params%22%3A%7B%22html%22%3A%22%3Cp%3E%3Cimg%20class%3D%5C%22sfdcCbImage%5C%22%20src%3D%5C%22%7B!contentAsset.buscar_proposta.1%7D%5C%22%20%2F%3E%3C%2Fp%3E%22%7D%2C%22version%22%3A%2255.0%22%2C%22storable%22%3Atrue%7D%2C%7B%22id%22%3A%22148%3Ba%22%2C%22descriptor%22%3A%22aura%3A%2F%2FComponentController%2FACTION%24getComponent%22%2C%22callingDescriptor%22%3A%22UNKNOWN%22%2C%22params%22%3A%7B%22name%22%3A%22markup%3A%2F%2FforceCommunity%3AglobalNavigation%22%2C%22attributes%22%3A%7B%22NavigationMenuEditorRefresh%22%3A%22Default_Navigation1%22%2C%22hideHomeText%22%3Afalse%2C%22hideAppLauncher%22%3Afalse%7D%7D%7D%5D%7D&aura.context=%7B%22mode%22%3A%22PROD%22%2C%22fwuid%22%3A%22QPQi8lbYE8YujG6og6Dqgw%22%2C%22app%22%3A%22siteforce%3AcommunityApp%22%2C%22loaded%22%3A%7B%22APPLICATION%40markup%3A%2F%2Fsiteforce%3AcommunityApp%22%3A%22LpCTzuyqBUeCUwKaXXlwUA%22%2C%22COMPONENT%40markup%3A%2F%2Fflowruntime%3AflowRuntimeForFlexiPage%22%3A%22-5daKiCvGVZANVvqKEoy2Q%22%2C%22COMPONENT%40markup%3A%2F%2FforceCommunity%3Adashboard%22%3A%22AiCYJU2L1bxRJx7dSn1bjw%22%2C%22COMPONENT%40markup%3A%2F%2FforceCommunity%3AflowCommunity%22%3A%222aHA7kue5UGz8eJ4g8pZbQ%22%2C%22COMPONENT%40markup%3A%2F%2FforceCommunity%3AglobalNavigation%22%3A%22hMmasIzVdWEZ3ka9-lPn0w%22%2C%22COMPONENT%40markup%3A%2F%2FforceCommunity%3AgroupAnnouncement%22%3A%22P4M42Q1bH-ULweP4K3yAHg%22%2C%22COMPONENT%40markup%3A%2F%2FforceCommunity%3ArichTextInline%22%3A%22HRtpLMxEd9S_qFnNhOYX_Q%22%2C%22COMPONENT%40markup%3A%2F%2Finstrumentation%3Ao11yCoreCollector%22%3A%228089lZkrpgraL8-V8KZXNw%22%2C%22COMPONENT%40markup%3A%2F%2Fsiteforce%3AregionLoaderWrapper%22%3A%22iB-z_tJpr_VgV-1n1WmpOg%22%7D%2C%22dn%22%3A%5B%5D%2C%22globals%22%3A%7B%7D%2C%22uad%22%3Afalse%7D&aura.pageURI=%2Fs%2F" +
                     "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.Component.getComponent=1&ui-analytics-dashboard-components-lightning.DashboardComponent.getAdditionalParameters=1&ui-analytics-dashboard-components-lightning.DashboardComponent.isFeedEnabled=1&ui-chatter-components-aura-components-forceChatter-groups.GroupAnnouncement.getAnnouncement=1&ui-chatter-components-messages.Messages.getMessagingPermAndPref=1&ui-communities-components-aura-components-forceCommunity-flowCommunity.FlowCommunity.canViewFlow=2&ui-communities-components-aura-components-forceCommunity-richText.RichText.getParsedRichTextValue=4&ui-force-components-controllers-hostConfig.HostConfig.getConfigData=1&ui-self-service-components-profileMenu.ProfileMenu.getProfileMenuResponse=1",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.Component.getComponent=1&ui-analytics-dashboard-components-lightning.DashboardComponent.getAdditionalParameters=1&ui-analytics-dashboard-components-lightning.DashboardComponent.isFeedEnabled=1&ui-chatter-components-aura-components-forceChatter-groups.GroupAnnouncement.getAnnouncement=1&ui-chatter-components-messages.Messages.getMessagingPermAndPref=1&ui-communities-components-aura-components-forceCommunity-flowCommunity.FlowCommunity.canViewFlow=2&ui-communities-components-aura-components-forceCommunity-richText.RichText.getParsedRichTextValue=4&ui-force-components-controllers-hostConfig.HostConfig.getConfigData=1&ui-self-service-components-profileMenu.ProfileMenu.getProfileMenuResponse=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/",
                            _accept: "*/*");
-                UpdateKeys("currentNetworkId", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, ",\"currentNetworkId\":\"", "\""));
+                UpdateKeys("currentNetworkId", RetornaAuxSubstring(response.Content, ",\"currentNetworkId\":\"", "\""));
 
-                auxURL = RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "\"loaded\":", ",\"globalValueProviders");
+                auxURL = RetornaAuxSubstring(response.Content, "\"loaded\":", ",\"globalValueProviders");
 
                 context.Loaded = JsonConvert.DeserializeObject<Loaded>(auxURL);
                 #endregion
@@ -404,7 +418,7 @@ namespace ValidacaoBeneficioBot
                    "&aura.pageURI=%2Fs%2F" +
                    "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&ui-comm-runtime-components-aura-components-siteforce-controller.PubliclyCacheableAttributeLoader.getComponentAttributes=1",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&ui-comm-runtime-components-aura-components-siteforce-controller.PubliclyCacheableAttributeLoader.getComponentAttributes=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/",
@@ -436,7 +450,7 @@ namespace ValidacaoBeneficioBot
                    "&aura.pageURI=%2Fs%2F" +
                    "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&ui-analytics-dashboard-components-lightning.DashboardComponent.getSitePathPrefix=1",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&ui-analytics-dashboard-components-lightning.DashboardComponent.getSitePathPrefix=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/",
@@ -451,16 +465,16 @@ namespace ValidacaoBeneficioBot
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
                 hdrs.Add("Host", "agibank.force.com");
 
-                response = DoGet("/desktopDashboards/dashboardApp.app?dashboardId=01Z6e000001DeZoEAK&displayMode=view&networkId=" + keys["currentNetworkId"] + "&userId=" + currentUser.Id,
+                response = DoGet("https://agibank.force.com/desktopDashboards/dashboardApp.app?dashboardId=01Z6e000001DeZoEAK&displayMode=view&networkId=" + keys["currentNetworkId"] + "&userId=" + currentUser.Id,
                     headers: hdrs,
                     _accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
                     _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36 Edg/102.0.1245.33",
                     _referer: "https://agibank.force.com/s/");
 
-                var newAuraToken = RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "\",\"pathPrefix\":\"\",\"token\":\"", "\",\"staticResourceDomain");
+                var newAuraToken = RetornaAuxSubstring(response.Content, "\",\"pathPrefix\":\"\",\"token\":\"", "\",\"staticResourceDomain");
                 UpdateKeys("new.aura.token", newAuraToken);
 
-                UpdateKeys("aura.context", RetornaAuxSubstring(WebUtility.UrlDecode(response.Content.ReadAsStringAsync().Result), "\"desktopDashboards:dashboardApp\",\"loaded\":", ",\"styleContext\""));
+                UpdateKeys("aura.context", RetornaAuxSubstring(WebUtility.UrlDecode(response.Content), "\"desktopDashboards:dashboardApp\",\"loaded\":", ",\"styleContext\""));
 
                 #endregion
 
@@ -526,13 +540,13 @@ namespace ValidacaoBeneficioBot
                    "&aura.pageURI=%2Fs%2F" +
                    "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&ui-communities-components-aura-components-forceCommunity-navigationMenu.NavigationMenuDataProvider.getNavigationMenu=1&ui-interaction-runtime-components-controllers.FlowRuntime.runInterview=2",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&ui-communities-components-aura-components-forceCommunity-navigationMenu.NavigationMenuDataProvider.getNavigationMenu=1&ui-interaction-runtime-components-controllers.FlowRuntime.runInterview=2",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/",
                            _accept: "*/*");
 
-                auxURL = response.Content.ReadAsStringAsync().Result.Substring(response.Content.ReadAsStringAsync().Result.LastIndexOf("serializedEncodedState\":\"") + 25);
+                auxURL = response.Content.Substring(response.Content.LastIndexOf("serializedEncodedState\":\"") + 25);
                 auxURL = auxURL.Substring(0, auxURL.IndexOf("\""));
                 var serializedEncodedState = auxURL;
 
@@ -552,7 +566,7 @@ namespace ValidacaoBeneficioBot
                 strPost = "message=%7B%22actions%22%3A%5B%7B%22id%22%3A%22252%3Ba%22%2C%22descriptor%22%3A%22serviceComponent%3A%2F%2Fui.instrumentation.components.beacon.InstrumentationBeaconController%2FACTION%24sendData%22%2C%22callingDescriptor%22%3A%22UNKNOWN%22%2C%22params%22%3A%7B%22batch%22%3A%5B%7B%22topic%22%3A%22ailtn%22%2C%22schemaType%22%3A%22LightningInteraction%22%2C%22payload%22%3A%22%7B%5C%22id%5C%22%3A%5C%22ltng%3Ainteraction%5C%22%2C%5C%22ts%5C%22%3A2283.79%2C%5C%22pageStartTime%5C%22%3A1658372759439%2C%5C%22owner%5C%22%3A%5C%22siteforce%3AcommunityApp%5C%22%2C%5C%22unixTS%5C%22%3Afalse%2C%5C%22eventType%5C%22%3A%5C%22user%5C%22%2C%5C%22eventSource%5C%22%3A%5C%22synthetic-communitynavigation%5C%22%2C%5C%22attributes%5C%22%3A%7B%5C%22pageViewCounter%5C%22%3A1%2C%5C%22cdnEnabled%5C%22%3Afalse%2C%5C%22uriDefsEnabled%5C%22%3Afalse%2C%5C%22gates%5C%22%3A%7B%7D%7D%2C%5C%22locator%5C%22%3A%7B%5C%22target%5C%22%3A%5C%22link%5C%22%2C%5C%22scope%5C%22%3A%5C%22communitynavigation%5C%22%2C%5C%22context%5C%22%3A%7B%5C%22unifiedEventType%5C%22%3A%5C%22COMMUNITY_PAGE_NAVIGATION%5C%22%2C%5C%22referrer%5C%22%3A%5C%22%2Fs%2F%5C%22%2C%5C%22requestURI%5C%22%3A%5C%22%2Fs%2F%5C%22%2C%5C%22entityId%5C%22%3Anull%7D%7D%2C%5C%22sequence%5C%22%3A1%2C%5C%22page%5C%22%3A%7B%5C%22context%5C%22%3A%5C%22home%5C%22%2C%5C%22attributes%5C%22%3A%7B%5C%22url%5C%22%3A%5C%22%2Fs%2F%5C%22%7D%7D%7D%22%7D%2C%7B%22topic%22%3A%22ailtn%22%2C%22schemaType%22%3A%22LightningPerformance%22%2C%22payload%22%3A%22%7B%5C%22id%5C%22%3A%5C%22ltng%3Aperformance%5C%22%2C%5C%22ts%5C%22%3A2328.89%2C%5C%22duration%5C%22%3A0%2C%5C%22pageStartTime%5C%22%3A1658372759439%2C%5C%22marks%5C%22%3A%7B%7D%2C%5C%22owner%5C%22%3A%5C%22siteforce%3ArouterInitializer%5C%22%2C%5C%22unixTS%5C%22%3Afalse%2C%5C%22eventType%5C%22%3A%5C%22performance%5C%22%2C%5C%22eventSource%5C%22%3A%5C%22synthetic-communityembarcadero%5C%22%2C%5C%22attributes%5C%22%3A%7B%5C%22methodName%5C%22%3A%5C%22resolveUrl%5C%22%2C%5C%22pageType%5C%22%3A%5C%22comm__namedPage%5C%22%2C%5C%22pageAttributes%5C%22%3A%7B%5C%22name%5C%22%3A%5C%22Home%5C%22%7D%2C%5C%22success%5C%22%3Atrue%2C%5C%22cdnEnabled%5C%22%3Afalse%2C%5C%22uriDefsEnabled%5C%22%3Afalse%2C%5C%22gates%5C%22%3A%7B%7D%7D%7D%22%7D%2C%7B%22topic%22%3A%22ailtn%22%2C%22schemaType%22%3A%22LightningPerformance%22%2C%22payload%22%3A%22%7B%5C%22id%5C%22%3A%5C%22ltng%3AnewDefs%5C%22%2C%5C%22ts%5C%22%3A2342.5%2C%5C%22duration%5C%22%3A0%2C%5C%22pageStartTime%5C%22%3A1658372759439%2C%5C%22marks%5C%22%3A%7B%7D%2C%5C%22owner%5C%22%3A%5C%22siteforce%3ArouterInitializer%5C%22%2C%5C%22unixTS%5C%22%3Afalse%2C%5C%22eventType%5C%22%3A%5C%22performance%5C%22%2C%5C%22eventSource%5C%22%3A%5C%22newDefs%5C%22%2C%5C%22attributes%5C%22%3A%7B%5C%22componentDefs%5C%22%3A%5B%5C%22markup%3A%2F%2Fsiteforce%3AruntimeComponent%5C%22%2C%5C%22layout%3A%2F%2Fsiteforce-generatedpage-7170e41d-7e6f-4a3d-94ba-ac63c2576cb4.c1658372762824%5C%22%5D%2C%5C%22cdnEnabled%5C%22%3Afalse%2C%5C%22uriDefsEnabled%5C%22%3Afalse%2C%5C%22gates%5C%22%3A%7B%7D%7D%7D%22%7D%2C%7B%22topic%22%3A%22ailtn%22%2C%22schemaType%22%3A%22LightningPerformance%22%2C%22payload%22%3A%22%7B%5C%22id%5C%22%3A%5C%22ltng%3Aperformance%5C%22%2C%5C%22ts%5C%22%3A2345.1%2C%5C%22duration%5C%22%3A7%2C%5C%22pageStartTime%5C%22%3A1658372759439%2C%5C%22marks%5C%22%3A%7B%5C%22component%5C%22%3A%5B%7B%5C%22totalCreateTime%5C%22%3Anull%2C%5C%22slowestCreates%5C%22%3A%5B%7B%5C%22name%5C%22%3A%5C%22siteforce-generatedpage-7170e41d-7e6f-4a3d-94ba-ac63c2576cb4.c1658372762824%5C%22%2C%5C%22createCount%5C%22%3A1%2C%5C%22createTimeTotal%5C%22%3Anull%7D%5D%7D%5D%7D%2C%5C%22owner%5C%22%3A%5C%22siteforce%3ArouterInitializer%5C%22%2C%5C%22unixTS%5C%22%3Afalse%2C%5C%22eventType%5C%22%3A%5C%22performance%5C%22%2C%5C%22eventSource%5C%22%3A%5C%22Audience-pageLoaderCreate%5C%22%2C%5C%22attributes%5C%22%3A%7B%5C%22cdnEnabled%5C%22%3Afalse%2C%5C%22uriDefsEnabled%5C%22%3Afalse%2C%5C%22gates%5C%22%3A%7B%7D%7D%7D%22%7D%2C%7B%22topic%22%3A%22ailtn%22%2C%22schemaType%22%3A%22LightningPerformance%22%2C%22payload%22%3A%22%7B%5C%22id%5C%22%3A%5C%22ltng%3Abootstrap%5C%22%2C%5C%22ts%5C%22%3A0%2C%5C%22duration%5C%22%3A2283%2C%5C%22pageStartTime%5C%22%3A1658372759439%2C%5C%22marks%5C%22%3A%7B%5C%22actions%5C%22%3A%5B%7B%5C%22ts%5C%22%3A2019.89%2C%5C%22context%5C%22%3A%7B%5C%22id%5C%22%3A%5C%222%3Ba%5C%22%2C%5C%22abortable%5C%22%3Afalse%2C%5C%22storable%5C%22%3Afalse%2C%5C%22background%5C%22%3Atrue%2C%5C%22cmp%5C%22%3A%5C%22siteforce%3ApubliclyCacheableComponentLoader%5C%22%2C%5C%22def%5C%22%3A%5C%22serviceComponent%3A%2F%2Fui.comm.runtime.components.aura.components.siteforce.controller.PubliclyCacheableComponentLoaderController%2FACTION%24getAudienceTargetedPageComponent%5C%22%2C%5C%22state%5C%22%3A%5C%22SUCCESS%5C%22%2C%5C%22cache%5C%22%3Afalse%7D%2C%5C%22xhrWait%5C%22%3A0%2C%5C%22enqueueWait%5C%22%3A0%2C%5C%22serverTime%5C%22%3A%7B%5C%22total%5C%22%3A92%2C%5C%22db%5C%22%3A5%2C%5C%22xhrServerTime%5C%22%3A124%2C%5C%22boxCarCount%5C%22%3A1%7D%2C%5C%22callbackTime%5C%22%3A9%2C%5C%22duration%5C%22%3A333%7D%5D%2C%5C%22component%5C%22%3A%5B%7B%5C%22totalCreateTime%5C%22%3A221%2C%5C%22slowestCreates%5C%22%3A%5B%7B%5C%22name%5C%22%3A%5C%22siteforce%3AcommunityApp%5C%22%2C%5C%22createCount%5C%22%3A1%2C%5C%22createTimeTotal%5C%22%3A176.8%7D%2C%7B%5C%22name%5C%22%3A%5C%22ui%3Alabel%5C%22%2C%5C%22createCount%5C%22%3A1%2C%5C%22createTimeTotal%5C%22%3A0.59%7D%2C%7B%5C%22name%5C%22%3A%5C%22siteforce-generatedpage-7170e41d-7e6f-4a3d-94ba-ac63c2576cb4.c25%5C%22%2C%5C%22createCount%5C%22%3A1%2C%5C%22createTimeTotal%5C%22%3A35.09%7D%2C%7B%5C%22name%5C%22%3A%5C%22siteforce-generatedpage-7170e41d-7e6f-4a3d-94ba-ac63c2576cb4.c1658372762824%5C%22%2C%5C%22createCount%5C%22%3A1%2C%5C%22createTimeTotal%5C%22%3A8.5%7D%5D%7D%5D%7D%2C%5C%22owner%5C%22%3Anull%2C%5C%22unixTS%5C%22%3Afalse%2C%5C%22eventType%5C%22%3A%5C%22bootstrap%5C%22%2C%5C%22eventSource%5C%22%3A%5C%22framework%5C%22%2C%5C%22attributes%5C%22%3A%7B%5C%22cache%5C%22%3A%7B%5C%22appCache%5C%22%3Afalse%2C%5C%22gvps%5C%22%3Atrue%7D%2C%5C%22execInlineJs%5C%22%3A787%2C%5C%22appCssLoading%5C%22%3Anull%2C%5C%22visibilityStateStart%5C%22%3A%5C%22visible%5C%22%2C%5C%22execAuraJs%5C%22%3A914%2C%5C%22runInitAsync%5C%22%3A953%2C%5C%22runAfterContextCreated%5C%22%3A1234%2C%5C%22runAfterInitDefsReady%5C%22%3A1234%2C%5C%22execBootstrapJs%5C%22%3A1940%2C%5C%22runAfterBootstrapReady%5C%22%3A1943%2C%5C%22AuraFrameworkEPT%5C%22%3A1943%2C%5C%22appCreationStart%5C%22%3A1989%2C%5C%22appCreationEnd%5C%22%3A2167%2C%5C%22appRenderingStart%5C%22%3A2167%2C%5C%22appRenderingEnd%5C%22%3A2283%2C%5C%22bootstrapEPT%5C%22%3A2283%2C%5C%22cdnEnabled%5C%22%3Afalse%2C%5C%22mode%5C%22%3A%5C%22PROD%5C%22%2C%5C%22maxAllowedParallelXHRCounts%5C%22%3A6%2C%5C%22pageStartTime%5C%22%3A1658372759439%2C%5C%22timing%5C%22%3A%7B%5C%22navigationStart%5C%22%3A1658372759439%2C%5C%22fetchStart%5C%22%3A1658372759445%2C%5C%22readyStart%5C%22%3A6%2C%5C%22dnsStart%5C%22%3A1658372759445%2C%5C%22dnsEnd%5C%22%3A1658372759445%2C%5C%22lookupDomainTime%5C%22%3A0%2C%5C%22connectStart%5C%22%3A1658372759445%2C%5C%22connectEnd%5C%22%3A1658372759445%2C%5C%22connectTime%5C%22%3A0%2C%5C%22requestStart%5C%22%3A1658372759447%2C%5C%22responseStart%5C%22%3A1658372760164%2C%5C%22responseEnd%5C%22%3A1658372760166%2C%5C%22requestTime%5C%22%3A719%2C%5C%22domLoading%5C%22%3A1658372760171%2C%5C%22domInteractive%5C%22%3A1658372761775%2C%5C%22initDomTreeTime%5C%22%3A1609%2C%5C%22contentLoadStart%5C%22%3A1658372761775%2C%5C%22contentLoadEnd%5C%22%3A1658372761775%2C%5C%22domComplete%5C%22%3A1658372761776%2C%5C%22domReadyTime%5C%22%3A1%2C%5C%22loadEventStart%5C%22%3A1658372761776%2C%5C%22loadEventEnd%5C%22%3A1658372761776%2C%5C%22loadEventTime%5C%22%3A0%2C%5C%22loadTime%5C%22%3A2331%2C%5C%22unloadEventStart%5C%22%3A1658372760170%2C%5C%22unloadEventEnd%5C%22%3A1658372760170%2C%5C%22unloadEventTime%5C%22%3A0%2C%5C%22appCacheTime%5C%22%3A0%2C%5C%22redirectTime%5C%22%3A0%7D%2C%5C%22type%5C%22%3A%5C%22WARM%5C%22%2C%5C%22allRequests%5C%22%3A%5B%7B%5C%22name%5C%22%3A%5C%22https%3A%2F%2Fagibank.force.com%2Fs%2F%5C%22%2C%5C%22initiatorType%5C%22%3A%5C%22navigation%5C%22%2C%5C%22nextHopProtocol%5C%22%3A%5C%22http%2F1.1%5C%22%2C%5C%22duration%5C%22%3A726%2C%5C%22startTime%5C%22%3A0%2C%5C%22fetchStart%5C%22%3A5%2C%5C%22serverTime%5C%22%3A386%2C%5C%22redirect%5C%22%3A0%2C%5C%22requestStart%5C%22%3A8%2C%5C%22incompleteTimings%5C%22%3Afalse%2C%5C%22transferSize%5C%22%3A140033%2C%5C%22encodedBodySize%5C%22%3A139733%2C%5C%22decodedBodySize%5C%22%3A139733%2C%5C%22dns%5C%22%3A0%2C%5C%22tcp%5C%22%3A0%2C%5C%22ttfb%5C%22%3A724%2C%5C%22transfer%5C%22%3A1%7D%2C%7B%5C%22name%5C%22%3A%5C%22%2Faura_%5C%22%2C%5C%22initiatorType%5C%22%3A%5C%22link%5C%22%2C%5C%22nextHopProtocol%5C%22%3A%5C%22%5C%22%2C%5C%22duration%5C%22%3A22%2C%5C%22startTime%5C%22%3A735%2C%5C%22fetchStart%5C%22%3A735%2C%5C%22serverTime%5C%22%3A57%2C%5C%22redirect%5C%22%3A0%2C%5C%22requestStart%5C%22%3A735%2C%5C%22incompleteTimings%5C%22%3Afalse%2C%5C%22transferSize%5C%22%3A0%2C%5C%22encodedBodySize%5C%22%3A795001%2C%5C%22decodedBodySize%5C%22%3A795001%2C%5C%22dns%5C%22%3A0%2C%5C%22tcp%5C%22%3A0%2C%5C%22ttfb%5C%22%3A2%2C%5C%22transfer%5C%22%3A20%7D%2C%7B%5C%22name%5C%22%3A%5C%22app.js%5C%22%2C%5C%22initiatorType%5C%22%3A%5C%22link%5C%22%2C%5C%22nextHopProtocol%5C%22%3A%5C%22%5C%22%2C%5C%22duration%5C%22%3A45%2C%5C%22startTime%5C%22%3A737%2C%5C%22fetchStart%5C%22%3A737%2C%5C%22redirect%5C%22%3A0%2C%5C%22requestStart%5C%22%3A738%2C%5C%22incompleteTimings%5C%22%3Afalse%2C%5C%22transferSize%5C%22%3A0%2C%5C%22encodedBodySize%5C%22%3A2323183%2C%5C%22decodedBodySize%5C%22%3A2323183%2C%5C%22dns%5C%22%3A0%2C%5C%22tcp%5C%22%3A0%2C%5C%22ttfb%5C%22%3A4%2C%5C%22transfer%5C%22%3A41%7D%2C%7B%5C%22name%5C%22%3A%5C%22https%3A%2F%2Fagibank.force.com%2Fs%2Fsfsites%2Fruntimedownload%2Ffonts.css%3FlastMod%3D1645010501000%26brandSet%3D174f992c-43e9-44fd-8cea-8213cf228cc1%5C%22%2C%5C%22initiatorType%5C%22%3A%5C%22link%5C%22%2C%5C%22nextHopProtocol%5C%22%3A%5C%22%5C%22%2C%5C%22duration%5C%22%3A11%2C%5C%22startTime%5C%22%3A741%2C%5C%22fetchStart%5C%22%3A741%2C%5C%22redirect%5C%22%3A0%2C%5C%22requestStart%5C%22%3A742%2C%5C%22incompleteTimings%5C%22%3Afalse%2C%5C%22transferSize%5C%22%3A0%2C%5C%22encodedBodySize%5C%22%3A270366%2C%5C%22decodedBodySize%5C%22%3A270366%2C%5C%22dns%5C%22%3A0%2C%5C%22tcp%5C%22%3A0%2C%5C%22ttfb%5C%22%3A4%2C%5C%22transfer%5C%22%3A7%7D%2C%7B%5C%22name%5C%22%3A%5C%22https%3A%2F%2Fagibank.force.com%2Fs%2Fsfsites%2Fl%2F%257B%2522mode%2522%253A%2522PROD%2522%252C%2522app%2522%253A%2522siteforce%253AcommunityApp%2522%252C%2522fwuid%2522%253A%2522QPQi8lbYE8YujG6og6Dqgw%2522%252C%2522loaded%2522%253A%257B%2522APPLICATION%2540markup%253A%252F%252Fsiteforce%253AcommunityApp%2522%253A%2522LpCTzuyqBUeCUwKaXXlwUA%2522%257D%252C%2522mlr%2522%253A1%252C%2522pathPrefix%2522%253A%2522%2522%252C%2522dns%2522%253A%2522c%2522%252C%2522ls%2522%253A1%252C%2522lrmc%2522%253A%2522533941497%2522%257D%2Fresources.js%3Fpv%3D16583396570001196944436%26rv%3D1658272158000%5C%22%2C%5C%22initiatorType%5C%22%3A%5C%22script%5C%22%2C%5C%22nextHopProtocol%5C%22%3A%5C%22%5C%22%2C%5C%22duration%5C%22%3A7%2C%5C%22startTime%5C%22%3A742%2C%5C%22fetchStart%5C%22%3A742%2C%5C%22redirect%5C%22%3A0%2C%5C%22requestStart%5C%22%3A742%2C%5C%22incompleteTimings%5C%22%3Afalse%2C%5C%22transferSize%5C%22%3A0%2C%5C%22encodedBodySize%5C%22%3A4713%2C%5C%22decodedBodySize%5C%22%3A4713%2C%5C%22dns%5C%22%3A0%2C%5C%22tcp%5C%22%3A0%2C%5C%22ttfb%5C%22%3A5%2C%5C%22transfer%5C%22%3A1%7D%2C%7B%5C%22name%5C%22%3A%5C%22bootstrap.js%5C%22%2C%5C%22initiatorType%5C%22%3A%5C%22script%5C%22%2C%5C%22nextHopProtocol%5C%22%3A%5C%22http%2F1.1%5C%22%2C%5C%22duration%5C%22%3A1172%2C%5C%22startTime%5C%22%3A743%2C%5C%22fetchStart%5C%22%3A743%2C%5C%22redirect%5C%22%3A0%2C%5C%22requestStart%5C%22%3A747%2C%5C%22incompleteTimings%5C%22%3Afalse%2C%5C%22transferSize%5C%22%3A687988%2C%5C%22encodedBodySize%5C%22%3A687688%2C%5C%22decodedBodySize%5C%22%3A687688%2C%5C%22dns%5C%22%3A0%2C%5C%22tcp%5C%22%3A0%2C%5C%22ttfb%5C%22%3A1169%2C%5C%22transfer%5C%22%3A2%7D%2C%7B%5C%22name%5C%22%3A%5C%22app.css%5C%22%2C%5C%22initiatorType%5C%22%3A%5C%22link%5C%22%2C%5C%22nextHopProtocol%5C%22%3A%5C%22%5C%22%2C%5C%22duration%5C%22%3A5%2C%5C%22startTime%5C%22%3A788%2C%5C%22fetchStart%5C%22%3A788%2C%5C%22redirect%5C%22%3A0%2C%5C%22requestStart%5C%22%3A789%2C%5C%22incompleteTimings%5C%22%3Afalse%2C%5C%22transferSize%5C%22%3A0%2C%5C%22encodedBodySize%5C%22%3A1001436%2C%5C%22decodedBodySize%5C%22%3A1001436%2C%5C%22dns%5C%22%3A0%2C%5C%22tcp%5C%22%3A0%2C%5C%22ttfb%5C%22%3A1%2C%5C%22transfer%5C%22%3A4%7D%2C%7B%5C%22name%5C%22%3A%5C%22https%3A%2F%2Fagibank.force.com%2Ffile-asset%2Fblue_104%3Fv%3D1%26amp%3Bheight%3D300%26amp%3Bwidth%3D300%5C%22%2C%5C%22initiatorType%5C%22%3A%5C%22css%5C%22%2C%5C%22nextHopProtocol%5C%22%3A%5C%22%5C%22%2C%5C%22duration%5C%22%3A1%2C%5C%22startTime%5C%22%3A2190%2C%5C%22fetchStart%5C%22%3A2190%2C%5C%22redirect%5C%22%3A0%2C%5C%22requestStart%5C%22%3A2190%2C%5C%22incompleteTimings%5C%22%3Afalse%2C%5C%22transferSize%5C%22%3A0%2C%5C%22encodedBodySize%5C%22%3A3715%2C%5C%22decodedBodySize%5C%22%3A3715%2C%5C%22dns%5C%22%3A0%2C%5C%22tcp%5C%22%3A0%2C%5C%22ttfb%5C%22%3A1%2C%5C%22transfer%5C%22%3A0%7D%5D%2C%5C%22requestAuraJs%5C%22%3A%7B%5C%22name%5C%22%3A%5C%22%2Faura_%5C%22%2C%5C%22initiatorType%5C%22%3A%5C%22link%5C%22%2C%5C%22nextHopProtocol%5C%22%3A%5C%22%5C%22%2C%5C%22duration%5C%22%3A22%2C%5C%22startTime%5C%22%3A735%2C%5C%22fetchStart%5C%22%3A735%2C%5C%22serverTime%5C%22%3A57%2C%5C%22redirect%5C%22%3A0%2C%5C%22requestStart%5C%22%3A735%2C%5C%22incompleteTimings%5C%22%3Afalse%2C%5C%22transferSize%5C%22%3A0%2C%5C%22encodedBodySize%5C%22%3A795001%2C%5C%22decodedBodySize%5C%22%3A795001%2C%5C%22dns%5C%22%3A0%2C%5C%22tcp%5C%22%3A0%2C%5C%22ttfb%5C%22%3A2%2C%5C%22transfer%5C%22%3A20%7D%2C%5C%22requestAppJs%5C%22%3A%7B%5C%22name%5C%22%3A%5C%22app.js%5C%22%2C%5C%22initiatorType%5C%22%3A%5C%22link%5C%22%2C%5C%22nextHopProtocol%5C%22%3A%5C%22%5C%22%2C%5C%22duration%5C%22%3A45%2C%5C%22startTime%5C%22%3A737%2C%5C%22fetchStart%5C%22%3A737%2C%5C%22redirect%5C%22%3A0%2C%5C%22requestStart%5C%22%3A738%2C%5C%22incompleteTimings%5C%22%3Afalse%2C%5C%22transferSize%5C%22%3A0%2C%5C%22encodedBodySize%5C%22%3A2323183%2C%5C%22decodedBodySize%5C%22%3A2323183%2C%5C%22dns%5C%22%3A0%2C%5C%22tcp%5C%22%3A0%2C%5C%22ttfb%5C%22%3A4%2C%5C%22transfer%5C%22%3A41%7D%2C%5C%22requestBootstrapJs%5C%22%3A%7B%5C%22name%5C%22%3A%5C%22bootstrap.js%5C%22%2C%5C%22initiatorType%5C%22%3A%5C%22script%5C%22%2C%5C%22nextHopProtocol%5C%22%3A%5C%22http%2F1.1%5C%22%2C%5C%22duration%5C%22%3A1172%2C%5C%22startTime%5C%22%3A743%2C%5C%22fetchStart%5C%22%3A743%2C%5C%22redirect%5C%22%3A0%2C%5C%22requestStart%5C%22%3A747%2C%5C%22incompleteTimings%5C%22%3Afalse%2C%5C%22transferSize%5C%22%3A687988%2C%5C%22encodedBodySize%5C%22%3A687688%2C%5C%22decodedBodySize%5C%22%3A687688%2C%5C%22dns%5C%22%3A0%2C%5C%22tcp%5C%22%3A0%2C%5C%22ttfb%5C%22%3A1169%2C%5C%22transfer%5C%22%3A2%7D%2C%5C%22requestAppCss%5C%22%3A%7B%5C%22name%5C%22%3A%5C%22app.css%5C%22%2C%5C%22initiatorType%5C%22%3A%5C%22link%5C%22%2C%5C%22nextHopProtocol%5C%22%3A%5C%22%5C%22%2C%5C%22duration%5C%22%3A5%2C%5C%22startTime%5C%22%3A788%2C%5C%22fetchStart%5C%22%3A788%2C%5C%22redirect%5C%22%3A0%2C%5C%22requestStart%5C%22%3A789%2C%5C%22incompleteTimings%5C%22%3Afalse%2C%5C%22transferSize%5C%22%3A0%2C%5C%22encodedBodySize%5C%22%3A1001436%2C%5C%22decodedBodySize%5C%22%3A1001436%2C%5C%22dns%5C%22%3A0%2C%5C%22tcp%5C%22%3A0%2C%5C%22ttfb%5C%22%3A1%2C%5C%22transfer%5C%22%3A4%7D%2C%5C%22connection%5C%22%3A%7B%5C%22rtt%5C%22%3A1000%2C%5C%22downlink%5C%22%3A1.15%7D%2C%5C%22visibilityStateEnd%5C%22%3A%5C%22visible%5C%22%2C%5C%22uriDefsEnabled%5C%22%3Afalse%2C%5C%22gates%5C%22%3A%7B%7D%7D%7D%22%7D%2C%7B%22topic%22%3A%22ailtn%22%2C%22schemaType%22%3A%22LightningInteraction%22%2C%22payload%22%3A%22%7B%5C%22id%5C%22%3A%5C%22ltng%3Ainteraction%5C%22%2C%5C%22ts%5C%22%3A2813.19%2C%5C%22pageStartTime%5C%22%3A1658372759439%2C%5C%22owner%5C%22%3A%5C%22desktopDashboards%3Adashboard%5C%22%2C%5C%22unixTS%5C%22%3Afalse%2C%5C%22eventType%5C%22%3A%5C%22user%5C%22%2C%5C%22eventSource%5C%22%3A%5C%22synthetic-sfxDashboardInit%5C%22%2C%5C%22attributes%5C%22%3A%7B%5C%22displayMode%5C%22%3A%5C%22view%5C%22%2C%5C%22context%5C%22%3A%5C%22%5C%22%2C%5C%22height%5C%22%3A0%2C%5C%22hideOnError%5C%22%3Afalse%2C%5C%22pageViewCounter%5C%22%3A1%2C%5C%22cdnEnabled%5C%22%3Afalse%2C%5C%22uriDefsEnabled%5C%22%3Afalse%2C%5C%22gates%5C%22%3A%7B%7D%7D%2C%5C%22sequence%5C%22%3A2%2C%5C%22page%5C%22%3A%7B%5C%22context%5C%22%3A%5C%22home%5C%22%2C%5C%22attributes%5C%22%3A%7B%5C%22url%5C%22%3A%5C%22%2Fs%2F%5C%22%7D%7D%7D%22%7D%2C%7B%22topic%22%3A%22ailtn%22%2C%22schemaType%22%3A%22LightningPerformance%22%2C%22payload%22%3A%22%7B%5C%22id%5C%22%3A%5C%22ltng%3Aperformance%5C%22%2C%5C%22ts%5C%22%3A2879.39%2C%5C%22duration%5C%22%3A552%2C%5C%22pageStartTime%5C%22%3A1658372759439%2C%5C%22marks%5C%22%3A%7B%5C%22transport%5C%22%3A%5B%7B%5C%22ts%5C%22%3A2898.5%2C%5C%22context%5C%22%3A%7B%5C%22auraXHRId%5C%22%3A4%2C%5C%22requestLength%5C%22%3A2892%2C%5C%22background%5C%22%3Afalse%2C%5C%22actionDefs%5C%22%3A%5B%5C%22192%3Ba%5C%22%2C%5C%22212%3Ba%5C%22%2C%5C%22221%3Ba%5C%22%5D%2C%5C%22requestId%5C%22%3A%5C%222898390000bb0cc09c%5C%22%2C%5C%22status%5C%22%3A200%2C%5C%22statusText%5C%22%3A%5C%22OK%5C%22%2C%5C%22responseLength%5C%22%3A10483%2C%5C%22xhrDuration%5C%22%3A517%2C%5C%22xhrStall%5C%22%3A0%2C%5C%22startTime%5C%22%3A2899%2C%5C%22fetchStart%5C%22%3A2899%2C%5C%22requestStart%5C%22%3A2899%2C%5C%22dns%5C%22%3A0%2C%5C%22tcp%5C%22%3A0%2C%5C%22ttfb%5C%22%3A516%2C%5C%22transfer%5C%22%3A0%2C%5C%22transferSize%5C%22%3A10791%2C%5C%22nextHopProtocol%5C%22%3A%5C%22http%2F1.1%5C%22%2C%5C%22serverTime%5C%22%3A349%2C%5C%22xhrDelay%5C%22%3A14%7D%2C%5C%22duration%5C%22%3A531%7D%5D%2C%5C%22actions%5C%22%3A%5B%7B%5C%22ts%5C%22%3A2892.39%2C%5C%22context%5C%22%3A%7B%5C%22id%5C%22%3A%5C%22216%3Ba%5C%22%2C%5C%22abortable%5C%22%3Atrue%2C%5C%22storable%5C%22%3Atrue%2C%5C%22background%5C%22%3Afalse%2C%5C%22cmp%5C%22%3A%5C%22forceCommunity%3AnavigationMenuBase%5C%22%2C%5C%22def%5C%22%3A%5C%22serviceComponent%3A%2F%2Fui.communities.components.aura.components.forceCommunity.navigationMenu.NavigationMenuDataProviderController%2FACTION%24getNavigationMenu%5C%22%2C%5C%22state%5C%22%3A%5C%22SUCCESS%5C%22%2C%5C%22cache%5C%22%3Atrue%7D%2C%5C%22params%5C%22%3A%7B%5C%22navigationLinkSetIdOrName%5C%22%3A%5C%22Default_Navigation1%5C%22%2C%5C%22includeImageUrl%5C%22%3Afalse%2C%5C%22addHomeMenuItem%5C%22%3Atrue%2C%5C%22menuItemTypesToSkip%5C%22%3A%5C%22%5B%5C%5C%5C%22SystemLink%5C%5C%5C%22%2C%5C%5C%5C%22Event%5C%5C%5C%22%5D%5C%22%2C%5C%22masterLabel%5C%22%3A%5C%22Default%20Navigation%5C%22%7D%2C%5C%22callbackTime%5C%22%3A1%2C%5C%22enqueueWait%5C%22%3A3%2C%5C%22duration%5C%22%3A5%7D%5D%2C%5C%22component%5C%22%3A%5B%7B%5C%22totalCreateTime%5C%22%3A11.88%2C%5C%22slowestCreates%5C%22%3A%5B%7B%5C%22name%5C%22%3A%5C%22flowruntime%3AflowRuntimeForFlexiPage%5C%22%2C%5C%22createCount%5C%22%3A1%2C%5C%22createTimeTotal%5C%22%3A6.38%7D%2C%7B%5C%22name%5C%22%3A%5C%22forceCommunity%3AglobalNavigation%5C%22%2C%5C%22createCount%5C%22%3A1%2C%5C%22createTimeTotal%5C%22%3A5.5%7D%5D%7D%5D%2C%5C%22custom%5C%22%3A%5B%7B%5C%22ns%5C%22%3A%5C%22flowruntime%5C%22%2C%5C%22name%5C%22%3A%5C%22flowRuntimeCommunity.onInit%5C%22%2C%5C%22phase%5C%22%3A%5C%22stamp%5C%22%2C%5C%22ts%5C%22%3A2880.89%2C%5C%22context%5C%22%3A%7B%5C%22networkId%5C%22%3A%5C%220DB6e000000k9hL%5C%22%7D%2C%5C%22owner%5C%22%3A%5C%22forceCommunity%3AflowCommunity%5C%22%7D%2C%7B%5C%22ns%5C%22%3A%5C%22flowruntime%5C%22%2C%5C%22name%5C%22%3A%5C%22flowRuntimeForFlexiPage.onInit%5C%22%2C%5C%22phase%5C%22%3A%5C%22stamp%5C%22%2C%5C%22ts%5C%22%3A2881.29%2C%5C%22context%5C%22%3Anull%2C%5C%22owner%5C%22%3A%5C%22flowruntime%3AflowRuntimeForFlexiPage%5C%22%7D%5D%7D%2C%5C%22owner%5C%22%3A%5C%22flowruntime%3AflowRuntimeV2%5C%22%2C%5C%22unixTS%5C%22%3Afalse%2C%5C%22eventType%5C%22%3A%5C%22performance%5C%22%2C%5C%22eventSource%5C%22%3A%5C%22flowRuntimeController.onInitialized%5C%22%2C%5C%22attributes%5C%22%3A%7B%5C%22flowDevName%5C%22%3A%5C%22OrderProductSearchFlow%5C%22%2C%5C%22consumerIdentifier%5C%22%3A%5C%22flowRuntime%5C%22%2C%5C%22cdnEnabled%5C%22%3Afalse%2C%5C%22uriDefsEnabled%5C%22%3Afalse%2C%5C%22gates%5C%22%3A%7B%5C%22LWCMarksEnabled%5C%22%3Afalse%7D%7D%7D%22%7D%2C%7B%22topic%22%3A%22ailtn%22%2C%22schemaType%22%3A%22LightningPerformance%22%2C%22payload%22%3A%22%7B%5C%22id%5C%22%3A%5C%22ltng%3Aperformance%5C%22%2C%5C%22ts%5C%22%3A2886.89%2C%5C%22duration%5C%22%3A545%2C%5C%22pageStartTime%5C%22%3A1658372759439%2C%5C%22marks%5C%22%3A%7B%5C%22transport%5C%22%3A%5B%7B%5C%22ts%5C%22%3A2898.5%2C%5C%22context%5C%22%3A%7B%5C%22auraXHRId%5C%22%3A4%2C%5C%22requestLength%5C%22%3A2892%2C%5C%22background%5C%22%3Afalse%2C%5C%22actionDefs%5C%22%3A%5B%5C%22192%3Ba%5C%22%2C%5C%22212%3Ba%5C%22%2C%5C%22221%3Ba%5C%22%5D%2C%5C%22requestId%5C%22%3A%5C%222898390000bb0cc09c%5C%22%2C%5C%22status%5C%22%3A200%2C%5C%22statusText%5C%22%3A%5C%22OK%5C%22%2C%5C%22responseLength%5C%22%3A10483%2C%5C%22xhrDuration%5C%22%3A517%2C%5C%22xhrStall%5C%22%3A0%2C%5C%22startTime%5C%22%3A2899%2C%5C%22fetchStart%5C%22%3A2899%2C%5C%22requestStart%5C%22%3A2899%2C%5C%22dns%5C%22%3A0%2C%5C%22tcp%5C%22%3A0%2C%5C%22ttfb%5C%22%3A516%2C%5C%22transfer%5C%22%3A0%2C%5C%22transferSize%5C%22%3A10791%2C%5C%22nextHopProtocol%5C%22%3A%5C%22http%2F1.1%5C%22%2C%5C%22serverTime%5C%22%3A349%2C%5C%22xhrDelay%5C%22%3A14%7D%2C%5C%22duration%5C%22%3A531%7D%5D%2C%5C%22actions%5C%22%3A%5B%7B%5C%22ts%5C%22%3A2892.39%2C%5C%22context%5C%22%3A%7B%5C%22id%5C%22%3A%5C%22216%3Ba%5C%22%2C%5C%22abortable%5C%22%3Atrue%2C%5C%22storable%5C%22%3Atrue%2C%5C%22background%5C%22%3Afalse%2C%5C%22cmp%5C%22%3A%5C%22forceCommunity%3AnavigationMenuBase%5C%22%2C%5C%22def%5C%22%3A%5C%22serviceComponent%3A%2F%2Fui.communities.components.aura.components.forceCommunity.navigationMenu.NavigationMenuDataProviderController%2FACTION%24getNavigationMenu%5C%22%2C%5C%22state%5C%22%3A%5C%22SUCCESS%5C%22%2C%5C%22cache%5C%22%3Atrue%7D%2C%5C%22params%5C%22%3A%7B%5C%22navigationLinkSetIdOrName%5C%22%3A%5C%22Default_Navigation1%5C%22%2C%5C%22includeImageUrl%5C%22%3Afalse%2C%5C%22addHomeMenuItem%5C%22%3Atrue%2C%5C%22menuItemTypesToSkip%5C%22%3A%5C%22%5B%5C%5C%5C%22SystemLink%5C%5C%5C%22%2C%5C%5C%5C%22Event%5C%5C%5C%22%5D%5C%22%2C%5C%22masterLabel%5C%22%3A%5C%22Default%20Navigation%5C%22%7D%2C%5C%22callbackTime%5C%22%3A1%2C%5C%22enqueueWait%5C%22%3A3%2C%5C%22duration%5C%22%3A5%7D%2C%7B%5C%22ts%5C%22%3A2898.5%2C%5C%22context%5C%22%3A%7B%5C%22id%5C%22%3A%5C%22192%3Ba%5C%22%2C%5C%22state%5C%22%3A%5C%22SUCCESS%5C%22%2C%5C%22cache%5C%22%3Afalse%7D%2C%5C%22xhrWait%5C%22%3A0%2C%5C%22enqueueWait%5C%22%3A0%2C%5C%22serverTime%5C%22%3A%7B%5C%22total%5C%22%3A21%2C%5C%22db%5C%22%3A3%2C%5C%22xhrServerTime%5C%22%3A349%2C%5C%22boxCarCount%5C%22%3A3%7D%2C%5C%22callbackTime%5C%22%3A0%2C%5C%22duration%5C%22%3A533%7D%5D%2C%5C%22component%5C%22%3A%5B%7B%5C%22totalCreateTime%5C%22%3A5.5%2C%5C%22slowestCreates%5C%22%3A%5B%7B%5C%22name%5C%22%3A%5C%22forceCommunity%3AglobalNavigation%5C%22%2C%5C%22createCount%5C%22%3A1%2C%5C%22createTimeTotal%5C%22%3A5.5%7D%5D%7D%5D%7D%2C%5C%22owner%5C%22%3A%5C%22flowruntime%3AflowRuntimeV2%5C%22%2C%5C%22unixTS%5C%22%3Afalse%2C%5C%22eventType%5C%22%3A%5C%22performance%5C%22%2C%5C%22eventSource%5C%22%3A%5C%22flowRuntimeController.onInitialized%5C%22%2C%5C%22attributes%5C%22%3A%7B%5C%22flowDevName%5C%22%3A%5C%22NewAccountSimulationFlow%5C%22%2C%5C%22consumerIdentifier%5C%22%3A%5C%22flowRuntime%5C%22%2C%5C%22cdnEnabled%5C%22%3Afalse%2C%5C%22uriDefsEnabled%5C%22%3Afalse%2C%5C%22gates%5C%22%3A%7B%7D%7D%7D%22%7D%2C%7B%22topic%22%3A%22ailtn%22%2C%22schemaType%22%3A%22LightningInteraction%22%2C%22payload%22%3A%22%7B%5C%22id%5C%22%3A%5C%22ltng%3Ainteraction%5C%22%2C%5C%22ts%5C%22%3A3434.39%2C%5C%22pageStartTime%5C%22%3A1658372759439%2C%5C%22owner%5C%22%3A%5C%22flowruntime%3AflowRuntimeV2%5C%22%2C%5C%22unixTS%5C%22%3Afalse%2C%5C%22eventType%5C%22%3A%5C%22system%5C%22%2C%5C%22eventSource%5C%22%3A%5C%22synthetic-click%5C%22%2C%5C%22attributes%5C%22%3A%7B%5C%22screenName%5C%22%3A%5C%22SeacrhOrderItemScreen%5C%22%2C%5C%22flowDevName%5C%22%3A%5C%22OrderProductSearchFlow%5C%22%2C%5C%22sectionsCount%5C%22%3A0%2C%5C%22columnsCount%5C%22%3A0%2C%5C%22screenFieldCounts%5C%22%3A%7B%5C%22flowruntime%3AdisplayTextLwc%5C%22%3A1%2C%5C%22flowruntime%3ASTRING.INPUT%5C%22%3A1%7D%2C%5C%22totalFieldsCount%5C%22%3A2%2C%5C%22customerAuraLcCount%5C%22%3A0%2C%5C%22customerLwcLcCount%5C%22%3A0%2C%5C%22outOfTheBoxLcCount%5C%22%3A0%2C%5C%22pageViewCounter%5C%22%3A1%2C%5C%22cdnEnabled%5C%22%3Afalse%2C%5C%22uriDefsEnabled%5C%22%3Afalse%2C%5C%22gates%5C%22%3A%7B%7D%7D%2C%5C%22sequence%5C%22%3A3%2C%5C%22page%5C%22%3A%7B%5C%22context%5C%22%3A%5C%22home%5C%22%2C%5C%22attributes%5C%22%3A%7B%5C%22url%5C%22%3A%5C%22%2Fs%2F%5C%22%7D%7D%7D%22%7D%2C%7B%22topic%22%3A%22ailtn%22%2C%22schemaType%22%3A%22LightningInteraction%22%2C%22payload%22%3A%22%7B%5C%22id%5C%22%3A%5C%22ltng%3Ainteraction%5C%22%2C%5C%22ts%5C%22%3A3509.89%2C%5C%22pageStartTime%5C%22%3A1658372759439%2C%5C%22owner%5C%22%3A%5C%22flowruntime%3AflowRuntimeV2%5C%22%2C%5C%22unixTS%5C%22%3Afalse%2C%5C%22eventType%5C%22%3A%5C%22system%5C%22%2C%5C%22eventSource%5C%22%3A%5C%22synthetic-click%5C%22%2C%5C%22attributes%5C%22%3A%7B%5C%22screenName%5C%22%3A%5C%22AccountDocumentStep%5C%22%2C%5C%22flowDevName%5C%22%3A%5C%22NewAccountSimulationFlow%5C%22%2C%5C%22sectionsCount%5C%22%3A0%2C%5C%22columnsCount%5C%22%3A0%2C%5C%22screenFieldCounts%5C%22%3A%7B%5C%22flowruntime%3AdisplayTextLwc%5C%22%3A1%2C%5C%22flowruntime%3ASTRING.INPUT%5C%22%3A1%7D%2C%5C%22totalFieldsCount%5C%22%3A2%2C%5C%22customerAuraLcCount%5C%22%3A0%2C%5C%22customerLwcLcCount%5C%22%3A0%2C%5C%22outOfTheBoxLcCount%5C%22%3A0%2C%5C%22pageViewCounter%5C%22%3A1%2C%5C%22cdnEnabled%5C%22%3Afalse%2C%5C%22uriDefsEnabled%5C%22%3Afalse%2C%5C%22gates%5C%22%3A%7B%7D%7D%2C%5C%22sequence%5C%22%3A4%2C%5C%22page%5C%22%3A%7B%5C%22context%5C%22%3A%5C%22home%5C%22%2C%5C%22attributes%5C%22%3A%7B%5C%22url%5C%22%3A%5C%22%2Fs%2F%5C%22%7D%7D%7D%22%7D%2C%7B%22topic%22%3A%22ailtn%22%2C%22schemaType%22%3A%22LightningPageView%22%2C%22payload%22%3A%22%7B%5C%22id%5C%22%3A%5C%22ltng%3ApageView%5C%22%2C%5C%22ts%5C%22%3A2017.5%2C%5C%22duration%5C%22%3A1617%2C%5C%22pageStartTime%5C%22%3A1658372759439%2C%5C%22marks%5C%22%3A%7B%5C%22transport%5C%22%3A%5B%7B%5C%22ts%5C%22%3A2375.19%2C%5C%22context%5C%22%3A%7B%5C%22auraXHRId%5C%22%3A2%2C%5C%22requestLength%5C%22%3A2011%2C%5C%22background%5C%22%3Atrue%2C%5C%22actionDefs%5C%22%3A%5B%5C%22143%3Ba%5C%22%5D%2C%5C%22requestId%5C%22%3A%5C%222375190000e7f97398%5C%22%2C%5C%22status%5C%22%3A200%2C%5C%22statusText%5C%22%3A%5C%22OK%5C%22%2C%5C%22responseLength%5C%22%3A2027%2C%5C%22xhrDuration%5C%22%3A269%2C%5C%22xhrStall%5C%22%3A0%2C%5C%22startTime%5C%22%3A2375%2C%5C%22fetchStart%5C%22%3A2375%2C%5C%22requestStart%5C%22%3A2376%2C%5C%22dns%5C%22%3A0%2C%5C%22tcp%5C%22%3A0%2C%5C%22ttfb%5C%22%3A268%2C%5C%22transfer%5C%22%3A0%2C%5C%22transferSize%5C%22%3A2327%2C%5C%22nextHopProtocol%5C%22%3A%5C%22http%2F1.1%5C%22%2C%5C%22serverTime%5C%22%3A112%2C%5C%22xhrDelay%5C%22%3A2%7D%2C%5C%22duration%5C%22%3A271%7D%2C%7B%5C%22ts%5C%22%3A2394.29%2C%5C%22context%5C%22%3A%7B%5C%22auraXHRId%5C%22%3A3%2C%5C%22requestLength%5C%22%3A1762%2C%5C%22background%5C%22%3Afalse%2C%5C%22actionDefs%5C%22%3A%5B%5C%22154%3Ba%5C%22%5D%2C%5C%22requestId%5C%22%3A%5C%2223941900000aa647cf%5C%22%2C%5C%22status%5C%22%3A200%2C%5C%22statusText%5C%22%3A%5C%22OK%5C%22%2C%5C%22responseLength%5C%22%3A1793%2C%5C%22xhrDuration%5C%22%3A416%2C%5C%22xhrStall%5C%22%3A249%2C%5C%22startTime%5C%22%3A2395%2C%5C%22fetchStart%5C%22%3A2395%2C%5C%22requestStart%5C%22%3A2645%2C%5C%22dns%5C%22%3A0%2C%5C%22tcp%5C%22%3A0%2C%5C%22ttfb%5C%22%3A415%2C%5C%22transfer%5C%22%3A0%2C%5C%22transferSize%5C%22%3A2093%2C%5C%22nextHopProtocol%5C%22%3A%5C%22http%2F1.1%5C%22%2C%5C%22serverTime%5C%22%3A23%2C%5C%22xhrDelay%5C%22%3A2%7D%2C%5C%22duration%5C%22%3A418%7D%2C%7B%5C%22ts%5C%22%3A2373.6%2C%5C%22context%5C%22%3A%7B%5C%22auraXHRId%5C%22%3A1%2C%5C%22requestLength%5C%22%3A6706%2C%5C%22background%5C%22%3Afalse%2C%5C%22actionDefs%5C%22%3A%5B%5C%22142%3Ba%5C%22%2C%5C%2241%3Ba%5C%22%2C%5C%22147%3Ba%5C%22%2C%5C%22106%3Ba%5C%22%2C%5C%22107%3Ba%5C%22%2C%5C%22149%3Ba%5C%22%2C%5C%22116%3Ba%5C%22%2C%5C%22150%3Ba%5C%22%2C%5C%22151%3Ba%5C%22%2C%5C%22152%3Ba%5C%22%2C%5C%22130%3Ba%5C%22%2C%5C%22153%3Ba%5C%22%2C%5C%22148%3Ba%5C%22%5D%2C%5C%22requestId%5C%22%3A%5C%222373600000f24433c7%5C%22%2C%5C%22status%5C%22%3A200%2C%5C%22statusText%5C%22%3A%5C%22OK%5C%22%2C%5C%22responseLength%5C%22%3A13299%2C%5C%22xhrDuration%5C%22%3A473%2C%5C%22xhrStall%5C%22%3A0%2C%5C%22startTime%5C%22%3A2374%2C%5C%22fetchStart%5C%22%3A2374%2C%5C%22requestStart%5C%22%3A2375%2C%5C%22dns%5C%22%3A0%2C%5C%22tcp%5C%22%3A0%2C%5C%22ttfb%5C%22%3A472%2C%5C%22transfer%5C%22%3A0%2C%5C%22transferSize%5C%22%3A13601%2C%5C%22nextHopProtocol%5C%22%3A%5C%22http%2F1.1%5C%22%2C%5C%22serverTime%5C%22%3A304%2C%5C%22xhrDelay%5C%22%3A1%7D%2C%5C%22duration%5C%22%3A474%7D%2C%7B%5C%22ts%5C%22%3A2898.5%2C%5C%22context%5C%22%3A%7B%5C%22auraXHRId%5C%22%3A4%2C%5C%22requestLength%5C%22%3A2892%2C%5C%22background%5C%22%3Afalse%2C%5C%22actionDefs%5C%22%3A%5B%5C%22192%3Ba%5C%22%2C%5C%22212%3Ba%5C%22%2C%5C%22221%3Ba%5C%22%5D%2C%5C%22requestId%5C%22%3A%5C%222898390000bb0cc09c%5C%22%2C%5C%22status%5C%22%3A200%2C%5C%22statusText%5C%22%3A%5C%22OK%5C%22%2C%5C%22responseLength%5C%22%3A10483%2C%5C%22xhrDuration%5C%22%3A517%2C%5C%22xhrStall%5C%22%3A0%2C%5C%22startTime%5C%22%3A2899%2C%5C%22fetchStart%5C%22%3A2899%2C%5C%22requestStart%5C%22%3A2899%2C%5C%22dns%5C%22%3A0%2C%5C%22tcp%5C%22%3A0%2C%5C%22ttfb%5C%22%3A516%2C%5C%22transfer%5C%22%3A0%2C%5C%22transferSize%5C%22%3A10791%2C%5C%22nextHopProtocol%5C%22%3A%5C%22http%2F1.1%5C%22%2C%5C%22serverTime%5C%22%3A349%2C%5C%22xhrDelay%5C%22%3A14%7D%2C%5C%22duration%5C%22%3A531%7D%5D%2C%5C%22actions%5C%22%3A%5B%7B%5C%22ts%5C%22%3A2019.89%2C%5C%22context%5C%22%3A%7B%5C%22id%5C%22%3A%5C%222%3Ba%5C%22%2C%5C%22abortable%5C%22%3Afalse%2C%5C%22storable%5C%22%3Afalse%2C%5C%22background%5C%22%3Atrue%2C%5C%22cmp%5C%22%3A%5C%22siteforce%3ApubliclyCacheableComponentLoader%5C%22%2C%5C%22def%5C%22%3A%5C%22serviceComponent%3A%2F%2Fui.comm.runtime.components.aura.components.siteforce.controller.PubliclyCacheableComponentLoaderController%2FACTION%24getAudienceTargetedPageComponent%5C%22%2C%5C%22state%5C%22%3A%5C%22SUCCESS%5C%22%2C%5C%22cache%5C%22%3Afalse%7D%2C%5C%22xhrWait%5C%22%3A0%2C%5C%22enqueueWait%5C%22%3A0%2C%5C%22serverTime%5C%22%3A%7B%5C%22total%5C%22%3A92%2C%5C%22db%5C%22%3A5%2C%5C%22xhrServerTime%5C%22%3A124%2C%5C%22boxCarCount%5C%22%3A1%7D%2C%5C%22callbackTime%5C%22%3A9%2C%5C%22duration%5C%22%3A333%7D%2C%7B%5C%22ts%5C%22%3A2094.1%2C%5C%22context%5C%22%3A%7B%5C%22id%5C%22%3A%5C%2230%3Ba%5C%22%2C%5C%22abortable%5C%22%3Atrue%2C%5C%22storable%5C%22%3Atrue%2C%5C%22background%5C%22%3Afalse%2C%5C%22cmp%5C%22%3A%5C%22forceChatter%3AmessagesManager%5C%22%2C%5C%22def%5C%22%3A%5C%22serviceComponent%3A%2F%2Fui.chatter.components.messages.MessagesController%2FACTION%24getMessagingPermAndPref%5C%22%2C%5C%22state%5C%22%3A%5C%22SUCCESS%5C%22%2C%5C%22cache%5C%22%3Atrue%7D%2C%5C%22callbackTime%5C%22%3A0%2C%5C%22enqueueWait%5C%22%3A268%2C%5C%22duration%5C%22%3A268%7D%2C%7B%5C%22ts%5C%22%3A2163%2C%5C%22context%5C%22%3A%7B%5C%22id%5C%22%3A%5C%2278%3Ba%5C%22%2C%5C%22abortable%5C%22%3Atrue%2C%5C%22storable%5C%22%3Atrue%2C%5C%22background%5C%22%3Atrue%2C%5C%22cmp%5C%22%3A%5C%22siteforce%3ApubliclyCacheableAttributeLoader%5C%22%2C%5C%22def%5C%22%3A%5C%22serviceComponent%3A%2F%2Fui.comm.runtime.components.aura.components.siteforce.controller.PubliclyCacheableAttributeLoaderController%2FACTION%24getComponentAttributes%5C%22%2C%5C%22state%5C%22%3A%5C%22SUCCESS%5C%22%2C%5C%22cache%5C%22%3Atrue%7D%2C%5C%22callbackTime%5C%22%3A0%2C%5C%22enqueueWait%5C%22%3A199%2C%5C%22duration%5C%22%3A199%7D%2C%7B%5C%22ts%5C%22%3A2166.5%2C%5C%22context%5C%22%3A%7B%5C%22id%5C%22%3A%5C%2285%3Ba%5C%22%2C%5C%22abortable%5C%22%3Atrue%2C%5C%22storable%5C%22%3Atrue%2C%5C%22background%5C%22%3Afalse%2C%5C%22cmp%5C%22%3A%5C%22force%3AhostConfig%5C%22%2C%5C%22def%5C%22%3A%5C%22serviceComponent%3A%2F%2Fui.force.components.controllers.hostConfig.HostConfigController%2FACTION%24getConfigData%5C%22%2C%5C%22state%5C%22%3A%5C%22SUCCESS%5C%22%2C%5C%22cache%5C%22%3Atrue%7D%2C%5C%22callbackTime%5C%22%3A4%2C%5C%22enqueueWait%5C%22%3A196%2C%5C%22duration%5C%22%3A200%7D%2C%7B%5C%22ts%5C%22%3A2317.79%2C%5C%22context%5C%22%3A%7B%5C%22id%5C%22%3A%5C%22111%3Ba%5C%22%2C%5C%22abortable%5C%22%3Atrue%2C%5C%22storable%5C%22%3Atrue%2C%5C%22background%5C%22%3Afalse%2C%5C%22cmp%5C%22%3A%5C%22forceCommunity%3ArichText%5C%22%2C%5C%22def%5C%22%3A%5C%22serviceComponent%3A%2F%2Fui.communities.components.aura.components.forceCommunity.richText.RichTextController%2FACTION%24getParsedRichTextValue%5C%22%2C%5C%22state%5C%22%3A%5C%22SUCCESS%5C%22%2C%5C%22cache%5C%22%3Atrue%7D%2C%5C%22callbackTime%5C%22%3A0%2C%5C%22enqueueWait%5C%22%3A53%2C%5C%22duration%5C%22%3A53%7D%2C%7B%5C%22ts%5C%22%3A2324.39%2C%5C%22context%5C%22%3A%7B%5C%22id%5C%22%3A%5C%22121%3Ba%5C%22%2C%5C%22abortable%5C%22%3Atrue%2C%5C%22storable%5C%22%3Atrue%2C%5C%22background%5C%22%3Afalse%2C%5C%22cmp%5C%22%3A%5C%22forceChatter%3AgroupAnnouncement%5C%22%2C%5C%22def%5C%22%3A%5C%22serviceComponent%3A%2F%2Fui.chatter.components.aura.components.forceChatter.groups.GroupAnnouncementController%2FACTION%24getAnnouncement%5C%22%2C%5C%22state%5C%22%3A%5C%22SUCCESS%5C%22%2C%5C%22cache%5C%22%3Atrue%7D%2C%5C%22callbackTime%5C%22%3A0%2C%5C%22enqueueWait%5C%22%3A47%2C%5C%22duration%5C%22%3A47%7D%2C%7B%5C%22ts%5C%22%3A2325.39%2C%5C%22context%5C%22%3A%7B%5C%22id%5C%22%3A%5C%22124%3Ba%5C%22%2C%5C%22abortable%5C%22%3Atrue%2C%5C%22storable%5C%22%3Atrue%2C%5C%22background%5C%22%3Afalse%2C%5C%22cmp%5C%22%3A%5C%22forceCommunity%3ArichText%5C%22%2C%5C%22def%5C%22%3A%5C%22serviceComponent%3A%2F%2Fui.communities.components.aura.components.forceCommunity.richText.RichTextController%2FACTION%24getParsedRichTextValue%5C%22%2C%5C%22state%5C%22%3A%5C%22SUCCESS%5C%22%2C%5C%22cache%5C%22%3Atrue%7D%2C%5C%22callbackTime%5C%22%3A0%2C%5C%22enqueueWait%5C%22%3A47%2C%5C%22duration%5C%22%3A47%7D%2C%7B%5C%22ts%5C%22%3A2326.39%2C%5C%22context%5C%22%3A%7B%5C%22id%5C%22%3A%5C%22127%3Ba%5C%22%2C%5C%22abortable%5C%22%3Atrue%2C%5C%22storable%5C%22%3Atrue%2C%5C%22background%5C%22%3Afalse%2C%5C%22cmp%5C%22%3A%5C%22forceCommunity%3ArichText%5C%22%2C%5C%22def%5C%22%3A%5C%22serviceComponent%3A%2F%2Fui.communities.components.aura.components.forceCommunity.richText.RichTextController%2FACTION%24getParsedRichTextValue%5C%22%2C%5C%22state%5C%22%3A%5C%22SUCCESS%5C%22%2C%5C%22cache%5C%22%3Atrue%7D%2C%5C%22callbackTime%5C%22%3A0%2C%5C%22enqueueWait%5C%22%3A46%2C%5C%22duration%5C%22%3A46%7D%2C%7B%5C%22ts%5C%22%3A2351.79%2C%5C%22context%5C%22%3A%7B%5C%22id%5C%22%3A%5C%22138%3Ba%5C%22%2C%5C%22abortable%5C%22%3Atrue%2C%5C%22storable%5C%22%3Atrue%2C%5C%22background%5C%22%3Afalse%2C%5C%22cmp%5C%22%3A%5C%22forceCommunity%3ArichText%5C%22%2C%5C%22def%5C%22%3A%5C%22serviceComponent%3A%2F%2Fui.communities.components.aura.components.forceCommunity.richText.RichTextController%2FACTION%24getParsedRichTextValue%5C%22%2C%5C%22state%5C%22%3A%5C%22SUCCESS%5C%22%2C%5C%22cache%5C%22%3Atrue%7D%2C%5C%22callbackTime%5C%22%3A0%2C%5C%22enqueueWait%5C%22%3A21%2C%5C%22duration%5C%22%3A21%7D%2C%7B%5C%22ts%5C%22%3A2392.79%2C%5C%22context%5C%22%3A%7B%5C%22id%5C%22%3A%5C%22154%3Ba%5C%22%2C%5C%22abortable%5C%22%3Afalse%2C%5C%22storable%5C%22%3Afalse%2C%5C%22background%5C%22%3Afalse%2C%5C%22cmp%5C%22%3A%5C%22desktopDashboards%3Adashboard%5C%22%2C%5C%22def%5C%22%3A%5C%22serviceComponent%3A%2F%2Fui.analytics.dashboard.components.lightning.DashboardComponentController%2FACTION%24getSitePathPrefix%5C%22%2C%5C%22state%5C%22%3A%5C%22SUCCESS%5C%22%2C%5C%22cache%5C%22%3Afalse%7D%2C%5C%22xhrWait%5C%22%3A0%2C%5C%22enqueueWait%5C%22%3A1%2C%5C%22serverTime%5C%22%3A%7B%5C%22total%5C%22%3A0%2C%5C%22db%5C%22%3A0%2C%5C%22xhrServerTime%5C%22%3A22%2C%5C%22boxCarCount%5C%22%3A1%7D%2C%5C%22callbackTime%5C%22%3A5%2C%5C%22duration%5C%22%3A425%7D%2C%7B%5C%22ts%5C%22%3A2104.29%2C%5C%22context%5C%22%3A%7B%5C%22id%5C%22%3A%5C%2241%3Ba%5C%22%2C%5C%22abortable%5C%22%3Afalse%2C%5C%22storable%5C%22%3Afalse%2C%5C%22background%5C%22%3Afalse%2C%5C%22cmp%5C%22%3A%5C%22selfService%3AprofileMenuAPI%5C%22%2C%5C%22def%5C%22%3A%5C%22serviceComponent%3A%2F%2Fui.self.service.components.profileMenu.ProfileMenuController%2FACTION%24getProfileMenuResponse%5C%22%2C%5C%22state%5C%22%3A%5C%22SUCCESS%5C%22%2C%5C%22cache%5C%22%3Afalse%7D%2C%5C%22xhrWait%5C%22%3A88%2C%5C%22enqueueWait%5C%22%3A181%2C%5C%22serverTime%5C%22%3A%7B%5C%22total%5C%22%3A28%2C%5C%22db%5C%22%3A5%2C%5C%22xhrServerTime%5C%22%3A304%2C%5C%22boxCarCount%5C%22%3A13%7D%2C%5C%22callbackTime%5C%22%3A15%2C%5C%22duration%5C%22%3A760%7D%2C%7B%5C%22ts%5C%22%3A2373.6%2C%5C%22context%5C%22%3A%7B%5C%22id%5C%22%3A%5C%22147%3Ba%5C%22%2C%5C%22abortable%5C%22%3Atrue%2C%5C%22storable%5C%22%3Afalse%2C%5C%22background%5C%22%3Afalse%2C%5C%22cmp%5C%22%3A%5C%22force%3AhostConfig%5C%22%2C%5C%22def%5C%22%3A%5C%22serviceComponent%3A%2F%2Fui.force.components.controllers.hostConfig.HostConfigController%2FACTION%24getConfigData%5C%22%2C%5C%22refresh%5C%22%3Atrue%2C%5C%22state%5C%22%3A%5C%22SUCCESS%5C%22%2C%5C%22cache%5C%22%3Afalse%7D%2C%5C%22xhrWait%5C%22%3A0%2C%5C%22enqueueWait%5C%22%3A0%2C%5C%22serverTime%5C%22%3A%7B%5C%22total%5C%22%3A6%2C%5C%22db%5C%22%3A1%2C%5C%22xhrServerTime%5C%22%3A304%2C%5C%22boxCarCount%5C%22%3A13%7D%2C%5C%22callbackTime%5C%22%3A0%2C%5C%22duration%5C%22%3A491%7D%2C%7B%5C%22ts%5C%22%3A2314.69%2C%5C%22context%5C%22%3A%7B%5C%22id%5C%22%3A%5C%22106%3Ba%5C%22%2C%5C%22abortable%5C%22%3Afalse%2C%5C%22storable%5C%22%3Afalse%2C%5C%22background%5C%22%3Afalse%2C%5C%22cmp%5C%22%3A%5C%22desktopDashboards%3Adashboard%5C%22%2C%5C%22def%5C%22%3A%5C%22serviceComponent%3A%2F%2Fui.analytics.dashboard.components.lightning.DashboardComponentController%2FACTION%24isFeedEnabled%5C%22%2C%5C%22state%5C%22%3A%5C%22SUCCESS%5C%22%2C%5C%22cache%5C%22%3Afalse%7D%2C%5C%22xhrWait%5C%22%3A6%2C%5C%22enqueueWait%5C%22%3A52%2C%5C%22serverTime%5C%22%3A%7B%5C%22total%5C%22%3A2%2C%5C%22db%5C%22%3A0%2C%5C%22xhrServerTime%5C%22%3A304%2C%5C%22boxCarCount%5C%22%3A13%7D%2C%5C%22callbackTime%5C%22%3A0%2C%5C%22duration%5C%22%3A550%7D%2C%7B%5C%22ts%5C%22%3A2314.79%2C%5C%22context%5C%22%3A%7B%5C%22id%5C%22%3A%5C%22107%3Ba%5C%22%2C%5C%22abortable%5C%22%3Afalse%2C%5C%22storable%5C%22%3Afalse%2C%5C%22background%5C%22%3Afalse%2C%5C%22cmp%5C%22%3A%5C%22desktopDashboards%3Adashboard%5C%22%2C%5C%22def%5C%22%3A%5C%22serviceComponent%3A%2F%2Fui.analytics.dashboard.components.lightning.DashboardComponentController%2FACTION%24getAdditionalParameters%5C%22%2C%5C%22state%5C%22%3A%5C%22SUCCESS%5C%22%2C%5C%22cache%5C%22%3Afalse%7D%2C%5C%22xhrWait%5C%22%3A6%2C%5C%22enqueueWait%5C%22%3A52%2C%5C%22serverTime%5C%22%3A%7B%5C%22total%5C%22%3A0%2C%5C%22db%5C%22%3A0%2C%5C%22xhrServerTime%5C%22%3A304%2C%5C%22boxCarCount%5C%22%3A13%7D%2C%5C%22callbackTime%5C%22%3A0%2C%5C%22duration%5C%22%3A550%7D%2C%7B%5C%22ts%5C%22%3A2319.79%2C%5C%22context%5C%22%3A%7B%5C%22id%5C%22%3A%5C%22116%3Ba%5C%22%2C%5C%22abortable%5C%22%3Afalse%2C%5C%22storable%5C%22%3Afalse%2C%5C%22background%5C%22%3Afalse%2C%5C%22cmp%5C%22%3A%5C%22forceCommunity%3AflowCommunity%5C%22%2C%5C%22def%5C%22%3A%5C%22serviceComponent%3A%2F%2Fui.communities.components.aura.components.forceCommunity.flowCommunity.FlowCommunityController%2FACTION%24canViewFlow%5C%22%2C%5C%22state%5C%22%3A%5C%22SUCCESS%5C%22%2C%5C%22cache%5C%22%3Afalse%7D%2C%5C%22xhrWait%5C%22%3A6%2C%5C%22enqueueWait%5C%22%3A47%2C%5C%22serverTime%5C%22%3A%7B%5C%22total%5C%22%3A3%2C%5C%22db%5C%22%3A0%2C%5C%22xhrServerTime%5C%22%3A304%2C%5C%22boxCarCount%5C%22%3A13%7D%2C%5C%22callbackTime%5C%22%3A15%2C%5C%22duration%5C%22%3A560%7D%2C%7B%5C%22ts%5C%22%3A2327%2C%5C%22context%5C%22%3A%7B%5C%22id%5C%22%3A%5C%22130%3Ba%5C%22%2C%5C%22abortable%5C%22%3Afalse%2C%5C%22storable%5C%22%3Afalse%2C%5C%22background%5C%22%3Afalse%2C%5C%22cmp%5C%22%3A%5C%22forceCommunity%3AflowCommunity%5C%22%2C%5C%22def%5C%22%3A%5C%22serviceComponent%3A%2F%2Fui.communities.components.aura.components.forceCommunity.flowCommunity.FlowCommunityController%2FACTION%24canViewFlow%5C%22%2C%5C%22state%5C%22%3A%5C%22SUCCESS%5C%22%2C%5C%22cache%5C%22%3Afalse%7D%2C%5C%22xhrWait%5C%22%3A6%2C%5C%22enqueueWait%5C%22%3A40%2C%5C%22serverTime%5C%22%3A%7B%5C%22total%5C%22%3A2%2C%5C%22db%5C%22%3A0%2C%5C%22xhrServerTime%5C%22%3A304%2C%5C%22boxCarCount%5C%22%3A13%7D%2C%5C%22callbackTime%5C%22%3A6%2C%5C%22duration%5C%22%3A560%7D%2C%7B%5C%22ts%5C%22%3A2368.5%2C%5C%22context%5C%22%3A%7B%5C%22id%5C%22%3A%5C%22148%3Ba%5C%22%2C%5C%22abortable%5C%22%3Atrue%2C%5C%22storable%5C%22%3Afalse%2C%5C%22background%5C%22%3Afalse%2C%5C%22cmp%5C%22%3A%5C%22none%5C%22%2C%5C%22def%5C%22%3A%5C%22aura%3A%2F%2FComponentController%2FACTION%24getComponent%5C%22%2C%5C%22state%5C%22%3A%5C%22SUCCESS%5C%22%2C%5C%22cache%5C%22%3Afalse%7D%2C%5C%22params%5C%22%3A%7B%5C%22name%5C%22%3A%5C%22markup%3A%2F%2FforceCommunity%3AglobalNavigation%5C%22%7D%2C%5C%22xhrWait%5C%22%3A0%2C%5C%22enqueueWait%5C%22%3A4%2C%5C%22serverTime%5C%22%3A%7B%5C%22total%5C%22%3A6%2C%5C%22db%5C%22%3A0%2C%5C%22xhrServerTime%5C%22%3A304%2C%5C%22boxCarCount%5C%22%3A13%7D%2C%5C%22callbackTime%5C%22%3A6%2C%5C%22duration%5C%22%3A525%7D%2C%7B%5C%22ts%5C%22%3A2892.39%2C%5C%22context%5C%22%3A%7B%5C%22id%5C%22%3A%5C%22216%3Ba%5C%22%2C%5C%22abortable%5C%22%3Atrue%2C%5C%22storable%5C%22%3Atrue%2C%5C%22background%5C%22%3Afalse%2C%5C%22cmp%5C%22%3A%5C%22forceCommunity%3AnavigationMenuBase%5C%22%2C%5C%22def%5C%22%3A%5C%22serviceComponent%3A%2F%2Fui.communities.components.aura.components.forceCommunity.navigationMenu.NavigationMenuDataProviderController%2FACTION%24getNavigationMenu%5C%22%2C%5C%22state%5C%22%3A%5C%22SUCCESS%5C%22%2C%5C%22cache%5C%22%3Atrue%7D%2C%5C%22params%5C%22%3A%7B%5C%22navigationLinkSetIdOrName%5C%22%3A%5C%22Default_Navigation1%5C%22%2C%5C%22includeImageUrl%5C%22%3Afalse%2C%5C%22addHomeMenuItem%5C%22%3Atrue%2C%5C%22menuItemTypesToSkip%5C%22%3A%5C%22%5B%5C%5C%5C%22SystemLink%5C%5C%5C%22%2C%5C%5C%5C%22Event%5C%5C%5C%22%5D%5C%22%2C%5C%22masterLabel%5C%22%3A%5C%22Default%20Navigation%5C%22%7D%2C%5C%22callbackTime%5C%22%3A1%2C%5C%22enqueueWait%5C%22%3A3%2C%5C%22duration%5C%22%3A5%7D%2C%7B%5C%22ts%5C%22%3A2879.39%2C%5C%22context%5C%22%3A%7B%5C%22id%5C%22%3A%5C%22192%3Ba%5C%22%2C%5C%22abortable%5C%22%3Atrue%2C%5C%22storable%5C%22%3Afalse%2C%5C%22background%5C%22%3Afalse%2C%5C%22cmp%5C%22%3A%5C%22flowruntime%3AflowRuntimeV2%5C%22%2C%5C%22def%5C%22%3A%5C%22serviceComponent%3A%2F%2Fui.interaction.runtime.components.controllers.FlowRuntimeController%2FACTION%24runInterview%5C%22%2C%5C%22state%5C%22%3A%5C%22SUCCESS%5C%22%2C%5C%22cache%5C%22%3Afalse%7D%2C%5C%22xhrWait%5C%22%3A4%2C%5C%22enqueueWait%5C%22%3A15%2C%5C%22serverTime%5C%22%3A%7B%5C%22total%5C%22%3A21%2C%5C%22db%5C%22%3A3%2C%5C%22xhrServerTime%5C%22%3A349%2C%5C%22boxCarCount%5C%22%3A3%7D%2C%5C%22callbackTime%5C%22%3A0%2C%5C%22duration%5C%22%3A552%7D%2C%7B%5C%22ts%5C%22%3A2886.89%2C%5C%22context%5C%22%3A%7B%5C%22id%5C%22%3A%5C%22212%3Ba%5C%22%2C%5C%22abortable%5C%22%3Atrue%2C%5C%22storable%5C%22%3Afalse%2C%5C%22background%5C%22%3Afalse%2C%5C%22cmp%5C%22%3A%5C%22flowruntime%3AflowRuntimeV2%5C%22%2C%5C%22def%5C%22%3A%5C%22serviceComponent%3A%2F%2Fui.interaction.runtime.components.controllers.FlowRuntimeController%2FACTION%24runInterview%5C%22%2C%5C%22state%5C%22%3A%5C%22SUCCESS%5C%22%2C%5C%22cache%5C%22%3Afalse%7D%2C%5C%22xhrWait%5C%22%3A4%2C%5C%22enqueueWait%5C%22%3A7%2C%5C%22serverTime%5C%22%3A%7B%5C%22total%5C%22%3A10%2C%5C%22db%5C%22%3A2%2C%5C%22xhrServerTime%5C%22%3A349%2C%5C%22boxCarCount%5C%22%3A3%7D%2C%5C%22callbackTime%5C%22%3A0%2C%5C%22duration%5C%22%3A545%7D%5D%2C%5C%22component%5C%22%3A%5B%7B%5C%22totalCreateTime%5C%22%3A101.48%2C%5C%22slowestCreates%5C%22%3A%5B%7B%5C%22name%5C%22%3A%5C%22forceCommunity%3AglobalNavigation%5C%22%2C%5C%22createCount%5C%22%3A1%2C%5C%22createTimeTotal%5C%22%3A5.5%7D%2C%7B%5C%22name%5C%22%3A%5C%22siteforce-generatedpage-7170e41d-7e6f-4a3d-94ba-ac63c2576cb4.c25%5C%22%2C%5C%22createCount%5C%22%3A1%2C%5C%22createTimeTotal%5C%22%3A35.09%7D%2C%7B%5C%22name%5C%22%3A%5C%22siteforce-generatedpage-7170e41d-7e6f-4a3d-94ba-ac63c2576cb4.c1658372762824%5C%22%2C%5C%22createCount%5C%22%3A1%2C%5C%22createTimeTotal%5C%22%3A8.5%7D%2C%7B%5C%22name%5C%22%3A%5C%22ui%3Amenu%5C%22%2C%5C%22createCount%5C%22%3A1%2C%5C%22createTimeTotal%5C%22%3A12.69%7D%2C%7B%5C%22name%5C%22%3A%5C%22flowruntime%3AflowRuntimeForFlexiPage%5C%22%2C%5C%22createCount%5C%22%3A2%2C%5C%22createTimeTotal%5C%22%3A21.07%7D%5D%7D%5D%2C%5C%22custom%5C%22%3A%5B%7B%5C%22ns%5C%22%3A%5C%22flowruntime%5C%22%2C%5C%22name%5C%22%3A%5C%22flowRuntimeCommunity.onInit%5C%22%2C%5C%22phase%5C%22%3A%5C%22stamp%5C%22%2C%5C%22ts%5C%22%3A2865.69%2C%5C%22context%5C%22%3A%7B%5C%22networkId%5C%22%3A%5C%220DB6e000000k9hL%5C%22%7D%2C%5C%22owner%5C%22%3A%5C%22forceCommunity%3AflowCommunity%5C%22%7D%2C%7B%5C%22ns%5C%22%3A%5C%22flowruntime%5C%22%2C%5C%22name%5C%22%3A%5C%22flowRuntimeForFlexiPage.onInit%5C%22%2C%5C%22phase%5C%22%3A%5C%22stamp%5C%22%2C%5C%22ts%5C%22%3A2866.6%2C%5C%22context%5C%22%3Anull%2C%5C%22owner%5C%22%3A%5C%22flowruntime%3AflowRuntimeForFlexiPage%5C%22%7D%2C%7B%5C%22ns%5C%22%3A%5C%22flowruntime%5C%22%2C%5C%22name%5C%22%3A%5C%22flowRuntimeCommunity.onInit%5C%22%2C%5C%22phase%5C%22%3A%5C%22stamp%5C%22%2C%5C%22ts%5C%22%3A2880.89%2C%5C%22context%5C%22%3A%7B%5C%22networkId%5C%22%3A%5C%220DB6e000000k9hL%5C%22%7D%2C%5C%22owner%5C%22%3A%5C%22forceCommunity%3AflowCommunity%5C%22%7D%2C%7B%5C%22ns%5C%22%3A%5C%22flowruntime%5C%22%2C%5C%22name%5C%22%3A%5C%22flowRuntimeForFlexiPage.onInit%5C%22%2C%5C%22phase%5C%22%3A%5C%22stamp%5C%22%2C%5C%22ts%5C%22%3A2881.29%2C%5C%22context%5C%22%3Anull%2C%5C%22owner%5C%22%3A%5C%22flowruntime%3AflowRuntimeForFlexiPage%5C%22%7D%2C%7B%5C%22ns%5C%22%3A%5C%22ltng%5C%22%2C%5C%22name%5C%22%3A%5C%22flowRuntime%3AscreenFieldInfo%5C%22%2C%5C%22phase%5C%22%3A%5C%22stamp%5C%22%2C%5C%22ts%5C%22%3A3465.1%2C%5C%22context%5C%22%3A%7B%5C%22flowruntime%3AdisplayTextLwc%5C%22%3A1%2C%5C%22flowruntime%3AflowScreenInput%5C%22%3A1%7D%2C%5C%22owner%5C%22%3A%5C%22flowruntime%3AflowRuntimeV2%5C%22%7D%2C%7B%5C%22ns%5C%22%3A%5C%22ltng%5C%22%2C%5C%22name%5C%22%3A%5C%22performance%3AbuildComponentTree%5C%22%2C%5C%22ts%5C%22%3A3437.79%2C%5C%22context%5C%22%3A%7B%5C%22status%5C%22%3A%5C%22STARTED%5C%22%7D%2C%5C%22owner%5C%22%3A%5C%22flowruntime%3AflowRuntimeV2%5C%22%2C%5C%22duration%5C%22%3A34%7D%2C%7B%5C%22ns%5C%22%3A%5C%22ltng%5C%22%2C%5C%22name%5C%22%3A%5C%22flowRuntime%3AscreenFieldInfo%5C%22%2C%5C%22phase%5C%22%3A%5C%22stamp%5C%22%2C%5C%22ts%5C%22%3A3513.39%2C%5C%22context%5C%22%3A%7B%5C%22flowruntime%3AdisplayTextLwc%5C%22%3A1%2C%5C%22flowruntime%3AflowScreenInput%5C%22%3A1%7D%2C%5C%22owner%5C%22%3A%5C%22flowruntime%3AflowRuntimeV2%5C%22%7D%2C%7B%5C%22ns%5C%22%3A%5C%22ltng%5C%22%2C%5C%22name%5C%22%3A%5C%22performance%3AbuildComponentTree%5C%22%2C%5C%22ts%5C%22%3A3511.39%2C%5C%22context%5C%22%3A%7B%5C%22status%5C%22%3A%5C%22STARTED%5C%22%7D%2C%5C%22owner%5C%22%3A%5C%22flowruntime%3AflowRuntimeV2%5C%22%2C%5C%22duration%5C%22%3A7%7D%5D%7D%2C%5C%22owner%5C%22%3A%5C%22siteforce%3ArouterInitializer%5C%22%2C%5C%22unixTS%5C%22%3Afalse%2C%5C%22ept%5C%22%3A1607%2C%5C%22previousPage%5C%22%3A%7B%5C%22context%5C%22%3A%5C%22unknown%5C%22%2C%5C%22attributes%5C%22%3A%7B%7D%7D%2C%5C%22attributes%5C%22%3A%7B%5C%22designTime%5C%22%3Afalse%2C%5C%22domain%5C%22%3A%5C%22https%3A%2F%2Fagibank.force.com%5C%22%2C%5C%22template%5C%22%3A%5C%22PRM%20Community%20Template%5C%22%2C%5C%22priorityDuration%5C%22%3A%7B%5C%22Audience_duration%5C%22%3A8%2C%5C%22Audience_creation_complete%5C%22%3A335%7D%2C%5C%22longTaskTotal%5C%22%3A0%2C%5C%22longestTask%5C%22%3A0%2C%5C%22network%5C%22%3A%7B%5C%22rtt%5C%22%3A1000%2C%5C%22downlink%5C%22%3A1.15%2C%5C%22maxAllowedParallelXHRs%5C%22%3A6%7D%2C%5C%22cores%5C%22%3A4%2C%5C%22eptDeviation%5C%22%3Afalse%2C%5C%22density%5C%22%3A%5C%22UNKNOWN%5C%22%2C%5C%22totalEpt%5C%22%3A3624.5%2C%5C%22bootstrapType%5C%22%3A%5C%22WARM%5C%22%2C%5C%22defaultCmp%5C%22%3A%5B%5D%2C%5C%22gates%5C%22%3A%7B%5C%22lds.useNewTrackedFieldBehavior%5C%22%3Afalse%2C%5C%22scenarioTrackerEnabled.instrumentation.ltng%5C%22%3Atrue%2C%5C%22scenarioTrackerMarksEnabled.instrumentation.ltng%5C%22%3Afalse%2C%5C%22ui.services.PageScopedCache.enabled%5C%22%3Atrue%2C%5C%22browserIdleTime.instrumentation.ltng%5C%22%3Afalse%2C%5C%22clientTelemetry.instrumentation.ltng%5C%22%3Atrue%2C%5C%22componentProfiler.instrumentation.ltng%5C%22%3Afalse%2C%5C%22o11yAuraActionsEnabled.instrumentation.ltng%5C%22%3Afalse%2C%5C%22o11yEnabled.instrumentation.ltng%5C%22%3Atrue%2C%5C%22LWCMarksEnabled%5C%22%3Afalse%7D%2C%5C%22cdnEnabled%5C%22%3Afalse%2C%5C%22uriDefsEnabled%5C%22%3Afalse%7D%2C%5C%22cacheStats%5C%22%3A%7B%5C%22AuraStorage_actions%5C%22%3A%7B%5C%22hits%5C%22%3A14%2C%5C%22misses%5C%22%3A0%7D%2C%5C%22total%5C%22%3A%7B%5C%22hits%5C%22%3A14%2C%5C%22misses%5C%22%3A0%7D%7D%2C%5C%22complexity%5C%22%3Anull%2C%5C%22sequence%5C%22%3A1%2C%5C%22page%5C%22%3A%7B%5C%22context%5C%22%3A%5C%22home%5C%22%2C%5C%22attributes%5C%22%3A%7B%5C%22url%5C%22%3A%5C%22%2Fs%2F%5C%22%7D%7D%7D%22%7D%2C%7B%22topic%22%3A%22ailtn%22%2C%22schemaType%22%3A%22LightningInteraction%22%2C%22payload%22%3A%22%7B%5C%22id%5C%22%3A%5C%22ltng%3Ainteraction%5C%22%2C%5C%22ts%5C%22%3A3636.39%2C%5C%22pageStartTime%5C%22%3A1658372759439%2C%5C%22owner%5C%22%3Anull%2C%5C%22unixTS%5C%22%3Afalse%2C%5C%22eventType%5C%22%3A%5C%22system%5C%22%2C%5C%22eventSource%5C%22%3A%5C%22defsUsage%5C%22%2C%5C%22attributes%5C%22%3A%7B%5C%22defs%5C%22%3A%5B%5C%22markup%3A%2F%2Faura%3Aapplication%5C%22%2C%5C%22markup%3A%2F%2Fsiteforce%3AbaseApp%5C%22%2C%5C%22markup%3A%2F%2Fsiteforce%3AcommunityApp%5C%22%2C%5C%22markup%3A%2F%2Faura%3Acomponent%5C%22%2C%5C%22markup%3A%2F%2Fsiteforce%3ArouterInitializer%5C%22%2C%5C%22markup%3A%2F%2Fsiteforce%3ApageLoader%5C%22%2C%5C%22layout%3A%2F%2Fsiteforce-generatedpage-7170e41d-7e6f-4a3d-94ba-ac63c2576cb4.c25%5C%22%2C%5C%22markup%3A%2F%2Fsiteforce%3ApubliclyCacheableComponentLoader%5C%22%2C%5C%22markup%3A%2F%2Fui%3AasyncComponentManager%5C%22%2C%5C%22markup%3A%2F%2Fforce%3AtoastManager%5C%22%2C%5C%22markup%3A%2F%2Faura%3Ahtml%5C%22%2C%5C%22markup%3A%2F%2Fforce%3AvisualMessageQueue%5C%22%2C%5C%22markup%3A%2F%2Faura%3Aiteration%5C%22%2C%5C%22markup%3A%2F%2Faura%3Aexpression%5C%22%2C%5C%22markup%3A%2F%2Faura%3Aif%5C%22%2C%5C%22markup%3A%2F%2Fforce%3AhoverPrototypeManager%5C%22%2C%5C%22markup%3A%2F%2Fforce%3AhoverPrototype%5C%22%2C%5C%22markup%3A%2F%2Fone%3AactionsManager%5C%22%2C%5C%22markup%3A%2F%2Fforce%3AtargetInteractionHandler%5C%22%2C%5C%22markup%3A%2F%2Fsiteforce%3Aconditional%5C%22%2C%5C%22markup%3A%2F%2Fforce%3AmassErrorsManager%5C%22%2C%5C%22markup%3A%2F%2Fsiteforce%3ApanelsContainer%5C%22%2C%5C%22markup%3A%2F%2Fsiteforce%3AspinnerManager%5C%22%2C%5C%22markup%3A%2F%2Fsiteforce%3AloadingBalls%5C%22%2C%5C%22markup%3A%2F%2Fsiteforce%3ApanelManager%5C%22%2C%5C%22markup%3A%2F%2Fui%3ApanelManager2%5C%22%2C%5C%22markup%3A%2F%2Fone%3ApanelManager%5C%22%2C%5C%22markup%3A%2F%2Fui%3AcontainerManager%5C%22%2C%5C%22markup%3A%2F%2FforceContent%3AfilesManager%5C%22%2C%5C%22markup%3A%2F%2FforceContent%3AmodalPreviewManager%5C%22%2C%5C%22markup%3A%2F%2Fforce%3AhostConfig%5C%22%2C%5C%22markup%3A%2F%2FforceCommunity%3AsignalCollector%5C%22%2C%5C%22markup%3A%2F%2FforceSearch%3AsearchGDP%5C%22%2C%5C%22markup%3A%2F%2FforceSearch%3AsearchGDPCache%5C%22%2C%5C%22markup%3A%2F%2FforceSearch%3AsearchGDPCacheActivity%5C%22%2C%5C%22markup%3A%2F%2FforceSearch%3AsearchGDPCacheMrus%5C%22%2C%5C%22markup%3A%2F%2FforceSearch%3AsearchGDPCachePermsAndPrefs%5C%22%2C%5C%22markup%3A%2F%2FforceSearch%3AsearchGDPCacheResultsFilters%5C%22%2C%5C%22markup%3A%2F%2FforceSearch%3AsearchGDPCacheScopes%5C%22%2C%5C%22markup%3A%2F%2Fsearch_lightning%3Astore%5C%22%2C%5C%22markup%3A%2F%2Fsiteforce%3AsystemErrorHandler%5C%22%2C%5C%22markup%3A%2F%2Fsiteforce%3AcustomerErrorHandler%5C%22%2C%5C%22markup%3A%2F%2Fforce%3AalohaUrlService%5C%22%2C%5C%22markup%3A%2F%2Fsiteforce%3AnavigationProvider%5C%22%2C%5C%22markup%3A%2F%2Fsiteforce%3Aqb%5C%22%2C%5C%22markup%3A%2F%2Finstrumentation%3Abeacon%5C%22%2C%5C%22markup%3A%2F%2Finstrumentation%3Ao11yCoreCollector%5C%22%2C%5C%22markup%3A%2F%2Fforce%3AquickActionManager%5C%22%2C%5C%22markup%3A%2F%2FforceChatter%3AmessagesManager%5C%22%2C%5C%22markup%3A%2F%2FforceChatter%3AeditManager%5C%22%2C%5C%22markup%3A%2F%2FsalesforceIdentity%3AsessionTimeoutWarn%5C%22%2C%5C%22markup%3A%2F%2FsalesforceIdentity%3AsessionTimeoutWatcher%5C%22%2C%5C%22markup%3A%2F%2Fforce%3AlogoutHandler%5C%22%2C%5C%22markup%3A%2F%2Fforce%3AsessionLib%5C%22%2C%5C%22markup%3A%2F%2Fcommunity_runtime%3Aservices%5C%22%2C%5C%22layout%3A%2F%2Fsiteforce-generatedpage-Inner.c25%5C%22%2C%5C%22markup%3A%2F%2Fsiteforce%3AprmBody%5C%22%2C%5C%22markup%3A%2F%2Fsiteforce%3AruntimeRegion%5C%22%2C%5C%22markup%3A%2F%2Fsiteforce%3AruntimeComponent%5C%22%2C%5C%22markup%3A%2F%2FselfService%3AuserProfileMenu%5C%22%2C%5C%22markup%3A%2F%2FselfService%3AprofileMenuAPI%5C%22%2C%5C%22markup%3A%2F%2Fsiteforce%3AcontentArea%5C%22%2C%5C%22markup%3A%2F%2FforceCommunity%3AglobalSearchInput%5C%22%2C%5C%22markup%3A%2F%2FforceCommunity%3AbaseSearch%5C%22%2C%5C%22markup%3A%2F%2FforceSearch%3Abase%5C%22%2C%5C%22markup%3A%2F%2FforceSearch%3AbaseSearch%5C%22%2C%5C%22markup%3A%2F%2FforceSearch%3AgroupContainer%5C%22%2C%5C%22markup%3A%2F%2FforceCommunity%3AgroupContainer%5C%22%2C%5C%22markup%3A%2F%2FforceSearch%3AbaseSearchInput%5C%22%2C%5C%22markup%3A%2F%2FforceSearch%3Ainput%5C%22%2C%5C%22markup%3A%2F%2FforceSearch%3AinputDesktop%5C%22%2C%5C%22markup%3A%2F%2Fui%3AdataProvider%5C%22%2C%5C%22markup%3A%2F%2FforceSearch%3AoptionDataProvider%5C%22%2C%5C%22markup%3A%2F%2FforceSearch%3AinputDataProvider%5C%22%2C%5C%22markup%3A%2F%2FforceSearch%3AinputDesktopDataProvider%5C%22%2C%5C%22markup%3A%2F%2FforceSearch%3AactionDataProvider%5C%22%2C%5C%22markup%3A%2F%2FforceSearch%3AmruDataProvider%5C%22%2C%5C%22markup%3A%2F%2FforceSearch%3AtypeAheadDataProvider%5C%22%2C%5C%22markup%3A%2F%2Fui%3AresizeObserver%5C%22%2C%5C%22markup%3A%2F%2Fforce%3Aicon%5C%22%2C%5C%22markup%3A%2F%2Flightning%3Aicon%5C%22%2C%5C%22markup%3A%2F%2FforceSearch%3AinputDesktopPillWrapper%5C%22%2C%5C%22markup%3A%2F%2Fui%3Ainput%5C%22%2C%5C%22markup%3A%2F%2Fui%3Aautocomplete%5C%22%2C%5C%22markup%3A%2F%2FforceSearch%3AsearchInputListHeader%5C%22%2C%5C%22markup%3A%2F%2FforceSearch%3AfilterPanelTrigger%5C%22%2C%5C%22markup%3A%2F%2Faura%3Atext%5C%22%2C%5C%22markup%3A%2F%2Fui%3AinputTextForAutocomplete%5C%22%2C%5C%22markup%3A%2F%2FforceSearch%3AexperimentContextInitializer%5C%22%2C%5C%22markup%3A%2F%2Fforce%3AskipLink%5C%22%2C%5C%22markup%3A%2F%2Fcommunity_navigation%3AglobalNavigationTrigger%5C%22%2C%5C%22markup%3A%2F%2Fsiteforce%3ApubliclyCacheableAttributeLoader%5C%22%2C%5C%22markup%3A%2F%2FforceChatter%3AfeedEventsProcessor%5C%22%2C%5C%22markup%3A%2F%2FforceCommunity%3ApsscFeedsProxy%5C%22%2C%5C%22markup%3A%2F%2Fsiteforce%3AruntimeMode%5C%22%2C%5C%22markup%3A%2F%2Fui%3Alabel%5C%22%2C%5C%22markup%3A%2F%2Flightning%3AiconSvgTemplatesUtility%5C%22%2C%5C%22markup%3A%2F%2Fsiteforce%3AhiddenRegion%5C%22%2C%5C%22markup%3A%2F%2FforceCommunity%3AseoAssistant%5C%22%2C%5C%22markup%3A%2F%2Fsiteforce%3AsldsTwoCol66Layout%5C%22%2C%5C%22markup%3A%2F%2FforceCommunity%3Adashboard%5C%22%2C%5C%22markup%3A%2F%2FdesktopDashboards%3Adashboard%5C%22%2C%5C%22markup%3A%2F%2Flightning%3AworkspaceAPI%5C%22%2C%5C%22markup%3A%2F%2FanalyticsHome%3AanalyticsDataProvider%5C%22%2C%5C%22markup%3A%2F%2Fforce%3AinlineSpinner%5C%22%2C%5C%22markup%3A%2F%2Fforce%3AdotsSpinner%5C%22%2C%5C%22markup%3A%2F%2FforceCommunity%3ArichText%5C%22%2C%5C%22markup%3A%2F%2FforceCommunity%3ArichTextInline%5C%22%2C%5C%22markup%3A%2F%2Fui%3AoutputRichText%5C%22%2C%5C%22markup%3A%2F%2FforceCommunity%3AoutputRichText%5C%22%2C%5C%22markup%3A%2F%2Faura%3AunescapedHtml%5C%22%2C%5C%22markup%3A%2F%2FforceCommunity%3AflowCommunity%5C%22%2C%5C%22markup%3A%2F%2FforceCommunity%3AgroupAnnouncement%5C%22%2C%5C%22markup%3A%2F%2FforceChatter%3AgroupAnnouncement%5C%22%2C%5C%22markup%3A%2F%2Faura%3ArenderIf%5C%22%2C%5C%22markup%3A%2F%2Fui%3Aimage%5C%22%2C%5C%22markup%3A%2F%2Fui%3AoutputText%5C%22%2C%5C%22layout%3A%2F%2Fsiteforce-generatedpage-7170e41d-7e6f-4a3d-94ba-ac63c2576cb4.c1658372762824%5C%22%2C%5C%22markup%3A%2F%2FforceCommunity%3AglobalNavigation%5C%22%2C%5C%22markup%3A%2F%2Fui%3Apopup%5C%22%2C%5C%22markup%3A%2F%2Fui%3Amenu%5C%22%2C%5C%22markup%3A%2F%2Fui%3Ainteractive%5C%22%2C%5C%22markup%3A%2F%2Fui%3ApopupTrigger%5C%22%2C%5C%22markup%3A%2F%2Fui%3AmenuTrigger%5C%22%2C%5C%22markup%3A%2F%2FselfService%3AprofileMenuTrigger%5C%22%2C%5C%22markup%3A%2F%2Fui%3ApopupTarget%5C%22%2C%5C%22markup%3A%2F%2Fui%3AmenuList%5C%22%2C%5C%22markup%3A%2F%2Fui%3AmenuItem%5C%22%2C%5C%22markup%3A%2F%2Fui%3AactionMenuItem%5C%22%2C%5C%22markup%3A%2F%2Fflowruntime%3AflowRuntimeForFlexiPage%5C%22%2C%5C%22markup%3A%2F%2Fflowruntime%3AflowRuntime%5C%22%2C%5C%22markup%3A%2F%2Fflowruntime%3AflowRuntimeV2%5C%22%2C%5C%22markup%3A%2F%2Fflowruntime%3AruntimeLib%5C%22%2C%5C%22markup%3A%2F%2Fflowruntime%3Aspinner%5C%22%2C%5C%22markup%3A%2F%2Fcommunity_navigation%3AglobalNavigationList%5C%22%2C%5C%22markup%3A%2F%2FforceCommunity%3AnavigationMenuBase%5C%22%2C%5C%22markup%3A%2F%2FforceCommunity%3AnavigationMenuBaseInternal%5C%22%2C%5C%22markup%3A%2F%2Fflowruntime%3Aheader%5C%22%2C%5C%22markup%3A%2F%2Fflowruntime%3AhelpIcon%5C%22%2C%5C%22markup%3A%2F%2Fflowruntime%3AdisplayTextLwc%5C%22%2C%5C%22markup%3A%2F%2Fflowruntime%3AvisibilityWrapperV2%5C%22%2C%5C%22markup%3A%2F%2Fflowruntime%3AflowScreenInput%5C%22%2C%5C%22markup%3A%2F%2Fflowruntime%3AoneColumn%5C%22%2C%5C%22markup%3A%2F%2Fflowruntime%3Abody%5C%22%2C%5C%22markup%3A%2F%2Fflowruntime%3AactionBase%5C%22%2C%5C%22markup%3A%2F%2Fflowruntime%3AactionButton%5C%22%2C%5C%22markup%3A%2F%2Flightning%3Abutton%5C%22%2C%5C%22markup%3A%2F%2Fflowruntime%3AactionBar%5C%22%5D%2C%5C%22pageCounter%5C%22%3A1%2C%5C%22phase%5C%22%3A%5C%22EPT%5C%22%2C%5C%22pageViewCounter%5C%22%3A1%2C%5C%22cdnEnabled%5C%22%3Afalse%2C%5C%22uriDefsEnabled%5C%22%3Afalse%2C%5C%22gates%5C%22%3A%7B%7D%7D%2C%5C%22locator%5C%22%3A%7B%5C%22target%5C%22%3A%5C%22defsUsage%5C%22%2C%5C%22scope%5C%22%3A%5C%22defsUsage%5C%22%7D%2C%5C%22sequence%5C%22%3A5%2C%5C%22page%5C%22%3A%7B%5C%22context%5C%22%3A%5C%22home%5C%22%2C%5C%22attributes%5C%22%3A%7B%5C%22url%5C%22%3A%5C%22%2Fs%2F%5C%22%7D%7D%7D%22%7D%5D%2C%22traces%22%3A%22%5B%5D%22%2C%22metrics%22%3A%22%5B%7B%5C%22owner%5C%22%3A%5C%22Instrumentation%5C%22%2C%5C%22name%5C%22%3A%5C%22bwUsageReceived.beforeEpt.bytes%5C%22%2C%5C%22type%5C%22%3A%5C%22PercentileHistogram%5C%22%2C%5C%22ts%5C%22%3A1658372763065%2C%5C%22value%5C%22%3A%5B37088%5D%7D%2C%7B%5C%22owner%5C%22%3A%5C%22Instrumentation%5C%22%2C%5C%22name%5C%22%3A%5C%22bwUsageSent.beforeEpt.bytes%5C%22%2C%5C%22type%5C%22%3A%5C%22PercentileHistogram%5C%22%2C%5C%22ts%5C%22%3A1658372763065%2C%5C%22value%5C%22%3A%5B15079%5D%7D%2C%7B%5C%22owner%5C%22%3A%5C%22Instrumentation%5C%22%2C%5C%22name%5C%22%3A%5C%22pageview.ept.ms%5C%22%2C%5C%22type%5C%22%3A%5C%22PercentileHistogram%5C%22%2C%5C%22ts%5C%22%3A1658372763076%2C%5C%22value%5C%22%3A%5B1607%5D%7D%2C%7B%5C%22owner%5C%22%3A%5C%22flowclientruntime.navigation%5C%22%2C%5C%22name%5C%22%3A%5C%22BUILD_COMPONENT_TREE%5C%22%2C%5C%22tags%5C%22%3A%7B%5C%22version%5C%22%3A%5C%22flowruntimeV2%5C%22%2C%5C%22status%5C%22%3A%5C%22success%5C%22%7D%2C%5C%22type%5C%22%3A%5C%22Counter%5C%22%2C%5C%22ts%5C%22%3A1658372762958%2C%5C%22value%5C%22%3A2%7D%2C%7B%5C%22owner%5C%22%3A%5C%22flowclientruntime.navigation%5C%22%2C%5C%22name%5C%22%3A%5C%22BUILD_COMPONENT_TREE%5C%22%2C%5C%22tags%5C%22%3A%7B%5C%22version%5C%22%3A%5C%22flowruntimeV2%5C%22%2C%5C%22status%5C%22%3A%5C%22success%5C%22%7D%2C%5C%22type%5C%22%3A%5C%22PercentileHistogram%5C%22%2C%5C%22ts%5C%22%3A1658372762958%2C%5C%22value%5C%22%3A%5B38%2C8%5D%7D%2C%7B%5C%22owner%5C%22%3A%5C%22flowclientruntime.cfv%5C%22%2C%5C%22name%5C%22%3A%5C%22EVALUATE_VISIBILITY%5C%22%2C%5C%22tags%5C%22%3A%7B%5C%22version%5C%22%3A%5C%22flowruntimeV2%5C%22%2C%5C%22status%5C%22%3A%5C%22success%5C%22%7D%2C%5C%22type%5C%22%3A%5C%22Counter%5C%22%2C%5C%22ts%5C%22%3A1658372762962%2C%5C%22value%5C%22%3A2%7D%2C%7B%5C%22owner%5C%22%3A%5C%22flowclientruntime.cfv%5C%22%2C%5C%22name%5C%22%3A%5C%22EVALUATE_VISIBILITY%5C%22%2C%5C%22tags%5C%22%3A%7B%5C%22version%5C%22%3A%5C%22flowruntimeV2%5C%22%2C%5C%22status%5C%22%3A%5C%22success%5C%22%7D%2C%5C%22type%5C%22%3A%5C%22PercentileHistogram%5C%22%2C%5C%22ts%5C%22%3A1658372762962%2C%5C%22value%5C%22%3A%5B0%2C1%5D%7D%5D%22%2C%22o11yLogs%22%3A%22CiEKBG8xMXkRM1PcgusheEIYASAAKAAyCDIzOC4yNC4wOAAS%2FAUKG3NmLmluc3RydW1lbnRhdGlvbi5BY3Rpdml0eRLcBQkA2HqC6yF4QhK%2FBAogYTI4YWQ5Mjk2ODEyNGRmZmMyMTQ2NzI2NDkzZWEwNzMSD0xleFJvb3RBY3Rpdml0eRkAANDMzDKYQCL6AwoUc2YubGV4LlBhZ2V2aWV3RHJhZnQS4QMIAREAAAAAAByZQCkAAAAAAKh5QEEAAAAAAAAAAEkAAAAAAAAAAGgAmAEAogEEV0FSTbIBK3NjZW5hcmlvVHJhY2tlckVuYWJsZWQuaW5zdHJ1bWVudGF0aW9uLmx0bmeyASN1aS5zZXJ2aWNlcy5QYWdlU2NvcGVkQ2FjaGUuZW5hYmxlZLIBJGNsaWVudFRlbGVtZXRyeS5pbnN0cnVtZW50YXRpb24ubHRuZ7IBIG8xMXlFbmFibGVkLmluc3RydW1lbnRhdGlvbi5sdG5nugEebGRzLnVzZU5ld1RyYWNrZWRGaWVsZEJlaGF2aW9yugEwc2NlbmFyaW9UcmFja2VyTWFya3NFbmFibGVkLmluc3RydW1lbnRhdGlvbi5sdG5nugEkYnJvd3NlcklkbGVUaW1lLmluc3RydW1lbnRhdGlvbi5sdG5nugEmY29tcG9uZW50UHJvZmlsZXIuaW5zdHJ1bWVudGF0aW9uLmx0bme6AStvMTF5QXVyYUFjdGlvbnNFbmFibGVkLmluc3RydW1lbnRhdGlvbi5sdG5n8AEEqgIPUExBQ0VIT0xERVJfVVJMugIOUExBQ0VIT0xERVJfSUTIAgHYAqyqghPgAumtjRGJAwAAAAAAoHxAQAFQAFgAGQAAAGBmO6BAKAEyFnNpdGVmb3JjZTpjb21tdW5pdHlBcHA6OQoSc2YubGV4LlBhZ2VQYXlsb2FkEiMIASIPUExBQ0VIT0xERVJfVVJMMg5QTEFDRUhPTERFUl9JREIWc2l0ZWZvcmNlOmNvbW11bml0eUFwcEoCM2dSFQoRc2YubGV4LkFwcFBheWxvYWQSABoAIgA%3D%22%7D%7D%5D%7D&aura.context=%7B%22mode%22%3A%22PROD%22%2C%22fwuid%22%3A%22QPQi8lbYE8YujG6og6Dqgw%22%2C%22app%22%3A%22siteforce%3AcommunityApp%22%2C%22loaded%22%3A%7B%22APPLICATION%40markup%3A%2F%2Fsiteforce%3AcommunityApp%22%3A%22LpCTzuyqBUeCUwKaXXlwUA%22%2C%22COMPONENT%40markup%3A%2F%2Fflowruntime%3AflowRuntimeForFlexiPage%22%3A%22-5daKiCvGVZANVvqKEoy2Q%22%2C%22COMPONENT%40markup%3A%2F%2FforceCommunity%3Adashboard%22%3A%22AiCYJU2L1bxRJx7dSn1bjw%22%2C%22COMPONENT%40markup%3A%2F%2FforceCommunity%3AflowCommunity%22%3A%222aHA7kue5UGz8eJ4g8pZbQ%22%2C%22COMPONENT%40markup%3A%2F%2FforceCommunity%3AglobalNavigation%22%3A%22hMmasIzVdWEZ3ka9-lPn0w%22%2C%22COMPONENT%40markup%3A%2F%2FforceCommunity%3AgroupAnnouncement%22%3A%22P4M42Q1bH-ULweP4K3yAHg%22%2C%22COMPONENT%40markup%3A%2F%2FforceCommunity%3ArichTextInline%22%3A%22HRtpLMxEd9S_qFnNhOYX_Q%22%2C%22COMPONENT%40markup%3A%2F%2Finstrumentation%3Ao11yCoreCollector%22%3A%228089lZkrpgraL8-V8KZXNw%22%2C%22COMPONENT%40markup%3A%2F%2Fsiteforce%3AregionLoaderWrapper%22%3A%22iB-z_tJpr_VgV-1n1WmpOg%22%7D%2C%22dn%22%3A%5B%5D%2C%22globals%22%3A%7B%7D%2C%22uad%22%3Afalse%7D&aura.pageURI=%2Fs%2F" +
                    "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&ui-instrumentation-components-beacon.InstrumentationBeacon.sendData=1",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&ui-instrumentation-components-beacon.InstrumentationBeacon.sendData=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/",
@@ -592,7 +606,7 @@ namespace ValidacaoBeneficioBot
                    "&aura.pageURI=%2Fs%2F" +
                    "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&ui-identity-components-sessiontimeoutwarn.SessionTimeoutWarn.getSessionTimeoutConfig=1&ui-search-components-forcesearch-sgdp.PermsAndPrefsCache.getPermsAndPrefs=1",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&ui-identity-components-sessiontimeoutwarn.SessionTimeoutWarn.getSessionTimeoutConfig=1&ui-search-components-forcesearch-sgdp.PermsAndPrefsCache.getPermsAndPrefs=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/",
@@ -664,7 +678,7 @@ namespace ValidacaoBeneficioBot
                           "&userId=" + currentUser.Id +
                           "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/aura?r=0&ui-analytics-dashboard-components-lightning.DashboardApp.describe=1&ui-analytics-dashboard-components-lightning.DashboardApp.getActions=1&ui-analytics-dashboard-components-lightning.DashboardApp.medianFunctionSupported=1&ui-force-components-controllers-theme.ThemeCssVarLoader.getThemeVariables=1",
+                response = DoPost("https://agibank.force.com/aura?r=0&ui-analytics-dashboard-components-lightning.DashboardApp.describe=1&ui-analytics-dashboard-components-lightning.DashboardApp.getActions=1&ui-analytics-dashboard-components-lightning.DashboardApp.medianFunctionSupported=1&ui-force-components-controllers-theme.ThemeCssVarLoader.getThemeVariables=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/desktopDashboards/dashboardApp.app?dashboardId=01Z6e000001DeZoEAK&displayMode=view&networkId=" + keys["currentNetworkId"] + "&userId=" + currentUser.Id,
@@ -698,11 +712,11 @@ namespace ValidacaoBeneficioBot
                           "&userId=" + currentUser.Id +
                           "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/aura?r=1&ui-analytics-dashboard-components-lightning.DashboardApp.showDynamicGaugeChartControls=1",
+                response = DoPost("https://agibank.force.com/aura?r=1&ui-analytics-dashboard-components-lightning.DashboardApp.showDynamicGaugeChartControls=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/desktopDashboards/dashboardApp.app?dashboardId=01Z6e000001DeZoEAK&displayMode=view&networkId=" + keys["currentNetworkId"] + "&userId=" + currentUser.Id,
-                           _accept: response.RequestMessage.RequestUri.ToString());
+                           _accept: response.ResponseUri.ToString());
 
                 #endregion
 
@@ -736,11 +750,11 @@ namespace ValidacaoBeneficioBot
                           "&userId=" + currentUser.Id +
                           "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/aura?r=2&ui-analytics-dashboard-components-lightning.DashboardApp.getStatus=1",
+                response = DoPost("https://agibank.force.com/aura?r=2&ui-analytics-dashboard-components-lightning.DashboardApp.getStatus=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/desktopDashboards/dashboardApp.app?dashboardId=01Z6e000001DeZoEAK&displayMode=view&networkId=" + keys["currentNetworkId"] + "&userId=" + currentUser.Id,
-                           _accept: response.RequestMessage.RequestUri.ToString());
+                           _accept: response.ResponseUri.ToString());
 
                 #endregion
 
@@ -773,11 +787,11 @@ namespace ValidacaoBeneficioBot
                           "&userId=" + currentUser.Id +
                           "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/aura?r=3&ui-analytics-dashboard-components-lightning.DashboardApp.getActions=1",
+                response = DoPost("https://agibank.force.com/aura?r=3&ui-analytics-dashboard-components-lightning.DashboardApp.getActions=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/desktopDashboards/dashboardApp.app?dashboardId=01Z6e000001DeZoEAK&displayMode=view&networkId=" + keys["currentNetworkId"] + "&userId=" + currentUser.Id,
-                           _accept: response.RequestMessage.RequestUri.ToString());
+                           _accept: response.ResponseUri.ToString());
 
                 #endregion
 
@@ -791,7 +805,7 @@ namespace ValidacaoBeneficioBot
             }
         }
 
-        public bool BuscaCliente(string cpf, string nome, string sobrenome, ref bool clienteNovo, ref string erro)
+        public bool BuscaCliente(string cpf, string nome, string sobrenome, ref bool clienteNovo, ref string erro, ref string erroSite)
         {
             try
             {
@@ -839,23 +853,23 @@ namespace ValidacaoBeneficioBot
                    "&aura.pageURI=%2Fs%2F" +
                    "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&ui-interaction-runtime-components-controllers.FlowRuntime.executeAction=1",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&ui-interaction-runtime-components-controllers.FlowRuntime.executeAction=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/",
                            _accept: "*/*");
 
-                clienteNovo = response.Content.ReadAsStringAsync().Result.Contains("Este é um cliente novo! Informe os dados abaixo para continuar.");
-                var recordId = RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "serializedEncodedState\":\"", "\",");
+                clienteNovo = response.Content.Contains("Este é um cliente novo! Informe os dados abaixo para continuar.");
+                var recordId = RetornaAuxSubstring(response.Content, "serializedEncodedState\":\"", "\",");
 
                 #endregion
 
                 if (clienteNovo)
                 {
-                    auxURL = response.Content.ReadAsStringAsync().Result.Substring(response.Content.ReadAsStringAsync().Result.LastIndexOf("serializedEncodedState\":\"") + 25);
+                    auxURL = response.Content.Substring(response.Content.LastIndexOf("serializedEncodedState\":\"") + 25);
                     auxURL = auxURL.Substring(0, auxURL.IndexOf("\""));
 
-                    //var serializedEncodedState = RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "NewAccountSimulationFlow\", \"value\":\"", "\",");
+                    //var serializedEncodedState = RetornaAuxSubstring(response.Content, "NewAccountSimulationFlow\", \"value\":\"", "\",");
                     UpdateKeys("serializedEncodedState", auxURL);
 
                     #region POST /s/sfsites/aura?r=8&ui-instrumentation-components-beacon.InstrumentationBeacon.sendData=1 HTTP/1.1
@@ -900,7 +914,7 @@ namespace ValidacaoBeneficioBot
                       "&aura.pageURI=%2Fs%2F" +
                       "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                    response = DoPost("/s/sfsites/aura?r=" + countURL() + "&ui-instrumentation-components-beacon.InstrumentationBeacon.sendData=1",
+                    response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&ui-instrumentation-components-beacon.InstrumentationBeacon.sendData=1",
                                strPost,
                                headers: hdrs,
                                _referer: "https://agibank.force.com/s/",
@@ -945,16 +959,16 @@ namespace ValidacaoBeneficioBot
                       "&aura.pageURI=%2Fs%2F" +
                       "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                    response = DoPost("/s/sfsites/aura?r=" + countURL() + "&ui-interaction-runtime-components-controllers.FlowRuntime.executeAction=1",
+                    response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&ui-interaction-runtime-components-controllers.FlowRuntime.executeAction=1",
                                strPost,
                                headers: hdrs,
                                _referer: "https://agibank.force.com/s/",
                                _accept: "*/*");
 
-                    //auxURL = RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "\"requestIds\":{\"", "\":[");
-                    //auxURL = RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "\"records\":{\"" + auxURL + "\":", "},\"recordTemplates\":{}");
+                    //auxURL = RetornaAuxSubstring(response.Content, "\"requestIds\":{\"", "\":[");
+                    //auxURL = RetornaAuxSubstring(response.Content, "\"records\":{\"" + auxURL + "\":", "},\"recordTemplates\":{}");
                     //recordResponse = JsonConvert.DeserializeObject<RecordResponse>(auxURL);
-                    auxURL = RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "recordId\",\"isCollection\":false,\"value\":\"", "\"");
+                    auxURL = RetornaAuxSubstring(response.Content, "recordId\",\"isCollection\":false,\"value\":\"", "\"");
 
                     recordId = auxURL;
                     #endregion
@@ -987,7 +1001,7 @@ namespace ValidacaoBeneficioBot
                       "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordId + "/detail") +
                       "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                    response = DoPost("/s/sfsites/aura?r=" + countURL() + "&ui-force-components-controllers-recordGlobalValueProvider.RecordGvp.getRecord=1",
+                    response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&ui-force-components-controllers-recordGlobalValueProvider.RecordGvp.getRecord=1",
                                strPost,
                                headers: hdrs,
                                _referer: "https://agibank.force.com/s/account/" + recordId + "/detail",
@@ -1021,7 +1035,7 @@ namespace ValidacaoBeneficioBot
                               "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordId + "/detail") +
                               "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                    response = DoPost("/s/sfsites/aura?r=" + countURL() + "&ui-force-components-controllers-recordGlobalValueProvider.RecordGvp.getRecord=1",
+                    response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&ui-force-components-controllers-recordGlobalValueProvider.RecordGvp.getRecord=1",
                                strPost,
                                headers: hdrs,
                                _referer: "https://agibank.force.com/s/account/" + recordId + "/detail",
@@ -1062,7 +1076,7 @@ namespace ValidacaoBeneficioBot
                               "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordId + "/detail") +
                               "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                    response = DoPost("/s/sfsites/aura?r=" + countURL() + "&ui-interaction-runtime-components-controllers.FlowRuntime.executeAction=1",
+                    response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&ui-interaction-runtime-components-controllers.FlowRuntime.executeAction=1",
                                strPost,
                                headers: hdrs,
                                _referer: "https://agibank.force.com/s/account/" + recordId + "/detail",
@@ -1088,7 +1102,7 @@ namespace ValidacaoBeneficioBot
                               "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                               "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                    response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.Component.getComponent=8&ui-interaction-runtime-components-controllers.FlowRuntime.runInterview=1",
+                    response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.Component.getComponent=8&ui-interaction-runtime-components-controllers.FlowRuntime.runInterview=1",
                                strPost,
                                headers: hdrs,
                                _referer: "https://agibank.force.com/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -1114,7 +1128,7 @@ namespace ValidacaoBeneficioBot
                               "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                               "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                    response = DoPost("/s/sfsites/aura?r=" + countURL() + "&CMTD.EnhancedRelatedList_CC.getMetadataFields=5&CMTD.EnhancedRelatedList_CC.getObjectAccess=5&CMTD.EnhancedRelatedList_CC.getRecordTypes=5&ui-analytics-dashboard-components-lightning.DashboardComponent.getAdditionalParameters=1&ui-analytics-dashboard-components-lightning.DashboardComponent.isFeedEnabled=1&ui-chatter-components-aura-components-forceChatter-groups.GroupAnnouncement.getAnnouncement=1&ui-comm-runtime-components-aura-components-siteforce-qb.Quarterback.validateRoute=1&ui-communities-components-aura-components-forceCommunity-flowCommunity.FlowCommunity.canViewFlow=2&ui-communities-components-aura-components-forceCommunity-richText.RichText.getParsedRichTextValue=5&ui-communities-components-aura-components-forceCommunity-seoAssistant.SeoAssistant.getRecordAndTranslationData=1&ui-communities-components-aura-components-forceCommunity-tabset.Tabset.getLocalizedRegionLabels=1&ui-force-components-controllers-recordGlobalValueProvider.RecordGvp.getRecord=1",
+                    response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&CMTD.EnhancedRelatedList_CC.getMetadataFields=5&CMTD.EnhancedRelatedList_CC.getObjectAccess=5&CMTD.EnhancedRelatedList_CC.getRecordTypes=5&ui-analytics-dashboard-components-lightning.DashboardComponent.getAdditionalParameters=1&ui-analytics-dashboard-components-lightning.DashboardComponent.isFeedEnabled=1&ui-chatter-components-aura-components-forceChatter-groups.GroupAnnouncement.getAnnouncement=1&ui-comm-runtime-components-aura-components-siteforce-qb.Quarterback.validateRoute=1&ui-communities-components-aura-components-forceCommunity-flowCommunity.FlowCommunity.canViewFlow=2&ui-communities-components-aura-components-forceCommunity-richText.RichText.getParsedRichTextValue=5&ui-communities-components-aura-components-forceCommunity-seoAssistant.SeoAssistant.getRecordAndTranslationData=1&ui-communities-components-aura-components-forceCommunity-tabset.Tabset.getLocalizedRegionLabels=1&ui-force-components-controllers-recordGlobalValueProvider.RecordGvp.getRecord=1",
                                strPost,
                                headers: hdrs,
                                _referer: "https://agibank.force.com/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -1189,7 +1203,7 @@ namespace ValidacaoBeneficioBot
                               "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                               "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                    response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=3",
+                    response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=3",
                                strPost,
                                headers: hdrs,
                                _referer: "https://agibank.force.com/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -1233,7 +1247,7 @@ namespace ValidacaoBeneficioBot
                               "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                               "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                    response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
+                    response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
                                strPost,
                                headers: hdrs,
                                _referer: "https://agibank.force.com/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -1291,7 +1305,7 @@ namespace ValidacaoBeneficioBot
                               "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                               "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                    response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.RecordUi.getRecordWithFields=1",
+                    response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.RecordUi.getRecordWithFields=1",
                                strPost,
                                headers: hdrs,
                                _referer: "https://agibank.force.com/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -1335,7 +1349,7 @@ namespace ValidacaoBeneficioBot
                               "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                               "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                    response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
+                    response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
                                strPost,
                                headers: hdrs,
                                _referer: "https://agibank.force.com/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -1375,7 +1389,7 @@ namespace ValidacaoBeneficioBot
                               "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                               "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                    response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
+                    response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
                                strPost,
                                headers: hdrs,
                                _referer: "https://agibank.force.com/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -1419,7 +1433,7 @@ namespace ValidacaoBeneficioBot
                               "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                               "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                    response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
+                    response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
                                strPost,
                                headers: hdrs,
                                _referer: "https://agibank.force.com/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -1463,7 +1477,7 @@ namespace ValidacaoBeneficioBot
                               "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                               "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                    response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
+                    response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
                                strPost,
                                headers: hdrs,
                                _referer: "https://agibank.force.com/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -1507,13 +1521,13 @@ namespace ValidacaoBeneficioBot
                               "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                               "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                    response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
+                    response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
                                strPost,
                                headers: hdrs,
                                _referer: "https://agibank.force.com/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
                                _accept: "*/*");
 
-                    UpdateKeys("taskId", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "Atendimento ao Cliente\", \"Id\":\"", "\"},\"errors"));
+                    UpdateKeys("taskId", RetornaAuxSubstring(response.Content, "Atendimento ao Cliente\", \"Id\":\"", "\"},\"errors"));
 
                     #endregion
 
@@ -1565,7 +1579,7 @@ namespace ValidacaoBeneficioBot
                               "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                               "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                    response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.RecordUi.getRecordWithFields=1",
+                    response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.RecordUi.getRecordWithFields=1",
                                strPost,
                                headers: hdrs,
                                _referer: "https://agibank.force.com/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -1609,7 +1623,7 @@ namespace ValidacaoBeneficioBot
                               "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                               "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                    response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.RecordUi.getObjectInfo=1",
+                    response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.RecordUi.getObjectInfo=1",
                                strPost,
                                headers: hdrs,
                                _referer: "https://agibank.force.com/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -1636,7 +1650,7 @@ namespace ValidacaoBeneficioBot
                               "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                               "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                    response = DoPost("/s/sfsites/aura?r=" + countURL() + "&CMTD.EnhancedRelatedList_CC.getSObjectRecords=5&aura.Component.reportFailedAction=1",
+                    response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&CMTD.EnhancedRelatedList_CC.getSObjectRecords=5&aura.Component.reportFailedAction=1",
                                strPost,
                                headers: hdrs,
                                _referer: "https://agibank.force.com/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -1663,7 +1677,7 @@ namespace ValidacaoBeneficioBot
                               "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                               "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                    response = DoPost("/s/sfsites/aura?r=" + countURL() + "&ui-instrumentation-components-beacon.InstrumentationBeacon.sendData=1",
+                    response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&ui-instrumentation-components-beacon.InstrumentationBeacon.sendData=1",
                                strPost,
                                headers: hdrs,
                                _referer: "https://agibank.force.com/s/account/" + recordId + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -1671,13 +1685,13 @@ namespace ValidacaoBeneficioBot
 
                     #endregion
 
-                    NavegaHome(response.RequestMessage.RequestUri.ToString());
+                    NavegaHome(response.ResponseUri.ToString());
 
                     return true;
                 }
                 else
                 {
-                    recordId = RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "NewAccountSimulationFlow\",\"value\":\"", "\",\"objectType");
+                    recordId = RetornaAuxSubstring(response.Content, "NewAccountSimulationFlow\",\"value\":\"", "\",\"objectType");
                 }
 
                 #region POST /s/sfsites/aura?r=8&ui-force-components-controllers-recordGlobalValueProvider.RecordGvp.getRecord=1 HTTP/1.1
@@ -1750,14 +1764,14 @@ namespace ValidacaoBeneficioBot
                   "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordId + "/detail") +
                   "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&ui-force-components-controllers-recordGlobalValueProvider.RecordGvp.getRecord=1",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&ui-force-components-controllers-recordGlobalValueProvider.RecordGvp.getRecord=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/account/" + recordId + "/detail",
                            _accept: "*/*");
 
-                auxURL = RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "\"requestIds\":{\"", "\":[");
-                auxURL = RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "\"records\":{\"" + auxURL + "\":", "},\"recordTemplates\":{}");
+                auxURL = RetornaAuxSubstring(response.Content, "\"requestIds\":{\"", "\":[");
+                auxURL = RetornaAuxSubstring(response.Content, "\"records\":{\"" + auxURL + "\":", "},\"recordTemplates\":{}");
                 recordResponse = JsonConvert.DeserializeObject<RecordResponse>(auxURL);
                 #endregion
 
@@ -1779,7 +1793,7 @@ namespace ValidacaoBeneficioBot
                           "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                           "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&CMTD.EnhancedRelatedList_CC.getMetadataFields=5&CMTD.EnhancedRelatedList_CC.getObjectAccess=5&CMTD.EnhancedRelatedList_CC.getRecordTypes=5&ui-comm-runtime-components-aura-components-siteforce-qb.Quarterback.validateRoute=1&ui-communities-components-aura-components-forceCommunity-seoAssistant.SeoAssistant.getRecordAndTranslationData=1&ui-communities-components-aura-components-forceCommunity-tabset.Tabset.getLocalizedRegionLabels=1&ui-force-components-controllers-recordGlobalValueProvider.RecordGvp.getRecord=1&ui-interaction-runtime-components-controllers.FlowRuntime.executeAction=1",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&CMTD.EnhancedRelatedList_CC.getMetadataFields=5&CMTD.EnhancedRelatedList_CC.getObjectAccess=5&CMTD.EnhancedRelatedList_CC.getRecordTypes=5&ui-comm-runtime-components-aura-components-siteforce-qb.Quarterback.validateRoute=1&ui-communities-components-aura-components-forceCommunity-seoAssistant.SeoAssistant.getRecordAndTranslationData=1&ui-communities-components-aura-components-forceCommunity-tabset.Tabset.getLocalizedRegionLabels=1&ui-force-components-controllers-recordGlobalValueProvider.RecordGvp.getRecord=1&ui-interaction-runtime-components-controllers.FlowRuntime.executeAction=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -1855,7 +1869,7 @@ namespace ValidacaoBeneficioBot
                           "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                           "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=3",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=3",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -1900,7 +1914,7 @@ namespace ValidacaoBeneficioBot
                           "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                           "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -1940,7 +1954,7 @@ namespace ValidacaoBeneficioBot
                           "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                           "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.RecordUi.getRecordWithFields=1",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.RecordUi.getRecordWithFields=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -1986,7 +2000,7 @@ namespace ValidacaoBeneficioBot
                           "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                           "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -2028,7 +2042,7 @@ namespace ValidacaoBeneficioBot
                           "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                           "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -2074,7 +2088,7 @@ namespace ValidacaoBeneficioBot
                           "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                           "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -2120,7 +2134,7 @@ namespace ValidacaoBeneficioBot
                           "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                           "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -2166,7 +2180,7 @@ namespace ValidacaoBeneficioBot
                           "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                           "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -2251,7 +2265,7 @@ namespace ValidacaoBeneficioBot
                           "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                           "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -2296,7 +2310,7 @@ namespace ValidacaoBeneficioBot
                           "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                           "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&CMTD.EnhancedRelatedList_CC.getSObjectRecords=5&aura.RecordUi.getObjectInfo=1",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&CMTD.EnhancedRelatedList_CC.getSObjectRecords=5&aura.RecordUi.getObjectInfo=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -2341,7 +2355,7 @@ namespace ValidacaoBeneficioBot
                           "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                           "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&ui-instrumentation-components-beacon.InstrumentationBeacon.sendData=1",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&ui-instrumentation-components-beacon.InstrumentationBeacon.sendData=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -2386,7 +2400,7 @@ namespace ValidacaoBeneficioBot
                           "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                           "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&ui-instrumentation-components-beacon.InstrumentationBeacon.sendData=1",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&ui-instrumentation-components-beacon.InstrumentationBeacon.sendData=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -2398,15 +2412,16 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = ex.Message;
                 if (ex.InnerException != null)
-                    erro = ex.InnerException.Message;
+                    erro += " - " + ex.InnerException.Message;
                 return false;
             }
 
         }
 
-        public bool ClicaSimulacao(string cpf, string nome, string sobrenome, ref string erro)
+        public bool ClicaSimulacao(string cpf, string nome, string sobrenome, ref string erro, ref string erroSite)
         {
             try
             {
@@ -2458,7 +2473,7 @@ namespace ValidacaoBeneficioBot
                           "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                           "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                //response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
+                //response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
                 //           strPost,
                 //           headers: hdrs,
                 //           _referer: "https://agibank.force.com/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -2529,7 +2544,7 @@ namespace ValidacaoBeneficioBot
                          "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) +
                          "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-'),
@@ -2589,7 +2604,7 @@ namespace ValidacaoBeneficioBot
                           "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) + "?tabset-11f0d=51b55" +
                           "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=2",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=2",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-') + "?tabset-11f0d=51b55",
@@ -2649,7 +2664,7 @@ namespace ValidacaoBeneficioBot
                           "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) + "?tabset-11f0d=51b55" +
                           "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-') + "?tabset-11f0d=51b55",
@@ -2661,22 +2676,27 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = ex.Message;
                 if (ex.InnerException != null)
-                    erro = ex.InnerException.Message;
+                    erro += " - " + ex.InnerException.Message;
                 return false;
             }
 
         }
 
-        public bool ClicaINSS(string cpf, string nome, string sobrenome, ref string erro)
+        public Product ClicaINSS(string cpf, string nome, string sobrenome, ref string erro, ref string erroSite)
         {
+            var LinhaErro = "";
+            Product retorno;
+
             try
             {
                 var hdrs = new Dictionary<string, string>();
                 var auxURL = "";
 
                 #region POST /s/sfsites/aura?r=47&aura.ApexAction.execute=1 HTTP/1.1
+                LinhaErro = "2801 - Entrou POST /s/sfsites/aura?r=47&aura.ApexAction.execute=1 HTTP/1.1";
                 hdrs = new Dictionary<string, string>();
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
@@ -2737,16 +2757,17 @@ namespace ValidacaoBeneficioBot
                           "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) + "?tabset-11f0d=51b55" +
                           "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-') + "?tabset-11f0d=51b55",
                            _accept: "*/*");
-                UpdateKeys("attendanceNumber", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "attendanceNumber=", "\""));
-                UpdateKeys("taskId", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "TaskId\":\"", "\""));
+                UpdateKeys("attendanceNumber", RetornaAuxSubstring(response.Content, "attendanceNumber=", "\""));
+                UpdateKeys("taskId", RetornaAuxSubstring(response.Content, "TaskId\":\"", "\""));
                 #endregion
 
                 #region POST /s/sfsites/aura?r=48&aura.ApexAction.execute=1 HTTP/1.1
+                LinhaErro = "2872 - POST /s/sfsites/aura?r=48&aura.ApexAction.execute=1 HTTP/1.1";
                 hdrs = new Dictionary<string, string>();
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
@@ -2780,7 +2801,7 @@ namespace ValidacaoBeneficioBot
                          "&aura.pageURI=" + WebUtility.UrlEncode("/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-')) + "?tabset-11f0d=51b55" +
                          "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
 
-                response = DoPost("/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
+                response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&aura.ApexAction.execute=1",
                            strPost,
                            headers: hdrs,
                            _referer: "https://agibank.force.com/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-') + "?tabset-11f0d=51b55",
@@ -2790,34 +2811,37 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region GET /apex/OriginationPage?url=https%3A%2F%2Forigination-product-sale-originacao.agibank-prd.in%3FattendanceNumber%3D13031157&taskId=00T8Z00009mHDoQUAW&id=0018Z00002hGxfeQAC&corban=true&enableScroll=true HTTP/1.1
+                LinhaErro = "2916 - GET /apex/OriginationPage?url=https%3A%2F%2Forigination-product-sale-originacao.agibank-prd.in%3FattendanceNumber%3D13031157&taskId=00T8Z00009mHDoQUAW&id=0018Z00002hGxfeQAC&corban=true&enableScroll=true HTTP/1.1";
+
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
                 hdrs.Add("Host", "agibank.force.com");
 
-                response = DoGet("/apex/OriginationPage?url=https%3A%2F%2Forigination-product-sale-originacao.agibank-prd.in%3FattendanceNumber%3D" + keys["attendanceNumber"] +
+                response = DoGet("https://agibank.force.com/apex/OriginationPage?url=https%3A%2F%2Forigination-product-sale-originacao.agibank-prd.in%3FattendanceNumber%3D" + keys["attendanceNumber"] +
                            "&taskId=" + keys["taskId"] + "&id=" + recordResponse.Account.Record.Id + "&corban=true&enableScroll=true",
                            headers: hdrs,
                            _accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
                            _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36 Edg/102.0.1245.33",
                            _referer: "https://agibank.force.com/s/account/" + recordResponse.Account.Record.Id + "/" + (nome + " " + sobrenome).ToLower().Replace(' ', '-') + "?tabset-11f0d=51b55");
 
-                //var newAuraToken = RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "\",\"pathPrefix\":\"\",\"token\":\"", "\",\"staticResourceDomain");
+                //var newAuraToken = RetornaAuxSubstring(response.Content, "\",\"pathPrefix\":\"\",\"token\":\"", "\",\"staticResourceDomain");
 
                 //UpdateKeys("new.aura.token", newAuraToken);
 
-                //UpdateKeys("aura.context", RetornaAuxSubstring(WebUtility.UrlDecode(response.Content.ReadAsStringAsync().Result), "\"desktopDashboards:dashboardApp\",\"loaded\":", ",\"styleContext\""));
+                //UpdateKeys("aura.context", RetornaAuxSubstring(WebUtility.UrlDecode(response.Content), "\"desktopDashboards:dashboardApp\",\"loaded\":", ",\"styleContext\""));
 
-                UpdateKeys("ViewState", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "ViewState\" value=\"", "\""));
-                UpdateKeys("ViewStateVersion", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "=\"com.salesforce.visualforce.ViewStateVersion\" value=\"", "\""));
-                UpdateKeys("ViewStateCSRF", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "ViewStateCSRF\" value=\"", "\""));
-                UpdateKeys("ViewStateMAC", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "ViewStateMAC\" value=\"", "\""));
+                UpdateKeys("ViewState", RetornaAuxSubstring(response.Content, "ViewState\" value=\"", "\""));
+                UpdateKeys("ViewStateVersion", RetornaAuxSubstring(response.Content, "=\"com.salesforce.visualforce.ViewStateVersion\" value=\"", "\""));
+                UpdateKeys("ViewStateCSRF", RetornaAuxSubstring(response.Content, "ViewStateCSRF\" value=\"", "\""));
+                UpdateKeys("ViewStateMAC", RetornaAuxSubstring(response.Content, "ViewStateMAC\" value=\"", "\""));
 
-                VFRMRemotingProviderImpl = JsonConvert.DeserializeObject(RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "$VFRM.RemotingProviderImpl(", "));"));
+                VFRMRemotingProviderImpl = JsonConvert.DeserializeObject(RetornaAuxSubstring(response.Content, "$VFRM.RemotingProviderImpl(", "));"));
                 #endregion
 
                 #region POST /OriginationPage?id=0018Z00002hGxfeQAC HTTP/1.1
+                LinhaErro = " 2946 - POST /OriginationPage?id=0018Z00002hGxfeQAC HTTP/1.1";
                 hdrs = new Dictionary<string, string>();
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
@@ -2835,21 +2859,22 @@ namespace ValidacaoBeneficioBot
                           "&newUrl=https%3A%2F%2Forigination-product-sale-originacao.agibank-prd.in%3FattendanceNumber%3D" + keys["attendanceNumber"] +
                           "&thepage%3Aform%3Aj_id37=thepage%3Aform%3Aj_id37&";
 
-                var auxReferer = response.RequestMessage.RequestUri.ToString();
+                var auxReferer = response.ResponseUri.ToString();
 
-                response = DoPost("/OriginationPage?id=" + recordResponse.Account.Record.Id,
+                response = DoPost("https://agibank.force.com/OriginationPage?id=" + recordResponse.Account.Record.Id,
                            strPost,
                            headers: hdrs,
                            _referer: auxReferer,
                            _accept: "*/*");
 
-                UpdateKeys("ViewState", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "ViewState\" value=\"", "\""));
-                UpdateKeys("ViewStateVersion", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "=\"com.salesforce.visualforce.ViewStateVersion\" value=\"", "\""));
-                UpdateKeys("ViewStateCSRF", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "ViewStateCSRF\" value=\"", "\""));
-                UpdateKeys("ViewStateMAC", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "ViewStateMAC\" value=\"", "\""));
+                UpdateKeys("ViewState", RetornaAuxSubstring(response.Content, "ViewState\" value=\"", "\""));
+                UpdateKeys("ViewStateVersion", RetornaAuxSubstring(response.Content, "=\"com.salesforce.visualforce.ViewStateVersion\" value=\"", "\""));
+                UpdateKeys("ViewStateCSRF", RetornaAuxSubstring(response.Content, "ViewStateCSRF\" value=\"", "\""));
+                UpdateKeys("ViewStateMAC", RetornaAuxSubstring(response.Content, "ViewStateMAC\" value=\"", "\""));
                 #endregion
 
                 #region GET /c/accountHighlightContainerApp.app?aura.format=JSON&aura.formatAdapter=LIGHTNING_OUT HTTP/1.1
+                LinhaErro = "2979 - GET /c/accountHighlightContainerApp.app?aura.format=JSON&aura.formatAdapter=LIGHTNING_OUT HTTP/1.1";
 
                 hdrs = new Dictionary<string, string>();
 
@@ -2857,19 +2882,20 @@ namespace ValidacaoBeneficioBot
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
                 hdrs.Add("Host", "agibank.force.com");
 
-                response = DoGet("/c/accountHighlightContainerApp.app?aura.format=JSON&aura.formatAdapter=LIGHTNING_OUT",
+                response = DoGet("https://agibank.force.com/c/accountHighlightContainerApp.app?aura.format=JSON&aura.formatAdapter=LIGHTNING_OUT",
                                  headers: hdrs,
                                  _accept: "*/*",
                                  _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37",
                                  _referer: auxReferer);
 
                 //OU USAR DYNAMIC
-                accountHighlightContainerApp = JsonConvert.DeserializeObject<AccountHighlightContainerApp>(response.Content.ReadAsStringAsync().Result);
-                var auxAuraToken = RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "descriptor\":\"markup://c:accountHighlightContainerApp\",\"token\":\"", "\"");
+                accountHighlightContainerApp = JsonConvert.DeserializeObject<AccountHighlightContainerApp>(response.Content);
+                var auxAuraToken = RetornaAuxSubstring(response.Content, "descriptor\":\"markup://c:accountHighlightContainerApp\",\"token\":\"", "\"");
                 #endregion
 
                 #region GET //l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22c%3AaccountHighlightContainerApp%22%2C%22fwuid%22%3A%22QPQi8lbYE8YujG6og6Dqgw%22%2C%22loaded%22%3A%7B%22APPLICATION%40markup%3A%2F%2Fc%3AaccountHighlightContainerApp%22%3A%22Y7TmpRiaxoeUJ6leyXcmVA%22%7D%2C%22mlr%22%3A1%2C%22pathPrefix%22%3A%22%22%2C%22dns%22%3A%22c%22%2C%22ls%22%3A1%2C%22lrmc%22%3A%22533941497%22%7D/inline.js?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..p_HLOwAguZrx8PpV0kpURoqll47qCAglrAKJ-DD0kFg&ltngOut=true HTTP/1.1
 
+                LinhaErro = "3000 - GET //l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22c%3AaccountHighlightContainerApp%22%2C%22fwuid%22%3A%22QPQi8lbYE8YujG6og6Dqgw%22%2C%22loaded%22%3A%7B%22APPLICATION%40markup%3A%2F%2Fc%3AaccountHighlightContainerApp%22%3A%22Y7TmpRiaxoeUJ6leyXcmVA%22%7D%2C%22mlr%22%3A1%2C%22pathPrefix%22%3A%22%22%2C%22dns%22%3A%22c%22%2C%22ls%22%3A1%2C%22lrmc%22%3A%22533941497%22%7D/inline.js?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..p_HLOwAguZrx8PpV0kpURoqll47qCAglrAKJ-DD0kFg&ltngOut=true HTTP/1.1";
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
@@ -2889,11 +2915,11 @@ namespace ValidacaoBeneficioBot
 
                 try
                 {
-                    response = DoGet(auxURL,
-                                     headers: hdrs,
-                                     _accept: "*/*",
-                                     _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37",
-                                     _referer: auxReferer);
+                    //response = DoGet(auxURL,
+                    //                 headers: hdrs,
+                    //                 _accept: "*/*",
+                    //                 _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37",
+                    //                 _referer: auxReferer);
                 }
                 catch (Exception ex)
                 {
@@ -2902,7 +2928,7 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region GET //l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22c%3AaccountHighlightContainerApp%22%2C%22fwuid%22%3A%22QPQi8lbYE8YujG6og6Dqgw%22%2C%22loaded%22%3A%7B%22APPLICATION%40markup%3A%2F%2Fc%3AaccountHighlightContainerApp%22%3A%22Y7TmpRiaxoeUJ6leyXcmVA%22%7D%2C%22mlr%22%3A1%2C%22pathPrefix%22%3A%22%22%2C%22dns%22%3A%22c%22%2C%22ls%22%3A1%2C%22lrmc%22%3A%22533941497%22%7D/bootstrap.js?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..p_HLOwAguZrx8PpV0kpURoqll47qCAglrAKJ-DD0kFg&ltngOut=true HTTP/1.1
-
+                LinhaErro = " 3033 - GET //l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22c%3AaccountHighlightContainerApp%22%2C%22fwuid%22%3A%22QPQi8lbYE8YujG6og6Dqgw%22%2C%22loaded%22%3A%7B%22APPLICATION%40markup%3A%2F%2Fc%3AaccountHighlightContainerApp%22%3A%22Y7TmpRiaxoeUJ6leyXcmVA%22%7D%2C%22mlr%22%3A1%2C%22pathPrefix%22%3A%22%22%2C%22dns%22%3A%22c%22%2C%22ls%22%3A1%2C%22lrmc%22%3A%22533941497%22%7D/bootstrap.js?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..p_HLOwAguZrx8PpV0kpURoqll47qCAglrAKJ-DD0kFg&ltngOut=true HTTP/1.1";
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
@@ -2911,23 +2937,23 @@ namespace ValidacaoBeneficioBot
 
                 try
                 {
-                    response = DoGet("///l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22c%3AaccountHighlightContainerApp%22%2C%22fwuid%22%3A%22QPQi8lbYE8YujG6og6Dqgw%22%2C%22loaded%22%3A%7B%22APPLICATION%40markup%3A%2F%2Fc%3AaccountHighlightContainerApp%22%3A%22Y7TmpRiaxoeUJ6leyXcmVA%22%7D%2C%22mlr%22%3A1%2C%22pathPrefix%22%3A%22%22%2C%22dns%22%3A%22c%22%2C%22ls%22%3A1%2C%22lrmc%22%3A%22533941497%22%7D/bootstrap.js?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..p_HLOwAguZrx8PpV0kpURoqll47qCAglrAKJ-DD0kFg&ltngOut=true",
-                                 headers: hdrs,
-                                 _accept: "*/*",
-                                 _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37",
-                                 _referer: auxReferer);
+                    //response = DoGet("https://agibank.force.com//l/%7B%22mode%22%3A%22PROD%22%2C%22app%22%3A%22c%3AaccountHighlightContainerApp%22%2C%22fwuid%22%3A%22QPQi8lbYE8YujG6og6Dqgw%22%2C%22loaded%22%3A%7B%22APPLICATION%40markup%3A%2F%2Fc%3AaccountHighlightContainerApp%22%3A%22Y7TmpRiaxoeUJ6leyXcmVA%22%7D%2C%22mlr%22%3A1%2C%22pathPrefix%22%3A%22%22%2C%22dns%22%3A%22c%22%2C%22ls%22%3A1%2C%22lrmc%22%3A%22533941497%22%7D/bootstrap.js?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..p_HLOwAguZrx8PpV0kpURoqll47qCAglrAKJ-DD0kFg&ltngOut=true",
+                    //             headers: hdrs,
+                    //             _accept: "*/*",
+                    //             _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37",
+                    //             _referer: auxReferer);
                 }
                 catch (Exception ex)
                 {
                     var x = ex;
                 }
 
-                //OU USAR DYNAMIC
-                accountHighlightContainerApp = JsonConvert.DeserializeObject<AccountHighlightContainerApp>(response.Content.ReadAsStringAsync().Result);
+                ////OU USAR DYNAMIC
+                //accountHighlightContainerApp = JsonConvert.DeserializeObject<AccountHighlightContainerApp>(response.Content);
                 #endregion
 
                 #region GET /?attendanceNumber=13031157 HTTP/1.1
-
+                LinhaErro = "3058 - GET /?attendanceNumber=13031157 HTTP/1.1";
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
@@ -2944,6 +2970,7 @@ namespace ValidacaoBeneficioBot
                 #region //AURA
 
                 #region POST //aura?r=0&aura.ApexAction.execute=3 HTTP/1.1
+                LinhaErro = "3075 - POST //aura?r=0&aura.ApexAction.execute=3 HTTP/1.1";
                 hdrs = new Dictionary<string, string>();
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
@@ -3034,6 +3061,7 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region POST //aura?r=1&aura.ApexAction.execute=1 HTTP/1.1
+                LinhaErro = "3166 - POST //aura?r=1&aura.ApexAction.execute=1 HTTP/1.1";
                 hdrs = new Dictionary<string, string>();
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
@@ -3080,6 +3108,7 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region POST //aura?r=2&aura.RecordUi.getRecordWithFields=1 HTTP/1.1
+                LinhaErro = "3213 - POST //aura?r=1&aura.ApexAction.execute=1 HTTP/1.1";
                 hdrs = new Dictionary<string, string>();
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
@@ -3121,6 +3150,7 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region POST //aura?r=3&aura.ApexAction.execute=1 HTTP/1.1
+                LinhaErro = "3255 - POST //aura?r=1&aura.ApexAction.execute=1 HTTP/1.1";
                 hdrs = new Dictionary<string, string>();
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
@@ -3167,6 +3197,7 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region POST //aura?r=4&aura.RecordUi.getObjectInfo=1 HTTP/1.1
+                LinhaErro = "3302 - POST //aura?r=1&aura.ApexAction.execute=1 HTTP/1.1";
                 hdrs = new Dictionary<string, string>();
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
@@ -3205,6 +3236,7 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region POST //aura?r=5&aura.ApexAction.execute=1 HTTP/1.1
+                LinhaErro = "3341 - POST //aura?r=1&aura.ApexAction.execute=1 HTTP/1.1";
                 hdrs = new Dictionary<string, string>();
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
@@ -3247,6 +3279,7 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region POST //aura?r=6&aura.ApexAction.execute=1 HTTP/1.1
+                LinhaErro = "3384 - POST //aura?r=1&aura.ApexAction.execute=1 HTTP/1.1";
                 hdrs = new Dictionary<string, string>();
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
@@ -3293,6 +3326,7 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region POST //aura?r=7&aura.ApexAction.execute=1 HTTP/1.1
+                LinhaErro = "3431 - POST //aura?r=1&aura.ApexAction.execute=1 HTTP/1.1";
                 hdrs = new Dictionary<string, string>();
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
@@ -3330,7 +3364,7 @@ namespace ValidacaoBeneficioBot
                    "&enableScroll=true" +
                    "&aura.token=" + WebUtility.UrlEncode(auxAuraToken);
 
-                response = DoPost("//aura?r=7&aura.ApexAction.execute=1",
+                response = DoPost("https://agibank.force.com//aura?r=7&aura.ApexAction.execute=1",
                            strPost,
                            headers: hdrs,
                            _referer: auxReferer,
@@ -3339,6 +3373,7 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region POST //aura?r=8&aura.ApexAction.execute=1&aura.RecordUi.getRecordWithFields=1 HTTP/1.1
+                LinhaErro = "3478 - POST //aura?r=1&aura.ApexAction.execute=1 HTTP/1.1";
                 hdrs = new Dictionary<string, string>();
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
@@ -3403,6 +3438,7 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region POST //aura?r=8&aura.ApexAction.execute=1&aura.RecordUi.getRecordWithFields=1 HTTP/1.1
+                LinhaErro = "3543 - POST //aura?r=1&aura.ApexAction.execute=1 HTTP/1.1";
                 hdrs = new Dictionary<string, string>();
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
@@ -3458,16 +3494,18 @@ namespace ValidacaoBeneficioBot
                    "&enableScroll=true" +
                    "&aura.token=" + WebUtility.UrlEncode(auxAuraToken);
 
-                //response = DoPost("//aura?r=8&aura.ApexAction.execute=1&aura.RecordUi.getRecordWithFields=1",
+                //response = DoPost("https://agibank.force.com//aura?r=8&aura.ApexAction.execute=1&aura.RecordUi.getRecordWithFields=1",
                 //           strPost,
                 //           headers: hdrs,
                 //           _referer: auxReferer,
                 //           _accept: "*/*",
                 //           _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.44");
                 #endregion
+
                 #endregion
 
                 #region GET /v1/attendances/13031157?state-safe=true HTTP/1.1
+                LinhaErro = "3610 - POST //aura?r=1&aura.ApexAction.execute=1 HTTP/1.1";
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
@@ -3478,14 +3516,14 @@ namespace ValidacaoBeneficioBot
                 hdrs.Add("store-id", "0");
                 hdrs.Add("user-id", "0");
 
-                response = DoGet("/v1/attendances/" + keys["attendanceNumber"] + "?state-safe=true",
+                response = DoGet("https://origination-crm-service-comercial.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"] + "?state-safe=true",
                                  headers: hdrs,
                                  _accept: "*/*",
                                  _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
 
                 try
                 {
-                    attendancesData = JsonConvert.DeserializeObject<AttendancesData>(response.Content.ReadAsStringAsync().Result);
+                    attendancesData = JsonConvert.DeserializeObject<AttendancesData>(response.Content);
                 }
                 catch (Exception ex)
                 {
@@ -3495,6 +3533,7 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region GET /v1/attendances/13031157 HTTP/1.1 
+                LinhaErro = "3638 - POST //aura?r=1&aura.ApexAction.execute=1 HTTP/1.1";
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
@@ -3505,13 +3544,14 @@ namespace ValidacaoBeneficioBot
                 hdrs.Add("store-id", attendancesData.StoreId);
                 hdrs.Add("user-id", attendancesData.UserId);
 
-                response = DoGet("/v1/attendances/" + keys["attendanceNumber"],
+                response = DoGet("https://origination-product-sale-originacao.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"],
                                  headers: hdrs,
                                  _accept: "*/*",
                                  _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
                 #endregion
 
                 #region GET /v1/income-sources HTTP/1.1 
+                LinhaErro = "3656 - POST //aura?r=1&aura.ApexAction.execute=1 HTTP/1.1";
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
@@ -3522,13 +3562,14 @@ namespace ValidacaoBeneficioBot
                 hdrs.Add("store-id", attendancesData.StoreId);
                 hdrs.Add("user-id", attendancesData.UserId);
 
-                response = DoGet("/v1/income-sources",
+                response = DoGet("https://origination-product-sale-originacao.agibank-prd.in/v1/income-sources",
                                  headers: hdrs,
                                  _accept: "*/*",
                                  _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
                 #endregion
 
                 #region GET /v1/attendances/13031157/authorization-types HTTP/1.1
+                LinhaErro = "3674 - POST //aura?r=1&aura.ApexAction.execute=1 HTTP/1.1";
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
@@ -3539,13 +3580,14 @@ namespace ValidacaoBeneficioBot
                 hdrs.Add("store-id", attendancesData.StoreId);
                 hdrs.Add("user-id", attendancesData.UserId);
 
-                response = DoGet("/v1/attendances/" + keys["attendanceNumber"] + "/authorization-types",
+                response = DoGet("https://origination-product-sale-originacao.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"] + "/authorization-types",
                                  headers: hdrs,
                                  _accept: "*/*",
                                  _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
                 #endregion
 
                 #region PATCH /v1/attendances/13031157 HTTP/1.1
+                LinhaErro = "3692 - POST //aura?r=1&aura.ApexAction.execute=1 HTTP/1.1";
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
@@ -3567,6 +3609,7 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region GET /v1/attendances/13031157 HTTP/1.1
+                LinhaErro = "3714 - POST //aura?r=1&aura.ApexAction.execute=1 HTTP/1.1";
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
@@ -3577,13 +3620,14 @@ namespace ValidacaoBeneficioBot
                 hdrs.Add("store-id", attendancesData.StoreId);
                 hdrs.Add("user-id", attendancesData.UserId);
 
-                response = DoGet("/v1/attendances/" + keys["attendanceNumber"],
+                response = DoGet("https://origination-product-sale-originacao.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"],
                                  headers: hdrs,
                                  _accept: "*/*",
                                  _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
                 #endregion
 
                 #region GET /v1/attendances/13031157?state-safe=true HTTP/1.1 
+                LinhaErro = "3732 - POST //aura?r=1&aura.ApexAction.execute=1 HTTP/1.1";
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
@@ -3594,14 +3638,14 @@ namespace ValidacaoBeneficioBot
                 hdrs.Add("store-id", "0");
                 hdrs.Add("user-id", "0");
 
-                response = DoGet("/v1/attendances/" + keys["attendanceNumber"] + "?state-safe=true",
+                response = DoGet("https://origination-product-sale-originacao.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"] + "?state-safe=true",
                                  headers: hdrs,
                                  _accept: "*/*",
                                  _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
 
                 try
                 {
-                    attendancesData = JsonConvert.DeserializeObject<AttendancesData>(response.Content.ReadAsStringAsync().Result);
+                    attendancesData = JsonConvert.DeserializeObject<AttendancesData>(response.Content);
                 }
                 catch (Exception ex)
                 {
@@ -3610,6 +3654,7 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region GET /v1/attendances/13031157/available-offers HTTP/1.1 
+                LinhaErro = "3759 - POST //aura?r=1&aura.ApexAction.execute=1 HTTP/1.1";
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
@@ -3620,28 +3665,36 @@ namespace ValidacaoBeneficioBot
                 hdrs.Add("store-id", attendancesData.StoreId);
                 hdrs.Add("user-id", attendancesData.UserId);
 
-                response = DoGet("/v1/attendances/" + keys["attendanceNumber"] + "/available-offers",
+                response = DoGet("https://origination-product-sale-originacao.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"] + "/available-offers",
                                  headers: hdrs,
                                  _accept: "*/*",
                                  _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
 
+                var offers = JsonConvert.DeserializeObject<CustomerOffersRequest>(response.Content);
 
-                //attendancesData = JsonConvert.DeserializeObject<AttendancesData>(response.Content.ReadAsStringAsync().Result);
+                retorno = JsonConvert.DeserializeObject<Product>(JsonConvert.SerializeObject(offers.Products.Where(p => p.Id == "PERSONAL_LOAN").FirstOrDefault()));
+
+                if (retorno != null)
+                {
+                    var x = 1;
+                }
+
                 #endregion
 
-                return true;
+                return retorno;
             }
             catch (Exception ex)
             {
-                erro = ex.Message;
+                erroSite = ex.Message;
+                erro = LinhaErro + "   -   " + ex.Message;
                 if (ex.InnerException != null)
-                    erro = ex.InnerException.Message;
-                return false;
+                    erro += " - " + ex.InnerException.Message;
+                return null;
             }
 
         }
 
-        public bool AceitaOfertaGEV(DataClientPutRequest dadosCliente, ref string erro)
+        public bool AceitaOfertaGEV(DataClientPutRequest dadosCliente, ref string erro, ref string erroSite)
         {
             try
             {
@@ -3660,7 +3713,7 @@ namespace ValidacaoBeneficioBot
                 hdrs.Add("store-id", attendancesData.StoreId);
                 hdrs.Add("user-id", attendancesData.UserId);
 
-                dynamic auxBody = JsonConvert.DeserializeObject(response.Content.ReadAsStringAsync().Result);
+                dynamic auxBody = JsonConvert.DeserializeObject(response.Content);
 
                 var strPost = "{\"person\": " + auxBody.person + ", \"products\":" + auxBody.products + "}";
                 strPost = strPost.Replace("\n", "").Replace("\r", "").Replace("}]}", ",\"checked\":true}]}");
@@ -3683,7 +3736,7 @@ namespace ValidacaoBeneficioBot
                 hdrs.Add("store-id", attendancesData.StoreId);
                 hdrs.Add("user-id", attendancesData.UserId);
 
-                response = DoGet("/v1/attendances/" + keys["attendanceNumber"],
+                response = DoGet("https://origination-product-sale-originacao.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"],
                                  headers: hdrs,
                                  _accept: "*/*",
                                  _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
@@ -3713,15 +3766,15 @@ namespace ValidacaoBeneficioBot
                    "\"ns\": \"\"," +
                    "\"ver\":48}}";
 
-                response = DoPost("/apexremote",
+                response = DoPost("https://agibank.force.com/apexremote",
                            strPost,
                            headers: hdrs,
                            _referer: auxReferer,
                            _accept: "*/*");
 
                 hdrs.Remove("X-User-Agent");
-                UpdateKeys("GevAtendimentoDetailSrcUrl", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "GevAtendimentoDetailSrcUrl\":\"", "\""));
-                UpdateKeys("SimulatorPhoneSrcUrl", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "SimulatorPhoneSrcUrl\":\"", "\""));
+                UpdateKeys("GevAtendimentoDetailSrcUrl", RetornaAuxSubstring(response.Content, "GevAtendimentoDetailSrcUrl\":\"", "\""));
+                UpdateKeys("SimulatorPhoneSrcUrl", RetornaAuxSubstring(response.Content, "SimulatorPhoneSrcUrl\":\"", "\""));
                 #endregion
 
                 #region POST /OriginationPage?id=0018Z00002hGxfeQAC HTTP/1.1
@@ -3742,16 +3795,16 @@ namespace ValidacaoBeneficioBot
                           "%2Fcomplete-offer?document=" + dadosCliente.Document + "&" + keys["SimulatorPhoneSrcUrl"].Substring(keys["SimulatorPhoneSrcUrl"].IndexOf('&') + 1) +
                           "&thepage%3Aform%3Aj_id37=thepage%3Aform%3Aj_id37&";
 
-                response = DoPost("/OriginationPage?id=" + recordResponse.Account.Record.Id,
+                response = DoPost("https://agibank.force.com/OriginationPage?id=" + recordResponse.Account.Record.Id,
                            strPost,
                            headers: hdrs,
                            _referer: auxReferer,
                            _accept: "*/*");
 
-                UpdateKeys("ViewState", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "ViewState\" value=\"", "\""));
-                UpdateKeys("ViewStateVersion", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "=\"com.salesforce.visualforce.ViewStateVersion\" value=\"", "\""));
-                UpdateKeys("ViewStateCSRF", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "ViewStateCSRF\" value=\"", "\""));
-                UpdateKeys("ViewStateMAC", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "ViewStateMAC\" value=\"", "\""));
+                UpdateKeys("ViewState", RetornaAuxSubstring(response.Content, "ViewState\" value=\"", "\""));
+                UpdateKeys("ViewStateVersion", RetornaAuxSubstring(response.Content, "=\"com.salesforce.visualforce.ViewStateVersion\" value=\"", "\""));
+                UpdateKeys("ViewStateCSRF", RetornaAuxSubstring(response.Content, "ViewStateCSRF\" value=\"", "\""));
+                UpdateKeys("ViewStateMAC", RetornaAuxSubstring(response.Content, "ViewStateMAC\" value=\"", "\""));
                 #endregion
 
                 #region GET /92691925/complete-offer?document=31951228120&userId=62788&storeId=70035&actualStoreId=2722&consultantTaxId=41642530883 HTTP/1.1
@@ -3806,7 +3859,7 @@ namespace ValidacaoBeneficioBot
                                  _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37",
                                  _referer: "https://offer-engine-ui-comercial.agibank-prd.in/");
 
-                attendancesData = JsonConvert.DeserializeObject<AttendancesData>(response.Content.ReadAsStringAsync().Result);
+                attendancesData = JsonConvert.DeserializeObject<AttendancesData>(response.Content);
                 #endregion
 
                 #region PUT /simulator-service/v3/clients/92691925 HTTP/1.1
@@ -3878,7 +3931,7 @@ namespace ValidacaoBeneficioBot
                                  _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37",
                                  _referer: "https://offer-engine-ui-comercial.agibank-prd.in/");
 
-                attendancesData = JsonConvert.DeserializeObject<AttendancesData>(response.Content.ReadAsStringAsync().Result);
+                attendancesData = JsonConvert.DeserializeObject<AttendancesData>(response.Content);
                 #endregion
 
                 #region GET /simulator-service/v3/simulations/data/92691925 HTTP/1.1
@@ -3903,7 +3956,7 @@ namespace ValidacaoBeneficioBot
                                  _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37",
                                  _referer: "https://offer-engine-ui-comercial.agibank-prd.in/");
 
-                attendancesData = JsonConvert.DeserializeObject<AttendancesData>(response.Content.ReadAsStringAsync().Result);
+                attendancesData = JsonConvert.DeserializeObject<AttendancesData>(response.Content);
                 #endregion
 
                 #region PUT /simulator-service/v3/clients/92691925 HTTP/1.1
@@ -3994,15 +4047,16 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = ex.Message;
                 if (ex.InnerException != null)
-                    erro = ex.InnerException.Message;
+                    erro += " - " + ex.InnerException.Message;
                 return false;
             }
 
         }
 
-        public bool AtendimentoTelefonico(string cpf, string nome, string sobrenome, ref string erro)
+        public bool AtendimentoTelefonico(string cpf, string nome, string sobrenome, ref string erro, ref string erroSite)
         {
             try
             {
@@ -4145,22 +4199,23 @@ namespace ValidacaoBeneficioBot
                 //                 _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37",
                 //                 _referer: "https://offer-engine-ui-comercial.agibank-prd.in/");
 
-                ////attendancesData = JsonConvert.DeserializeObject<AttendancesData>(response.Content.ReadAsStringAsync().Result);
+                ////attendancesData = JsonConvert.DeserializeObject<AttendancesData>(response.Content);
                 //#endregion
 
                 return true;
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = ex.Message;
                 if (ex.InnerException != null)
-                    erro = ex.InnerException.Message;
+                    erro += " - " + ex.InnerException.Message;
                 return false;
             }
 
         }
 
-        public bool ContinuarProcesso(string cpf, string nome, string sobrenome, ref string erro)
+        public bool ContinuarProcesso(string cpf, string nome, string sobrenome, ref string erro, ref string erroSite)
         {
             try
             {
@@ -4231,22 +4286,23 @@ namespace ValidacaoBeneficioBot
                                     _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37",
                                     _referer: "https://offer-engine-ui-comercial.agibank-prd.in/");
 
-                attendancesData = JsonConvert.DeserializeObject<AttendancesData>(responsePut);
+                //attendancesData = JsonConvert.DeserializeObject<AttendancesData>(responsePut);
                 #endregion
 
                 return true;
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = ex.Message;
                 if (ex.InnerException != null)
-                    erro = ex.InnerException.Message;
+                    erro += " - " + ex.InnerException.Message;
                 return false;
             }
 
         }
 
-        public bool ContinuarSemCadastro(string cpf, string nome, string sobrenome, ref string erro)
+        public bool ContinuarSemCadastro(string cpf, string nome, string sobrenome, ref string erro, ref string erroSite)
         {
             try
             {
@@ -4268,7 +4324,7 @@ namespace ValidacaoBeneficioBot
                 hdrs.Add("storeId", keys["storeId"]);
                 hdrs.Add("userId", keys["userId"]);
 
-                response = DoGet("/simulator-service/v3/clients/" + cpf + "/phones?activated=true&hot=true",
+                response = DoGet("https://prd-gateway.agibank.com.br/simulator-service/v3/clients/" + cpf + "/phones?activated=true&hot=true",
                                  headers: hdrs,
                                  _accept: "application/json, text/plain, */*",
                                  _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37",
@@ -4290,7 +4346,7 @@ namespace ValidacaoBeneficioBot
                 hdrs.Add("storeId", keys["storeId"]);
                 hdrs.Add("userId", keys["userId"]);
 
-                response = DoGet("/simulator-service/v3/clients/" + cpf + "/phones?activated=true&hot=true",
+                response = DoGet("https://prd-gateway.agibank.com.br/simulator-service/v3/clients/" + cpf + "/phones?activated=true&hot=true",
                                  headers: hdrs,
                                  _accept: "application/json, text/plain, */*",
                                  _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37",
@@ -4319,14 +4375,14 @@ namespace ValidacaoBeneficioBot
 
                 var strPost = "{\"reason\":\"Cliente com telefone temporariamente indisponível\"}";
 
-                response = DoPost("/simulator-service/v3/simulations/events",
+                response = DoPost("https://prd-gateway.agibank.com.br/simulator-service/v3/simulations/events",
                            strPost,
                            headers: hdrs,
                            _referer: "https://offer-engine-ui-comercial.agibank-prd.in/",
                            _accept: "application/json, text/plain, */*");
 
-                //UpdateKeys("GevAtendimentoDetailSrcUrl", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "GevAtendimentoDetailSrcUrl\":\"", "\""));
-                //UpdateKeys("SimulatorPhoneSrcUrl", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "SimulatorPhoneSrcUrl\":\"", "\""));
+                //UpdateKeys("GevAtendimentoDetailSrcUrl", RetornaAuxSubstring(response.Content, "GevAtendimentoDetailSrcUrl\":\"", "\""));
+                //UpdateKeys("SimulatorPhoneSrcUrl", RetornaAuxSubstring(response.Content, "SimulatorPhoneSrcUrl\":\"", "\""));
                 #endregion
 
                 #region PUT /simulator-service/v3/clients/92691925 HTTP/1.1
@@ -4392,7 +4448,7 @@ namespace ValidacaoBeneficioBot
                 hdrs.Add("storeId", keys["storeId"]);
                 hdrs.Add("userId", keys["userId"]);
 
-                response = DoGet("/simulator-service/v2/documents/required-documents/" + keys["externalId"],
+                response = DoGet("https://prd-gateway.agibank.com.br/simulator-service/v2/documents/required-documents/" + keys["externalId"],
                                  headers: hdrs,
                                  _accept: "application/json, text/plain, */*",
                                  _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37",
@@ -4414,7 +4470,7 @@ namespace ValidacaoBeneficioBot
                 hdrs.Add("storeId", keys["storeId"]);
                 hdrs.Add("userId", keys["userId"]);
 
-                response = DoGet("/simulator-service/v3/clients/" + keys["externalId"] + "/dataprev-grants",
+                response = DoGet("https://prd-gateway.agibank.com.br/simulator-service/v3/clients/" + keys["externalId"] + "/dataprev-grants",
                                  headers: hdrs,
                                  _accept: "application/json, text/plain, */*",
                                  _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37",
@@ -4439,14 +4495,14 @@ namespace ValidacaoBeneficioBot
 
                 strPost = "{}";
 
-                response = DoPost("/simulator-service/v3/simulations/events",
+                response = DoPost("https://prd-gateway.agibank.com.br/simulator-service/v3/simulations/events",
                            strPost,
                            headers: hdrs,
                            _referer: "https://offer-engine-ui-comercial.agibank-prd.in/",
                            _accept: "application/json, text/plain, */*");
 
-                //UpdateKeys("GevAtendimentoDetailSrcUrl", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "GevAtendimentoDetailSrcUrl\":\"", "\""));
-                //UpdateKeys("SimulatorPhoneSrcUrl", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "SimulatorPhoneSrcUrl\":\"", "\""));
+                //UpdateKeys("GevAtendimentoDetailSrcUrl", RetornaAuxSubstring(response.Content, "GevAtendimentoDetailSrcUrl\":\"", "\""));
+                //UpdateKeys("SimulatorPhoneSrcUrl", RetornaAuxSubstring(response.Content, "SimulatorPhoneSrcUrl\":\"", "\""));
                 #endregion
 
                 #region GET /simulator-service/v3/customer-proposals/31951228120/benefits HTTP/1.1
@@ -4464,7 +4520,7 @@ namespace ValidacaoBeneficioBot
                 hdrs.Add("storeId", keys["storeId"]);
                 hdrs.Add("userId", keys["userId"]);
 
-                response = DoGet("/simulator-service/v3/customer-proposals/" + cpf + "/benefits",
+                response = DoGet("https://prd-gateway.agibank.com.br/simulator-service/v3/customer-proposals/" + cpf + "/benefits",
                                  headers: hdrs,
                                  _accept: "application/json, text/plain, */*",
                                  _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37",
@@ -4475,15 +4531,16 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = ex.Message;
                 if (ex.InnerException != null)
-                    erro = ex.InnerException.Message;
+                    erro += " - " + ex.InnerException.Message;
                 return false;
             }
 
         }
 
-        public bool EtapaDadosPessoais(DataClientPutRequest dadosCliente, ref string erro)
+        public bool EtapaDadosPessoais(DataClientPutRequest dadosCliente, ref string erro, ref string erroSite)
         {
             try
             {
@@ -4505,7 +4562,7 @@ namespace ValidacaoBeneficioBot
                 hdrs.Add("storeId", keys["storeId"]);
                 hdrs.Add("userId", keys["userId"]);
 
-                response = DoGet("/simulator-service/v1/cep/" + dadosCliente.PostCode,
+                response = DoGet("https://prd-gateway.agibank.com.br/simulator-service/v1/cep/" + dadosCliente.PostCode,
                                  headers: hdrs,
                                  _accept: "application/json, text/plain, */*",
                                  _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37",
@@ -4527,7 +4584,7 @@ namespace ValidacaoBeneficioBot
                 hdrs.Add("storeId", keys["storeId"]);
                 hdrs.Add("userId", keys["userId"]);
 
-                response = DoGet("/simulator-service/v1/cep/" + dadosCliente.PostCode,
+                response = DoGet("https://prd-gateway.agibank.com.br/simulator-service/v1/cep/" + dadosCliente.PostCode,
                                  headers: hdrs,
                                  _accept: "application/json, text/plain, */*",
                                  _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37",
@@ -4611,15 +4668,16 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = ex.Message;
                 if (ex.InnerException != null)
-                    erro = ex.InnerException.Message;
+                    erro += " - " + ex.InnerException.Message;
                 return false;
             }
 
         }
 
-        public bool EtapaDadosBeneficios(DataClientPutRequest dadosCliente, ref string erro)
+        public bool EtapaDadosBeneficios(DataClientPutRequest dadosCliente, ref string erro, ref string erroSite)
         {
             try
             {
@@ -4642,7 +4700,7 @@ namespace ValidacaoBeneficioBot
 
                 try
                 {
-                    response = DoGet("/simulator-service/v3/customer-proposals/" + dadosCliente.Document + "/benefits/" + dadosCliente.AdditionalDocuments[0].Number + "/income?benefitSpecieNumber=41",
+                    response = DoGet("https://prd-gateway.agibank.com.br/simulator-service/v3/customer-proposals/" + dadosCliente.Document + "/benefits/" + dadosCliente.AdditionalDocuments[0].Number + "/income?benefitSpecieNumber=41",
                                      headers: hdrs,
                                      _accept: "application/json, text/plain, */*",
                                      _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37",
@@ -4769,15 +4827,16 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = ex.Message;
                 if (ex.InnerException != null)
-                    erro = ex.InnerException.Message;
+                    erro += " - " + ex.InnerException.Message;
                 return false;
             }
 
         }
 
-        public bool EtapaDadosRenda(DataClientPutRequest dadosCliente, ref string erro)
+        public bool EtapaDadosRenda(DataClientPutRequest dadosCliente, ref string erro, ref string erroSite)
         {
             try
             {
@@ -4798,7 +4857,7 @@ namespace ValidacaoBeneficioBot
                 hdrs.Add("storeId", keys["storeId"]);
                 hdrs.Add("userId", keys["userId"]);
 
-                response = DoGet("/simulator-service/v3/simulations/" + dadosCliente.Income.DatePayday.Value.ToString("yyyy-MM-dd"),
+                response = DoGet("https://prd-gateway.agibank.com.br/simulator-service/v3/simulations/" + dadosCliente.Income.DatePayday.Value.ToString("yyyy-MM-dd"),
                                  headers: hdrs,
                                  _accept: "application/json, text/plain, */*",
                                  _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37",
@@ -4945,7 +5004,7 @@ namespace ValidacaoBeneficioBot
                 hdrs.Add("storeId", keys["storeId"]);
                 hdrs.Add("userId", keys["userId"]);
 
-                response = DoGet("/simulator-service/v3/simulations/" + dadosCliente.Income.DatePayday.Value.ToString("yyyy-MM-dd"),
+                response = DoGet("https://prd-gateway.agibank.com.br/simulator-service/v3/simulations/" + dadosCliente.Income.DatePayday.Value.ToString("yyyy-MM-dd"),
                                  headers: hdrs,
                                  _accept: "application/json, text/plain, */*",
                                  _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37",
@@ -4956,9 +5015,10 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = ex.Message;
                 if (ex.InnerException != null)
-                    erro = ex.InnerException.Message;
+                    erro += " - " + ex.InnerException.Message;
                 return false;
             }
 
@@ -4970,7 +5030,7 @@ namespace ValidacaoBeneficioBot
         /// <param name="dadosCliente"></param>
         /// <param name="erro"></param>
         /// <returns></returns>
-        public bool EtapaConferencia(DataClientPutRequest dadosCliente, ref string erro)
+        public bool EtapaConferencia(DataClientPutRequest dadosCliente, ref string erro, ref string erroSite)
         {
             try
             {
@@ -5082,17 +5142,19 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
+                erroSite = ex.Message;
                 erro = ex.Message;
                 if (ex.InnerException != null)
-                    erro = ex.InnerException.Message;
+                    erro += " - " + ex.InnerException.Message;
                 return false;
             }
 
         }
 
-        public DadosClienteProduto Simular(DataClientPutRequest dadosCliente, ref string erro)
+        public DadosClienteProduto Simular(DataClientPutRequest dadosCliente, ref string erro, ref string erroSite)
         {
             DadosClienteProduto retornoDadosCliente = new DadosClienteProduto();
+            var LinhaErro = 0;
 
             try
             {
@@ -5100,6 +5162,7 @@ namespace ValidacaoBeneficioBot
                 var auxURL = "";
 
                 #region POST /simulator-service/v3/simulations/92691925/connectDocument/true HTTP/1.1
+                LinhaErro = 5251;
                 hdrs = new Dictionary<string, string>();
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
@@ -5117,7 +5180,7 @@ namespace ValidacaoBeneficioBot
 
                 var strPost = "";
 
-                response = DoPost("/simulator-service/v3/simulations/" + keys["externalId"] + "/connectDocument/true",
+                response = DoPost("https://prd-gateway.agibank.com.br/simulator-service/v3/simulations/" + keys["externalId"] + "/connectDocument/true",
                            strPost,
                            headers: hdrs,
                            _referer: "https://offer-engine-ui-comercial.agibank-prd.in/",
@@ -5125,6 +5188,7 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region POST /apexremote HTTP/1.1
+                LinhaErro = 5277;
                 hdrs = new Dictionary<string, string>();
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
@@ -5149,18 +5213,19 @@ namespace ValidacaoBeneficioBot
                    "\"ns\": \"\"," +
                    "\"ver\":48}}";
 
-                response = DoPost("/apexremote",
+                response = DoPost("https://agibank.force.com/apexremote",
                            strPost,
                            headers: hdrs,
                            _referer: auxReferer,
                            _accept: "*/*");
 
                 hdrs.Remove("X-User-Agent");
-                UpdateKeys("GevAtendimentoDetailSrcUrl", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "GevAtendimentoDetailSrcUrl\":\"", "\""));
-                UpdateKeys("SimulatorPhoneSrcUrl", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "SimulatorPhoneSrcUrl\":\"", "\""));
+                UpdateKeys("GevAtendimentoDetailSrcUrl", RetornaAuxSubstring(response.Content, "GevAtendimentoDetailSrcUrl\":\"", "\""));
+                UpdateKeys("SimulatorPhoneSrcUrl", RetornaAuxSubstring(response.Content, "SimulatorPhoneSrcUrl\":\"", "\""));
                 #endregion
 
                 #region POST /OriginationPage?id=0018Z00002hGxfeQAC HTTP/1.1
+                LinhaErro = 5314;
                 hdrs = new Dictionary<string, string>();
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
@@ -5178,19 +5243,20 @@ namespace ValidacaoBeneficioBot
                           "%2Fcomplete-offer" + keys["SimulatorPhoneSrcUrl"].Substring(keys["SimulatorPhoneSrcUrl"].IndexOf('?')) +
                           "&thepage%3Aform%3Aj_id37=thepage%3Aform%3Aj_id37&";
 
-                response = DoPost("/OriginationPage?id=" + recordResponse.Account.Record.Id,
+                response = DoPost("https://agibank.force.com/OriginationPage?id=" + recordResponse.Account.Record.Id,
                            strPost,
                            headers: hdrs,
                            _referer: auxReferer,
                            _accept: "*/*");
 
-                UpdateKeys("ViewState", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "ViewState\" value=\"", "\""));
-                UpdateKeys("ViewStateVersion", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "=\"com.salesforce.visualforce.ViewStateVersion\" value=\"", "\""));
-                UpdateKeys("ViewStateCSRF", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "ViewStateCSRF\" value=\"", "\""));
-                UpdateKeys("ViewStateMAC", RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "ViewStateMAC\" value=\"", "\""));
+                UpdateKeys("ViewState", RetornaAuxSubstring(response.Content, "ViewState\" value=\"", "\""));
+                UpdateKeys("ViewStateVersion", RetornaAuxSubstring(response.Content, "=\"com.salesforce.visualforce.ViewStateVersion\" value=\"", "\""));
+                UpdateKeys("ViewStateCSRF", RetornaAuxSubstring(response.Content, "ViewStateCSRF\" value=\"", "\""));
+                UpdateKeys("ViewStateMAC", RetornaAuxSubstring(response.Content, "ViewStateMAC\" value=\"", "\""));
                 #endregion
 
                 #region GET /Venda.UI.Web/Atendimento/Embedded/2888d8a46b41665abd91407bea0d8908/ HTTP/1.1
+                LinhaErro = 5345;
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
@@ -5203,10 +5269,11 @@ namespace ValidacaoBeneficioBot
                            _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36 Edg/102.0.1245.33",
                            _referer: "https://agibank.force.com/");
 
-                auxReferer = response.RequestMessage.RequestUri.ToString();
+                auxReferer = response.ResponseUri.ToString();
                 #endregion
 
                 #region GET /Venda.UI.Web/Agenda/ConsultarEventos?from=1656644400000&to=1659322800000&utc_offset=180&browser_timezone=America%2FArgentina%2FBuenos_Aires HTTP/1.1
+                LinhaErro = 5362;
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
@@ -5214,14 +5281,15 @@ namespace ValidacaoBeneficioBot
                 hdrs.Add("Host", "portal.agiplan.com.br");
                 hdrs.Add("X-Requested-With", "XMLHttpRequest");
 
-                response = DoGet("/Venda.UI.Web/Agenda/ConsultarEventos?from=1656644400000&to=1659322800000&utc_offset=180&browser_timezone=America%2FArgentina%2FBuenos_Aires",
+                response = DoGet("https://portal.agiplan.com.br/Venda.UI.Web/Agenda/ConsultarEventos?from=1656644400000&to=1659322800000&utc_offset=180&browser_timezone=America%2FArgentina%2FBuenos_Aires",
                            headers: hdrs,
                            _accept: "application/json, text/javascript, */*; q=0.01",
                            _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36 Edg/102.0.1245.33",
-                           _referer: response.RequestMessage.RequestUri.ToString());
+                           _referer: response.ResponseUri.ToString());
                 #endregion
 
                 #region GET /Venda.UI.Web/Atendimento/Embedded/2888d8a46b41665abd91407bea0d8908/Content/html/calendar/month.html?_=1658373058914 HTTP/1.1
+                LinhaErro = 5378;
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
@@ -5235,30 +5303,32 @@ namespace ValidacaoBeneficioBot
                            _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36 Edg/102.0.1245.33",
                            _referer: keys["GevAtendimentoDetailSrcUrl"].Substring(0, keys["GevAtendimentoDetailSrcUrl"].IndexOf('#')));
 
-                var auxURLPost = RetornaAuxSubstring(response.Content.ReadAsStringAsync().Result, "data-dtconfig=\"", "\"></script>").Split('|');
+                var auxURLPost = RetornaAuxSubstring(response.Content, "data-dtconfig=\"", "\"></script>").Split('|');
                 #endregion
 
                 #region GET /Venda.UI.Web/Atendimento/Detail/92691925 HTTP/1.1
+                LinhaErro = 5396;
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
                 hdrs.Add("Host", "portal.agiplan.com.br");
 
-                response = DoGet("/Venda.UI.Web/Atendimento/Detail/" + keys["externalId"], //+ keys["attendanceNumber"],
+                response = DoGet("https://portal.agiplan.com.br/Venda.UI.Web/Atendimento/Detail/" + keys["externalId"], //+ keys["attendanceNumber"],
                            headers: hdrs,
                            _accept: "application/json, text/plain, */*",
                            _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36 Edg/102.0.1245.33",
                            _referer: keys["GevAtendimentoDetailSrcUrl"].Substring(0, keys["GevAtendimentoDetailSrcUrl"].IndexOf('#')));
 
 
-                auxURL = response.Content.ReadAsStringAsync().Result.Substring(response.Content.ReadAsStringAsync().Result.IndexOf("var atendimentoViewModel = ") + 27);
+                auxURL = response.Content.Substring(response.Content.IndexOf("var atendimentoViewModel = ") + 27);
                 auxURL = auxURL.Substring(0, auxURL.LastIndexOf("}") + 1);
 
                 dynamic atendimentoViewModel = JsonConvert.DeserializeObject(auxURL);
                 #endregion
 
                 #region POST /Venda.UI.Web/rb_33a41a92-bf71-4a55-a467-2755110f1449?type=js3&flavor=post&vi=HVIMBMMLOEKMEOAFEBHQUVCIFAHLVBJW-0&modifiedSince=1657347058020&rf=https%3A%2F%2Fportal.agiplan.com.br%2FVenda.UI.Web%2FAtendimento%2FEmbedded%2F2888d8a46b41665abd91407bea0d8908%2F%23%2FDetail%2F92691925&bp=3&app=a3174ac70aa0aab7&crc=1458136519&en=5vhk3ioo&end=1 HTTP/1.1
+                LinhaErro = 5417;
                 hdrs = new Dictionary<string, string>();
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
@@ -5305,6 +5375,7 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region GET /Venda.UI.Web/Atendimento/SomarPropostaAditivoDesconto?atendimentoCodigo=92691925 HTTP/1.1
+                LinhaErro = 5464;
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
@@ -5312,7 +5383,7 @@ namespace ValidacaoBeneficioBot
                 hdrs.Add("Host", "portal.agiplan.com.br");
                 hdrs.Add("X-Requested-With", "XMLHttpRequest");
 
-                response = DoGet("/Venda.UI.Web/Atendimento/SomarPropostaAditivoDesconto?atendimentoCodigo=" + keys["externalId"],
+                response = DoGet("https://portal.agiplan.com.br/Venda.UI.Web/Atendimento/SomarPropostaAditivoDesconto?atendimentoCodigo=" + keys["externalId"],
                            headers: hdrs,
                            _accept: "*/*",
                            _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36 Edg/102.0.1245.33",
@@ -5320,6 +5391,7 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region GET /Venda.UI.Web/Atendimento/GetHistoricoOcorrencias?cpfCnpj=31951228120 HTTP/1.1
+                LinhaErro = 5480;
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
@@ -5327,7 +5399,7 @@ namespace ValidacaoBeneficioBot
                 hdrs.Add("Host", "portal.agiplan.com.br");
                 hdrs.Add("X-Requested-With", "XMLHttpRequest");
 
-                response = DoGet("/Venda.UI.Web/Atendimento/GetHistoricoOcorrencias?cpfCnpj=" + dadosCliente.Document,
+                response = DoGet("https://portal.agiplan.com.br/Venda.UI.Web/Atendimento/GetHistoricoOcorrencias?cpfCnpj=" + dadosCliente.Document,
                            headers: hdrs,
                            _accept: "application/json, text/plain, */*",
                            _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36 Edg/102.0.1245.33",
@@ -5335,13 +5407,14 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region GET /Venda.UI.Web/Atendimento/GetHistoricoFatura?cpfCnpj=31951228120 HTTP/1.1
+                LinhaErro = 5496;
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
                 hdrs.Add("Host", "portal.agiplan.com.br");
 
-                response = DoGet("/Venda.UI.Web/Atendimento/GetHistoricoFatura?cpfCnpj=" + dadosCliente.Document,
+                response = DoGet("https://portal.agiplan.com.br/Venda.UI.Web/Atendimento/GetHistoricoFatura?cpfCnpj=" + dadosCliente.Document,
                            headers: hdrs,
                            _accept: "application/json, text/plain, */*",
                            _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36 Edg/102.0.1245.33",
@@ -5349,13 +5422,14 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region GET /Venda.UI.Web/Atendimento/ObterCidadesDoEstado HTTP/1.1 HTTP/1.1
+                LinhaErro = 5511;
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
                 hdrs.Add("Host", "portal.agiplan.com.br");
 
-                response = DoGet("/Venda.UI.Web/Atendimento/ObterCidadesDoEstado",
+                response = DoGet("https://portal.agiplan.com.br/Venda.UI.Web/Atendimento/ObterCidadesDoEstado",
                            headers: hdrs,
                            _accept: "application/json, text/plain, */*",
                            _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36 Edg/102.0.1245.33",
@@ -5363,13 +5437,14 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region GET /Venda.UI.Web/Atendimento/GetHistoricoProposta?cpf=31951228120 HTTP/1.1
+                LinhaErro = 5526;
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
                 hdrs.Add("Host", "portal.agiplan.com.br");
 
-                response = DoGet("/Venda.UI.Web/Atendimento/GetHistoricoProposta?cpf=" + dadosCliente.Document,
+                response = DoGet("https://portal.agiplan.com.br/Venda.UI.Web/Atendimento/GetHistoricoProposta?cpf=" + dadosCliente.Document,
                            headers: hdrs,
                            _accept: "application/json, text/plain, */*",
                            _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36 Edg/102.0.1245.33",
@@ -5377,13 +5452,14 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region GET /Venda.UI.Web/Atendimento/ConsultarHistoricoSeguros?cpf=31951228120 HTTP/1.1
+                LinhaErro = 5541;
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
                 hdrs.Add("Host", "portal.agiplan.com.br");
 
-                response = DoGet("/Venda.UI.Web/Atendimento/ConsultarHistoricoSeguros?cpf=" + dadosCliente.Document,
+                response = DoGet("https://portal.agiplan.com.br/Venda.UI.Web/Atendimento/ConsultarHistoricoSeguros?cpf=" + dadosCliente.Document,
                            headers: hdrs,
                            _accept: "application/json, text/plain, */*",
                            _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36 Edg/102.0.1245.33",
@@ -5391,13 +5467,14 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region GET /Venda.UI.Web/Atendimento/ConsultarHistoricoSeguros?cpf=31951228120 HTTP/1.1
+                LinhaErro = 5556;
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
                 hdrs.Add("Host", "portal.agiplan.com.br");
 
-                response = DoGet("/Venda.UI.Web/Atendimento/ConsultarHistoricoSeguros?cpf=" + dadosCliente.Document,
+                response = DoGet("https://portal.agiplan.com.br/Venda.UI.Web/Atendimento/ConsultarHistoricoSeguros?cpf=" + dadosCliente.Document,
                            headers: hdrs,
                            _accept: "application/json, text/plain, */*",
                            _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36 Edg/102.0.1245.33",
@@ -5405,13 +5482,14 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region POST /Venda.UI.Web/Atendimento/AtendimentoVerificaPontoAptoTelefonica HTTP/1.1
+                LinhaErro = 5571;
                 hdrs = new Dictionary<string, string>();
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
                 hdrs.Add("Host", "portal.agiplan.com.br");
                 hdrs.Add("Origin", "https://portal.agiplan.com.br");
 
-                response = DoPost("/Venda.UI.Web/Atendimento/AtendimentoVerificaPontoAptoTelefonica",
+                response = DoPost("https://portal.agiplan.com.br/Venda.UI.Web/Atendimento/AtendimentoVerificaPontoAptoTelefonica",
                                   "",
                                   headers: hdrs,
                                   _referer: keys["GevAtendimentoDetailSrcUrl"].Substring(0, keys["GevAtendimentoDetailSrcUrl"].IndexOf('#')),
@@ -5419,6 +5497,7 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region POST /Venda.UI.Web/Atendimento/VerificarAtendimentoFinalizado HTTP/1.1
+                LinhaErro = 5586;
                 hdrs = new Dictionary<string, string>();
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
@@ -5428,7 +5507,7 @@ namespace ValidacaoBeneficioBot
 
                 strPost = "{\"atendimentoCodigo\":" + keys["externalId"] + "}";
 
-                response = DoPost("/Venda.UI.Web/Atendimento/VerificarAtendimentoFinalizado",
+                response = DoPost("https://portal.agiplan.com.br/Venda.UI.Web/Atendimento/VerificarAtendimentoFinalizado",
                            strPost,
                            headers: hdrs,
                            _referer: keys["GevAtendimentoDetailSrcUrl"].Substring(0, keys["GevAtendimentoDetailSrcUrl"].IndexOf('#')),
@@ -5436,6 +5515,7 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region POST /Venda.UI.Web/Atendimento/SalvaDadosIdentificacao HTTP/1.1
+                LinhaErro = 5604;
                 SalvaDadosIdentificacaoRequest salvaDados = new SalvaDadosIdentificacaoRequest()
                 {
                     DataNascimentoString = DateTime.Parse(dadosCliente.Birthday).ToString("dd/MM/yyyy"),
@@ -5690,7 +5770,7 @@ namespace ValidacaoBeneficioBot
 
                 try
                 {
-                    response = DoPost("/Venda.UI.Web/Atendimento/SalvaDadosIdentificacao",
+                    response = DoPost("https://portal.agiplan.com.br/Venda.UI.Web/Atendimento/SalvaDadosIdentificacao",
                                       strPost,
                                       headers: hdrs,
                                       _accept: "application/json, text/plain, */*",
@@ -5705,13 +5785,14 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region GET /Venda.UI.Web/Atendimento/BuscarMensagemCartoes?cpfCnpj=31951228120 HTTP/1.1
+                LinhaErro = 5874;
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
                 hdrs.Add("Host", "portal.agiplan.com.br");
 
-                response = DoGet("/Venda.UI.Web/Atendimento/BuscarMensagemCartoes?cpfCnpj=" + dadosCliente.Document,
+                response = DoGet("https://portal.agiplan.com.br/Venda.UI.Web/Atendimento/BuscarMensagemCartoes?cpfCnpj=" + dadosCliente.Document,
                            headers: hdrs,
                            _accept: "application/json, text/plain, */*",
                            _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36 Edg/102.0.1245.33",
@@ -5719,13 +5800,14 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region GET /Venda.UI.Web/Atendimento/ObterMensagemMaisDeUmaContaAgibank?atendimentoCodigo=92691925&cpfCnpj=31951228120 HTTP/1.1
+                LinhaErro = 5889;
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
                 hdrs.Add("Host", "portal.agiplan.com.br");
 
-                response = DoGet("/Venda.UI.Web/Atendimento/ObterMensagemMaisDeUmaContaAgibank?atendimentoCodigo=" + keys["externalId"] + "&cpfCnpj=" + dadosCliente.Document,
+                response = DoGet("https://portal.agiplan.com.br/Venda.UI.Web/Atendimento/ObterMensagemMaisDeUmaContaAgibank?atendimentoCodigo=" + keys["externalId"] + "&cpfCnpj=" + dadosCliente.Document,
                            headers: hdrs,
                            _accept: "application/json, text/plain, */*",
                            _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36 Edg/102.0.1245.33",
@@ -5733,22 +5815,24 @@ namespace ValidacaoBeneficioBot
                 #endregion
 
                 #region GET /Venda.UI.Web/Atendimento/ObterUltimaOperacao?atendimentoCodigo=92691925&atualizar=false HTTP/1.1
+                LinhaErro = 5904;
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
                 hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
                 hdrs.Add("Host", "portal.agiplan.com.br");
 
-                response = DoGet("/Venda.UI.Web/Atendimento/ObterUltimaOperacao?atendimentoCodigo=" + keys["externalId"] + "&atualizar=false",
+                response = DoGet("https://portal.agiplan.com.br/Venda.UI.Web/Atendimento/ObterUltimaOperacao?atendimentoCodigo=" + keys["externalId"] + "&atualizar=false",
                            headers: hdrs,
                            _accept: "application/json, text/plain, */*",
                            _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36 Edg/102.0.1245.33",
                            _referer: keys["GevAtendimentoDetailSrcUrl"].Substring(0, keys["GevAtendimentoDetailSrcUrl"].IndexOf('#')));
-                dynamic ultOp = JsonConvert.DeserializeObject(response.Content.ReadAsStringAsync().Result);
+                dynamic ultOp = JsonConvert.DeserializeObject(response.Content);
 
                 #endregion
 
                 #region POST 18
+                LinhaErro = 5921;
                 hdrs = new Dictionary<string, string>();
 
                 hdrs.Add("Accept-Encoding", "gzip, deflate, br");
@@ -5891,20 +5975,20 @@ namespace ValidacaoBeneficioBot
                 }
                 #endregion
 
-                response = DoPost("/Venda.UI.Web/Atendimento/Simular",
+                response = DoPost("https://portal.agiplan.com.br/Venda.UI.Web/Atendimento/Simular",
                                 JsonConvert.SerializeObject(SimularRequestContext),
                                  headers: hdrs,
                                  _accept: "application/json, text/plain, */*",
                                  _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37",
                                  _referer: keys["GevAtendimentoDetailSrcUrl"].Substring(0, keys["GevAtendimentoDetailSrcUrl"].IndexOf('#')));
 
-                if (response.Headers.Where(h => h.Key == "x-mensageerror").Count() > 0)
+                if (response.Headers.Where(h => h.Name == "x-mensageerror").Count() > 0)
                 {
-                    erro = response.Headers.Where(h => h.Key == "x-mensageerror").FirstOrDefault().Value.ToString();
+                    erro = response.Headers.Where(h => h.Name == "x-mensageerror").FirstOrDefault().Value.ToString();
                     return retornoDadosCliente;
                 }
 
-                var simular = JsonConvert.DeserializeObject<SimularResponse>(response.Content.ReadAsStringAsync().Result);
+                var simular = JsonConvert.DeserializeObject<SimularResponse>(response.Content);
 
                 if (simular.Data.ErroList != null && simular.Data.ErroList.Count > 0)
                 {
@@ -5912,7 +5996,7 @@ namespace ValidacaoBeneficioBot
                     return retornoDadosCliente;
                 }
 
-                var auxProdutos = response.Content.ReadAsStringAsync().Result.Substring(response.Content.ReadAsStringAsync().Result.IndexOf("\"produtoList\":") + 14);
+                var auxProdutos = response.Content.Substring(response.Content.IndexOf("\"produtoList\":") + 14);
                 auxProdutos = auxProdutos.Substring(0, auxProdutos.IndexOf("\"produtoRemovidoList"));
                 auxProdutos = auxProdutos.Substring(0, auxProdutos.LastIndexOf("],") + 1);
 
@@ -5923,97 +6007,499 @@ namespace ValidacaoBeneficioBot
             }
             catch (Exception ex)
             {
-                erro = ex.Message;
+                erroSite = ex.Message;
+                erro = "Simular " + LinhaErro.ToString() + " - " + ex.Message;
                 if (ex.InnerException != null)
-                    erro = ex.InnerException.Message;
+                    erro += " - " + ex.InnerException.Message;
             }
 
             return retornoDadosCliente;
         }
 
-        #region WEBREQUEST
-        public HttpResponseMessage DoGet(string url, string _accept = "", string _userAgent = "", string _referer = "", bool keepAlive = true, Dictionary<string, string> headers = null, CookieCollection cookies = null)
+        public bool SalvarRascunho(ref string erro, ref string erroSite)
         {
-            foreach (var h in headers)
-            {
-                if (httpClient.DefaultRequestHeaders.Contains(h.Key))
-                    httpClient.DefaultRequestHeaders.Remove(h.Key);
+            DadosClienteProduto retornoDadosCliente = new DadosClienteProduto();
+            var LinhaErro = 0;
 
-                httpClient.DefaultRequestHeaders.Add(h.Key, h.Value);
+            try
+            {
+                var hdrs = new Dictionary<string, string>();
+                var auxURL = "";
+
+                #region POST /Venda.UI.Web//Atendimento/SalvarRascunho HTTP/1.1
+                LinhaErro = 5571;
+                hdrs = new Dictionary<string, string>();
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "portal.agiplan.com.br");
+                hdrs.Add("Origin", "https://portal.agiplan.com.br");
+                hdrs.Add("Content-Type", "application/json;charset=UTF-8");
+
+                response = DoPost("https://portal.agiplan.com.br/Venda.UI.Web/Atendimento/AtendimentoVerificaPontoAptoTelefonica",
+                                  "{\"atendimentoCodigo\":" + keys["externalId"] + "}",
+                                  headers: hdrs,
+                                  _referer: keys["GevAtendimentoDetailSrcUrl"].Substring(0, keys["GevAtendimentoDetailSrcUrl"].IndexOf('#')),
+                                  _accept: "application/json, text/plain, */*",
+                                  _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.81 Safari/537.36 Edg/104.0.1293.54");
+                #endregion
+
+                #region POST /OriginationPage?id=0018Z00002hGxfeQAC HTTP/1.1
+                LinhaErro = 2946;
+                hdrs = new Dictionary<string, string>();
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "agibank.force.com");
+                hdrs.Add("Origin", "https://agibank.force.com");
+                hdrs.Add("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+
+
+                var strPost = "AJAXREQUEST=_viewRoot" +
+                          "&thepage:form=thepage:form" +
+                          "&com.salesforce.visualforce.ViewState=" + WebUtility.UrlEncode(keys["ViewState"]) +
+                          "&com.salesforce.visualforce.ViewStateVersion=" + WebUtility.UrlEncode(keys["ViewStateVersion"]) +
+                          "&com.salesforce.visualforce.ViewStateMAC=" + WebUtility.UrlEncode(keys["ViewStateMAC"]) +
+                          "&com.salesforce.visualforce.ViewStateCSRF=" + WebUtility.UrlEncode(keys["ViewStateCSRF"]) +
+                          "&&thepage:form:j_id34=thepage:form:j_id34" +
+                          "&taskId=" + keys["taskId"] +
+                          "&status=Deferred&";
+
+                var auxReferer = response.ResponseUri.ToString();
+
+                response = DoPost("https://agibank.force.com/OriginationPage?id=" + recordResponse.Account.Record.Id,
+                           strPost,
+                           headers: hdrs,
+                           _referer: auxReferer,
+                           _accept: "*/*");
+
+                UpdateKeys("ViewState", RetornaAuxSubstring(response.Content, "ViewState\" value=\"", "\""));
+                UpdateKeys("ViewStateVersion", RetornaAuxSubstring(response.Content, "=\"com.salesforce.visualforce.ViewStateVersion\" value=\"", "\""));
+                UpdateKeys("ViewStateCSRF", RetornaAuxSubstring(response.Content, "ViewStateCSRF\" value=\"", "\""));
+                UpdateKeys("ViewStateMAC", RetornaAuxSubstring(response.Content, "ViewStateMAC\" value=\"", "\""));
+                #endregion
+
+                return true;
+
             }
+            catch (Exception ex)
+            {
+                erroSite = ex.Message;
+                erro = "Simular " + LinhaErro.ToString() + " - " + ex.Message;
+                if (ex.InnerException != null)
+                    erro += " - " + ex.InnerException.Message;
+            }
+
+            return false;
+        }
+
+        public bool ClicarSemConsultaDataprevSelecionarEmprestimoPessoal(DataClientPutRequest dadosCliente, ref string erro, ref string erroSite)
+        {
+            var LinhaErro = "";
+
+            try
+            {
+                var hdrs = new Dictionary<string, string>();
+                var auxURL = "";
+
+                #region PATCH /v1/attendances/14498943 HTTP/1.1
+                LinhaErro = "6201 - ATCH /v1/attendances/14498943 HTTP/1.1";
+                hdrs = new Dictionary<string, string>();
+
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "origination-crm-service-comercial.agibank-prd.in");
+                hdrs.Add("Origin", "https://origination-product-sale-originacao.agibank-prd.in");
+                hdrs.Add("Content-Type", "application/json");
+
+                hdrs.Add("store-id", attendancesData.StoreId);
+                hdrs.Add("user-id", attendancesData.UserId);
+
+                auxURL = "{\"benefitChosenAuthorization\":\"NO_AUTHORIZATION\",\"payerSource\":{\"name\":\"INSS\",\"identifier\":\"INSS\"}}";
+
+                var responsePatch = DoPatch("https://origination-crm-service-comercial.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"],
+                                            auxURL,
+                                            headers: hdrs,
+                                            _accept: "*/*",
+                                            _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
+                #endregion
+
+                #region GET /v1/attendances/14498943 HTTP/1.1
+                LinhaErro = "6223 - GET /v1/attendances/14498943 HTTP/1.1";
+                hdrs = new Dictionary<string, string>();
+
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "origination-crm-service-comercial.agibank-prd.in");
+                hdrs.Add("Origin", "https://origination-product-sale-originacao.agibank-prd.in");
+
+                hdrs.Add("store-id", attendancesData.StoreId);
+                hdrs.Add("user-id", attendancesData.UserId);
+
+                response = DoGet("https://origination-product-sale-originacao.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"],
+                                 headers: hdrs,
+                                 _accept: "*/*",
+                                 _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37",
+                                 _referer: "https://origination-product-sale-originacao.agibank-prd.in");
+                #endregion
+
+                #region GET /v1/attendances/14498943?state-safe=true HTTP/1.1 
+                LinhaErro = "6242 - GET /v1/attendances/14498943?state-safe=true HTTP/1.1";
+                hdrs = new Dictionary<string, string>();
+
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "origination-crm-service-comercial.agibank-prd.in");
+                hdrs.Add("Origin", "https://origination-product-sale-originacao.agibank-prd.in");
+
+                hdrs.Add("store-id", attendancesData.StoreId);
+                hdrs.Add("user-id", "0");
+
+                response = DoGet("https://origination-product-sale-originacao.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"] + "?state-safe=true",
+                                 headers: hdrs,
+                                 _accept: "*/*",
+                                 _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
+
+                try
+                {
+                    attendancesData = JsonConvert.DeserializeObject<AttendancesData>(response.Content);
+                }
+                catch (Exception ex)
+                {
+                    attendancesData = new AttendancesData() { StoreId = "2722", UserId = "41642530883" };
+                }
+                #endregion
+
+                #region GET /v1/attendances/14498943/available-offers HTTP/1.1 
+                LinhaErro = "6269 - GET /v1/attendances/14498943/available-offers HTTP/1.1";
+                hdrs = new Dictionary<string, string>();
+
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "origination-crm-service-comercial.agibank-prd.in");
+                hdrs.Add("Origin", "https://origination-product-sale-originacao.agibank-prd.in");
+
+                hdrs.Add("store-id", attendancesData.StoreId);
+                hdrs.Add("user-id", attendancesData.UserId);
+
+                response = DoGet("https://origination-product-sale-originacao.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"] + "/available-offers",
+                                 headers: hdrs,
+                                 _accept: "*/*",
+                                 _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
+
+                //attendancesData = JsonConvert.DeserializeObject<AttendancesData>(response.Content);
+
+                dynamic auxBody = JsonConvert.DeserializeObject(response.Content);
+
+                var strPost = "";
+
+                try
+                {
+                    var teste = JsonConvert.DeserializeObject<CustomerOffersRequest>(response.Content);
+                    List<Product> produtosSelecionados = new List<Product>();
+
+                    var empPessoal = teste.Products.Where(p => p.Id == "PERSONAL_LOAN").FirstOrDefault();
+                    var empPessoalUn = teste.UnavailableProducts.Where(p => p.Id == "PERSONAL_LOAN").FirstOrDefault();
+
+                    if (empPessoal != null)
+                    {
+                        produtosSelecionados.Add(empPessoal);
+
+                        foreach (var prod in empPessoal.Dependencies)
+                            produtosSelecionados.Add(teste.Products.Where(p => p.ProductOfferId == prod).FirstOrDefault());
+
+                        foreach (var prod in produtosSelecionados)
+                            prod.Checked = true;
+
+                        var USER_REGISTRATIONProd = teste.Products.Where(p => p.Id == "USER_REGISTRATION").FirstOrDefault();
+
+                        if (USER_REGISTRATIONProd == null)
+                        {
+                            var USER_REGISTRATIONUn = teste.UnavailableProducts.Where(p => p.Id == "USER_REGISTRATION").FirstOrDefault();
+
+                            if (USER_REGISTRATIONUn != null)
+                            {
+                                produtosSelecionados.Add(JsonConvert.DeserializeObject<Product>(JsonConvert.SerializeObject(USER_REGISTRATIONUn)));
+                            }
+                        }
+                        else
+                        {
+                            produtosSelecionados.Add(USER_REGISTRATIONProd);
+                        }
+
+                        strPost = "{\"person\": {}, \"products\":" + JsonConvert.SerializeObject(produtosSelecionados) + "}";
+                    }
+                    else
+                    {
+                        erro = "CLIENTE SEM EMPRÉSTIMO PESSOAL DISPONÍVEL";
+                        return false;
+                    }
+                }
+                catch (Exception exx)
+                {
+
+                }
+                #endregion
+
+                #region PUT /v1/attendances/14498943/customers/39119556691/offers?document-type=CPF HTTP/1.1
+                LinhaErro = "PUT /v1/attendances/14498943/customers/39119556691/offers?document-type=CPF HTTP/1.1";
+                hdrs = new Dictionary<string, string>();
+
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "origination-crm-service-comercial.agibank-prd.in");
+                hdrs.Add("Origin", "https://origination-product-sale-originacao.agibank-prd.in");
+                hdrs.Add("Content-Type", "application/json");
+
+                hdrs.Add("store-id", attendancesData.StoreId);
+                hdrs.Add("user-id", attendancesData.UserId);
+
+                var responsePut = DoPut("https://origination-crm-service-comercial.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"] + "/customers/" + dadosCliente.Document + "/offers?document-type=CPF",
+                                        body: strPost,
+                                        headers: hdrs,
+                                        _accept: "*/*",
+                                        _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
+                #endregion
+
+                #region GET /v1/attendances/14498943 HTTP/1.1
+                LinhaErro = "GET /v1/attendances/14498943 HTTP/1.1";
+                hdrs = new Dictionary<string, string>();
+
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "origination-crm-service-comercial.agibank-prd.in");
+                hdrs.Add("Origin", "https://origination-product-sale-originacao.agibank-prd.in");
+
+                hdrs.Add("store-id", attendancesData.StoreId);
+                hdrs.Add("user-id", attendancesData.UserId);
+
+                response = DoGet("https://origination-crm-service-comercial.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"],
+                                 headers: hdrs,
+                                 _accept: "*/*",
+                                 _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
+                #endregion
+
+                #region GET /v1/attendances/14498943 HTTP/1.1
+                LinhaErro = "GET /v1/attendances/14498943 HTTP/1.1";
+                hdrs = new Dictionary<string, string>();
+
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "origination-crm-service-comercial.agibank-prd.in");
+                hdrs.Add("Origin", "https://origination-product-sale-originacao.agibank-prd.in");
+
+                hdrs.Add("store-id", attendancesData.StoreId);
+                hdrs.Add("user-id", attendancesData.UserId);
+
+                response = DoGet("https://origination-crm-service-comercial.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"],
+                                 headers: hdrs,
+                                 _accept: "*/*",
+                                 _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
+                #endregion
+
+                #region CAPTURA DADOS EMPRÉSTIMO PESSOAL
+
+
+
+                #endregion
+
+
+
+                #region GET /v1/attendances/14498943/products/current-account/tax-packages HTTP/1.1
+                LinhaErro = "GET /v1/attendances/14498943/products/current-account/tax-packages HTTP/1.1";
+                hdrs = new Dictionary<string, string>();
+
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "origination-crm-service-comercial.agibank-prd.in");
+                hdrs.Add("Origin", "https://origination-product-sale-originacao.agibank-prd.in");
+
+                hdrs.Add("store-id", attendancesData.StoreId);
+                hdrs.Add("user-id", attendancesData.UserId);
+
+                response = DoGet("https://origination-crm-service-comercial.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"] + "/products/current-account/tax-packages",
+                                 headers: hdrs,
+                                 _accept: "*/*",
+                                 _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
+
+                keys.Add("selectedPackage", RetornaAuxSubstring(response.Content, "[{\"id\":\"", "\""));
+                #endregion
+
+                #region GET /v1/attendances/14498943/products/current-account/extra-services-taxes HTTP/1.1
+                LinhaErro = "GET /v1/attendances/14498943/products/current-account/extra-services-taxes HTTP/1.1";
+                hdrs = new Dictionary<string, string>();
+
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "origination-crm-service-comercial.agibank-prd.in");
+                hdrs.Add("Origin", "https://origination-product-sale-originacao.agibank-prd.in");
+
+                hdrs.Add("store-id", attendancesData.StoreId);
+                hdrs.Add("user-id", attendancesData.UserId);
+
+                response = DoGet("https://origination-crm-service-comercial.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"] + "/products/current-account/extra-services-taxes",
+                                 headers: hdrs,
+                                 _accept: "*/*",
+                                 _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
+                #endregion
+
+                #region GET /v1/attendances/14498943/products/current-account/due-dates HTTP/1.1
+                LinhaErro = "6409 - GET /v1/attendances/14498943/products/current-account/due-dates HTTP/1.1";
+                hdrs = new Dictionary<string, string>();
+
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "origination-crm-service-comercial.agibank-prd.in");
+                hdrs.Add("Origin", "https://origination-product-sale-originacao.agibank-prd.in");
+
+                hdrs.Add("store-id", attendancesData.StoreId);
+                hdrs.Add("user-id", attendancesData.UserId);
+
+                response = DoGet("https://origination-crm-service-comercial.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"] + "/products/current-account/due-dates",
+                                 headers: hdrs,
+                                 _accept: "*/*",
+                                 _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
+
+                auxBody = JsonConvert.DeserializeObject(response.Content);
+
+                keys.Add("CURRENT_ACCOUNT", auxBody);
+                #endregion
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                erroSite = ex.Message;
+                erro = LinhaErro + "   -   " + ex.Message;
+                if (ex.InnerException != null)
+                    erro += " - " + ex.InnerException.Message;
+                return false;
+            }
+
+        }
+
+        public bool CancelaCreditoPessoal(ref string erro, ref string erroSite)
+        {
+            var LinhaErro = "";
+
+            try
+            {
+                var hdrs = new Dictionary<string, string>();
+                var auxURL = "";
+
+                #region PATCH /v1/attendances/14498943/cancellation HTTP/1.1
+                LinhaErro = "PATCH /v1/attendances/14498943/cancellation HTTP/1.1";
+                hdrs = new Dictionary<string, string>();
+
+                hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                hdrs.Add("Host", "origination-crm-service-comercial.agibank-prd.in");
+                hdrs.Add("Origin", "https://origination-product-sale-originacao.agibank-prd.in");
+                hdrs.Add("Content-Type", "application/json");
+
+                hdrs.Add("store-id", attendancesData.StoreId);
+                hdrs.Add("user-id", attendancesData.UserId);
+
+                auxURL = "{\"reason\":\"Desistência da proposta\",\"attendanceNumber\":\"14498943\"}";
+
+                var responsePatch = DoPatch("https://origination-crm-service-comercial.agibank-prd.in/v1/attendances/" + keys["attendanceNumber"] + "/cancellation",
+                                            auxURL,
+                                            headers: hdrs,
+                                            _accept: "*/*",
+                                            _userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36 Edg/103.0.1264.37");
+                #endregion
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                erroSite = ex.Message;
+                erro = LinhaErro + "   -   " + ex.Message;
+                if (ex.InnerException != null)
+                    erro += " - " + ex.InnerException.Message;
+                return false;
+            }
+        }
+
+        #region WEBREQUEST
+        public async Task<HttpResponseMessage> DoGetTask(string url, string _accept = "", string _userAgent = "", string _referer = "", bool keepAlive = true, Dictionary<string, string> headers = null, CookieCollection cookies = null)
+        {
+            HttpClient httpClient = new HttpClient();
+
+            foreach (var h in headers)
+                httpClient.DefaultRequestHeaders.Add(h.Key, h.Value);
 
             if (_accept != "" && _accept != accept)
-            {
-                if (httpClient.DefaultRequestHeaders.Contains("Accept"))
-                    httpClient.DefaultRequestHeaders.Remove("Accept");
-
                 httpClient.DefaultRequestHeaders.Add("Accept", _accept);
-            }
 
             if (_referer != "" && _referer != referer)
-            {
-                if (httpClient.DefaultRequestHeaders.Contains("Referer"))
-                    httpClient.DefaultRequestHeaders.Remove("Referer");
-
                 httpClient.DefaultRequestHeaders.Add("Referer", _referer);
-            }
 
             if (keepAlive)
-            {
-                if (httpClient.DefaultRequestHeaders.Contains("Connection"))
-                    httpClient.DefaultRequestHeaders.Remove("Connection");
-
                 httpClient.DefaultRequestHeaders.Add("Connection", "keep-alive");
-            }
-
-            if (httpClient.DefaultRequestHeaders.Contains("User-Agent"))
-                httpClient.DefaultRequestHeaders.Remove("User-Agent");
 
             httpClient.DefaultRequestHeaders.Add("User-Agent", _userAgent);
 
-            return Get(httpClient, url);
+
+            var responseString = await httpClient.GetAsync(url);
+
+            return responseString;
         }
 
-        private HttpResponseMessage DoPost(string url, string body, string _accept = "", string _userAgent = "", string _referer = "", bool keepAlive = true, Dictionary<string, string> headers = null)
+        private RestResponse DoGet(string url, string _accept = "", string _userAgent = "", string _referer = "", bool keepAlive = true, Dictionary<string, string> headers = null, CookieCollection cookies = null)
         {
+            UpdateHeaders(_userAgent);
+
+            var rqst = new RestRequest(url);
+
+            if (_accept != "" && _accept != accept)
+                rqst.AddOrUpdateHeader("Accept", _accept);
+
+            if (_referer != "" && _referer != referer)
+                rqst.AddOrUpdateHeader("Referer", _referer);
+
+            //rqst.AddOrUpdateHeader("KeepAlive", keepAlive);
+            if (keepAlive)
+                rqst.AddOrUpdateHeader("Connection", "keep-alive");
+
+            rqst.AddOrUpdateHeader("User-Agent", userAgent);
+
+            if (headers != null)
                 foreach (var h in headers)
-                {
-                    if (httpClient.DefaultRequestHeaders.Contains(h.Key))
-                        httpClient.DefaultRequestHeaders.Remove(h.Key);
+                    rqst.AddOrUpdateHeader(h.Key, h.Value);
 
-                    httpClient.DefaultRequestHeaders.Add(h.Key, h.Value);
-                }
+            if (cookies != null)
+            {
+                //foreach (var c in cookies)
+                //client.CookieContainer.Add(c);
+            }
 
-                if (_accept != "" && _accept != accept)
-                {
-                    if (httpClient.DefaultRequestHeaders.Contains("Accept"))
-                        httpClient.DefaultRequestHeaders.Remove("Accept");
+            return Get(rqst);
+        }
 
-                    httpClient.DefaultRequestHeaders.Add("Accept", _accept);
-                }
+        private RestResponse DoPost(string url, string body, string _accept = "", string _userAgent = "", string _referer = "", bool keepAlive = true, Dictionary<string, string> headers = null)
+        {
+            UpdateHeaders(_userAgent);
 
-                if (_referer != "" && _referer != referer)
-                {
-                    if (httpClient.DefaultRequestHeaders.Contains("Referer"))
-                        httpClient.DefaultRequestHeaders.Remove("Referer");
+            var rqst = new RestRequest(url);
 
-                    httpClient.DefaultRequestHeaders.Add("Referer", _referer);
-                }
+            if (_accept != "" && _accept != accept)
+                rqst.AddOrUpdateHeader("Accept", _accept);
 
-                if (keepAlive)
-                {
-                    if (httpClient.DefaultRequestHeaders.Contains("Connection"))
-                        httpClient.DefaultRequestHeaders.Remove("Connection");
+            if (_referer != "" && _referer != referer)
+                rqst.AddOrUpdateHeader("Referer", _referer);
 
-                    httpClient.DefaultRequestHeaders.Add("Connection", "keep-alive");
-                }
+            //rqst.AddOrUpdateHeader("KeepAlive", keepAlive);
+            if (keepAlive)
+                rqst.AddOrUpdateHeader("Connection", "keep-alive");
 
-                if (httpClient.DefaultRequestHeaders.Contains("User-Agent"))
-                    httpClient.DefaultRequestHeaders.Remove("User-Agent");
+            rqst.AddOrUpdateHeader("User-Agent", userAgent);
 
-                httpClient.DefaultRequestHeaders.Add("User-Agent", _userAgent);
+            if (headers != null)
+                foreach (var h in headers)
+                    rqst.AddOrUpdateHeader(h.Key, h.Value);
 
-                return Post(httpClient, url, body);
+            rqst.AddBody(body);
+
+            return Post(rqst);
         }
 
         private string DoPut(string url, string body, string _accept = "", string _userAgent = "", string _referer = "", bool keepAlive = true, Dictionary<string, string> headers = null)
@@ -6022,33 +6508,58 @@ namespace ValidacaoBeneficioBot
 
             try
             {
-                byte[] toBytes = System.Text.Encoding.ASCII.GetBytes(body);
+                //byte[] toBytes = System.Text.Encoding.ASCII.GetBytes(body);
 
-                using (var client = new System.Net.WebClient())
-                {
-                    if (_accept != "" && _accept != accept)
-                        client.Headers.Add("Accept", _accept);
+                //using (var client = new System.Net.WebClient())
+                //{
+                //    if (_accept != "" && _accept != accept)
+                //        client.Headers.Add("Accept", _accept);
 
-                    if (_referer != "" && _referer != referer)
-                        client.Headers.Add("Referer", _referer);
+                //    if (_referer != "" && _referer != referer)
+                //        client.Headers.Add("Referer", _referer);
 
-                    //////if (keepAlive)
-                    //////   client.Headers.Add("Connection", "keep-alive");
+                //    //////if (keepAlive)
+                //    //////   client.Headers.Add("Connection", "keep-alive");
 
-                    client.Headers.Add("User-Agent", userAgent);
+                //    client.Headers.Add("User-Agent", userAgent);
 
-                    if (headers != null)
-                        foreach (var h in headers)
-                            client.Headers.Add(h.Key, h.Value);
+                //    if (headers != null)
+                //        foreach (var h in headers)
+                //            client.Headers.Add(h.Key, h.Value);
 
-                    return System.Text.Encoding.ASCII.GetString(client.UploadData(url, "PUT", toBytes));
-                }
+                //    return System.Text.Encoding.ASCII.GetString(client.UploadData(url, "PUT", toBytes));
+                //}
+
+                UpdateHeaders(_userAgent);
+
+                var rqst = new RestRequest(url);
+
+                if (_accept != "" && _accept != accept)
+                    rqst.AddOrUpdateHeader("Accept", _accept);
+
+                if (_referer != "" && _referer != referer)
+                    rqst.AddOrUpdateHeader("Referer", _referer);
+
+                //rqst.AddOrUpdateHeader("KeepAlive", keepAlive);
+                if (keepAlive)
+                    rqst.AddOrUpdateHeader("Connection", "keep-alive");
+
+                rqst.AddOrUpdateHeader("User-Agent", userAgent);
+
+                if (headers != null)
+                    foreach (var h in headers)
+                        rqst.AddOrUpdateHeader(h.Key, h.Value);
+
+                rqst.AddBody(body);
+
+                return Put(rqst).Content;
             }
             catch (Exception ex)
             {
                 throw ex;
             }
         }
+
         private string DoPatch(string url, string body, string _accept = "", string _userAgent = "", string _referer = "", bool keepAlive = true, Dictionary<string, string> headers = null)
         {
             //UpdateHeaders(_userAgent);
@@ -6075,14 +6586,63 @@ namespace ValidacaoBeneficioBot
                 return System.Text.Encoding.ASCII.GetString(client.UploadData(url, "PATCH", toBytes));
             }
         }
+        private string DoOptions(string url, string body, string _accept = "", string _userAgent = "", string _referer = "", bool keepAlive = true, Dictionary<string, string> headers = null)
+        {
+            //UpdateHeaders(_userAgent);
 
-        private HttpResponseMessage Get(HttpClient httpClient, string url)
-        {
-            return httpClient.GetAsync(url).Result;
+            try
+            {
+                byte[] toBytes = System.Text.Encoding.ASCII.GetBytes(body);
+
+                using (var client = new System.Net.WebClient())
+                {
+                    if (_accept != "" && _accept != accept)
+                        client.Headers.Add("Accept", _accept);
+
+                    if (_referer != "" && _referer != referer)
+                        client.Headers.Add("Referer", _referer);
+
+                    if (keepAlive)
+                        client.Headers.Add("Connection", "keep-alive");
+
+                    client.Headers.Add("User-Agent", userAgent);
+
+                    if (headers != null)
+                        foreach (var h in headers)
+                            client.Headers.Add(h.Key, h.Value);
+
+                    return System.Text.Encoding.ASCII.GetString(client.UploadData(url, "OPTIONS", toBytes));
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
-        private HttpResponseMessage Post(HttpClient httpClient, string url, string body)
+
+
+        private RestResponse Get(RestRequest rqst)
         {
-            return httpClient.PostAsync(url, new StringContent(body, Encoding.UTF8, "application/json")).Result;
+            var response = client.Get(rqst);
+
+
+            return response;
+        }
+        private RestResponse Post(RestRequest rqst)
+        {
+            var response = client.Post(rqst);
+
+            //UpdateKeys();
+
+            return response;
+        }
+        private RestResponse Put(RestRequest rqst)
+        {
+            var response = client.Put(rqst);
+
+            //UpdateKeys();
+
+            return response;
         }
         private void UpdateHeaders(string _userAgent = "")
         {

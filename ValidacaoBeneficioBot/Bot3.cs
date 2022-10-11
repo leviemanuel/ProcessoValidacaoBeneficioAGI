@@ -964,7 +964,7 @@ namespace ValidacaoBeneficioBot
                            _referer: "https://agibank.force.com/s/",
                            _accept: "*/*");
 
-                clienteNovo = response.Content.Contains("Este é um cliente novo! Informe os dados abaixo para continuar.");
+                clienteNovo = response.Content.Contains("ClientOriginMedia") && response.Content.Contains("Cadastrar Clientes");
                 var recordId = RetornaAuxSubstring(response.Content, "serializedEncodedState\":\"", "\",");
 
                 #endregion
@@ -1025,6 +1025,72 @@ namespace ValidacaoBeneficioBot
                                _referer: "https://agibank.force.com/s/",
                                _accept: "*/*");
 
+                    #endregion
+
+                    #region POST /s/sfsites/aura?r=9&ui-interaction-runtime-components-controllers.FlowRuntime.executeAction=1 HTTP/1.1
+                    hdrs = new Dictionary<string, string>();
+                    hdrs.Add("Accept-Encoding", "gzip, deflate, br");
+                    hdrs.Add("Accept-Language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+                    hdrs.Add("Host", "agibank.force.com");
+                    hdrs.Add("Origin", "https://agibank.force.com");
+                    hdrs.Add("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+
+                    fields = new List<Field>();
+
+                    fields.Add(new Field() { FieldSon = "ClientMediaSurvey.bottomValue", Value = "", IsVisible = true });
+
+                    fields.Add(new Field() { FieldSon = "ClientMediaSurvey.dependencyWrapperApiName", Value = "Account", IsVisible = true });
+
+                    fields.Add(new Field() { FieldSon = "ClientMediaSurvey.middleLabel", Value = "Tipo de ação", IsVisible = true });
+
+                    fields.Add(new Field() { FieldSon = "ClientMediaSurvey.middlePicklistApiName", Value = "ClientTypeMedia__c", IsVisible = true });
+
+                    fields.Add(new Field() { FieldSon = "ClientMediaSurvey.middleRequired", Value = "true", IsVisible = true });
+
+                    fields.Add(new Field() { FieldSon = "ClientMediaSurvey.middleValue", Value = "Canais Parceiros", IsVisible = true });
+
+                    fields.Add(new Field() { FieldSon = "ClientMediaSurvey.topLabel", Value = "Origem do cliente", IsVisible = true });
+
+                    fields.Add(new Field() { FieldSon = "ClientMediaSurvey.topPicklistApiName", Value = "ClientOriginMedia__c", IsVisible = true });
+
+                    fields.Add(new Field() { FieldSon = "ClientMediaSurvey.topRequired", Value = "true", IsVisible = true });
+
+                    fields.Add(new Field() { FieldSon = "ClientMediaSurvey.topValue", Value = "Digital", IsVisible = true });
+
+                    objRequest = new MessageRequest();
+
+                    objRequest.Actions.Add(new JSONObjects.Action()
+                    {
+                        Id = "1040;a",
+                        Descriptor = "serviceComponent://ui.interaction.runtime.components.controllers.FlowRuntimeController/ACTION$executeAction",
+                        CallingDescriptor = "UNKNOWN",
+                        Params = new JSONObjects.ActionParams()
+                        {
+                            Action = "NEXT",
+                            Interview = keys["serializedEncodedState"],
+                            Fields = fields,
+                            UIElementVisited = true,
+                            EnableTrace = false,
+                            LCErrors = new object()
+                        },
+                    });
+
+                    strPost = "message=" + WebUtility.UrlEncode(JsonConvert.SerializeObject(objRequest).Replace("\"true\"", "true")) +
+                      "&aura.context=" + WebUtility.UrlEncode(JsonConvert.SerializeObject(context).Replace("\"dn\":null", "\"dn\":[]").Replace("\"globals\":null", "\"globals\":{}")) +
+                      "&aura.pageURI=%2Fs%2F" +
+                      "&aura.token=" + WebUtility.UrlEncode(keys["aura.token"]);
+
+                    response = DoPost("https://agibank.force.com/s/sfsites/aura?r=" + countURL() + "&ui-interaction-runtime-components-controllers.FlowRuntime.executeAction=1",
+                               strPost,
+                               headers: hdrs,
+                               _referer: "https://agibank.force.com/s/",
+                               _accept: "*/*");
+
+                    auxURL = response.Content.Substring(response.Content.LastIndexOf("serializedEncodedState\":\"") + 25);
+                    auxURL = auxURL.Substring(0, auxURL.IndexOf("\""));
+
+                    //var serializedEncodedState = RetornaAuxSubstring(response.Content, "NewAccountSimulationFlow\", \"value\":\"", "\",");
+                    UpdateKeys("serializedEncodedState", auxURL);
                     #endregion
 
                     #region POST /s/sfsites/aura?r=9&ui-interaction-runtime-components-controllers.FlowRuntime.executeAction=1 HTTP/1.1
